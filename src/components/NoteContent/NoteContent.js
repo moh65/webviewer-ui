@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,13 @@ import './NoteContent.scss';
 import NoteHeader from 'components/NoteHeader';
 import NoteTextPreview from 'src/components/NoteTextPreview';
 import isString from 'lodash/isString';
+
+//customization
+import Choice from 'components/Choice';
+import { webViewerApply } from 'helpers/applyRedactions';
+import TagDropDown from 'components/TagDropDown'
+console.log('drop down = ' + TagDropDown)
+//customization
 
 dayjs.extend(LocalizedFormat);
 
@@ -197,6 +204,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
   }
 
   const handleNoteContentClicked = () => {
+    //debugger
     if (isReply) {
       onReplyClicked(annotation);
     } else if (!isEditing) {
@@ -229,16 +237,20 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
       return (
         <React.Fragment>
           {isEditing && isSelected ? (
-            <ContentArea
-              annotation={annotation}
-              noteIndex={noteIndex}
-              setIsEditing={setIsEditing}
-              textAreaValue={textAreaValue}
-              onTextAreaValueChange={onTextChange}
-            />
+            !isReply ?
+              <ContentArea
+                annotation={annotation}
+                noteIndex={noteIndex}
+                setIsEditing={setIsEditing}
+                textAreaValue={textAreaValue}
+                onTextAreaValueChange={onTextChange}
+              />
+              : <div className={classNames('container', { 'reply-content': isReply })} onClick={handleContentsClicked} style={contentStyle}>
+                {renderContents(contentsToRender, richTextStyle)}
+              </div>
           ) : (
             contentsToRender && (
-                <div className={classNames('container', { 'reply-content': isReply })} onClick={handleContentsClicked} style={contentStyle}>
+              <div className={classNames('container', { 'reply-content': isReply })} onClick={handleContentsClicked} style={contentStyle}>
                 {renderContents(contentsToRender, richTextStyle)}
               </div>
             )
@@ -303,6 +315,8 @@ NoteContent.propTypes = propTypes;
 
 export default NoteContent;
 
+
+
 // a component that contains the content textarea, the save button and the cancel button
 const ContentArea = ({
   annotation,
@@ -323,6 +337,7 @@ const ContentArea = ({
   const [t] = useTranslation();
   const textareaRef = useRef();
   const isReply = annotation.isReply();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // on initial mount, focus the last character of the textarea
@@ -368,9 +383,26 @@ const ContentArea = ({
     }
   };
 
+  //customization
+  let isAnnotPrivate = annotation.getCustomData("custom-private");
+  let annotNoteDate = annotation.getCustomData("custom-date");
+  // let annotTags = annotation.getCustomData("custom-tag");
+  let annotTags = annotation.getCustomData("custom-tag-options");
+
+  const [isPrivate, setIsPrivate] = useState(isAnnotPrivate === 'true' ? true : false);
+  const [noteDate, setNoteDate] = useState(annotNoteDate ? annotNoteDate : new Date().toISOString().split('T')[0]);
+  const [customDataChanged, setCustomDataChanged] = useState(false);
+  const [selectedTags, setSelectedTags] = useState( annotTags != null && annotTags != undefined && annotTags != '' ? JSON.parse(annotTags) : []);
+  //customization
+
   const contentClassName = classNames('edit-content', { 'reply-content': isReply })
 
+  //debugger
+
+
+
   return (
+    //customization
     <div className={contentClassName}>
       <NoteTextarea
         ref={el => {
@@ -382,7 +414,73 @@ const ContentArea = ({
         placeholder={`${t('action.comment')}...`}
         aria-label={`${t('action.comment')}...`}
       />
+      {!isReply && (
+        <div>
+          <input type="date"
+            value={noteDate}
+            onChange={e => {
+              e.stopPropagation();
+              setCustomDataChanged(true);
+              let date = e.target.value;
+
+              setNoteDate(date);
+              //annotation.setCustomData("custom-date", date);
+            }}
+          />
+
+          <TagDropDown
+            setDropDownChanged={setCustomDataChanged}
+            setSelectedTags={setSelectedTags}
+            selectedTags={selectedTags}
+            creatable
+          />
+
+          <Choice
+            type="checkbox"
+            label="Private"
+            checked={isPrivate}
+
+            onChange={e => {
+              e.stopPropagation();
+              setCustomDataChanged(true);
+              if (e.target.checked) {
+                //annotation.setCustomData('custom-private', true);
+                setIsPrivate(true);
+              } else {
+                //annotation.setCustomData('custom-private', false);
+                setIsPrivate(false);
+              }
+            }}
+          />
+        </div>
+      )
+      }
       <div className="edit-buttons">
+        {
+          (annotation.Subject === "Redact") &&
+          <button
+            className="cancel-button"
+            onClick={async e => {
+              e.stopPropagation();
+              window.documentViewer.getAnnotationManager().enableRedaction();
+              let isEnabled = core.isCreateRedactionEnabled();
+              webViewerApply([annotation], dispatch)
+            }}
+          >
+            {t('action.apply')}
+          </button>
+        }
+
+
+        <button
+          className="cancel-button"
+          onClick={e => {
+            e.stopPropagation();
+            core.deleteAnnotations([annotation, ...annotation.getGroupedChildren()]);
+          }}
+        >
+          {t('action.delete')}
+        </button>
         <button
           className="cancel-button"
           onClick={e => {
@@ -395,17 +493,24 @@ const ContentArea = ({
           {t('action.cancel')}
         </button>
         <button
-          className={`save-button${!textAreaValue ? ' disabled' : ''}`}
-          disabled={!textAreaValue}
+          className={`save-button${!textAreaValue && !customDataChanged ? ' disabled' : ''}`}
+          disabled={!textAreaValue && !customDataChanged}
           onClick={e => {
             e.stopPropagation();
             setContents(e);
+            debugger
+            
+            annotation.setCustomData('custom-private', isPrivate);
+            annotation.setCustomData("custom-date", noteDate);
+            annotation.setCustomData('custom-tag-options', selectedTags);
+            annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0]));
           }}
         >
           {t('action.save')}
         </button>
       </div>
     </div>
+    //customization
   );
 };
 

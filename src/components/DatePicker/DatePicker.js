@@ -5,13 +5,14 @@ const DatePicker = ({ onClick, annotation, onDatePickerShow }) => {
   const dateRef = useRef(null);
   const dateContainerRef = useRef(null);
   useEffect(() => {
+    debugger
     let datePicker;
     const getDatePicker = async () => {
       datePicker = await window.Core.createDatePicker({
         field: dateRef.current,
         onClick,
         container: dateContainerRef.current,
-        format: annotation.getDateFormat(),
+        format: 'dd-MM-yyyy',
       });
       onDatePickerShow(true);
     };

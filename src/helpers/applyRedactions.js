@@ -26,6 +26,7 @@ const webViewerServerApply = (annotations, dispatch) =>
   });
 
 const webViewerApply = (annotations, dispatch) => {
+  debugger
   const message = i18next.t('warning.redaction.applyMessage');
   const title = i18next.t('warning.redaction.applyTile');
   const confirmBtnText = i18next.t('action.apply');
@@ -42,3 +43,5 @@ const webViewerApply = (annotations, dispatch) => {
 
   return dispatch(actions.showWarningMessage(warning));
 };
+
+export {webViewerApply, webViewerServerApply}

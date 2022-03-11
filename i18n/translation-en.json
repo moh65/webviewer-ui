@@ -127,9 +127,14 @@
     "listBoxFormField": "List Box Field",
     "comboBoxFormField": "Combo Box Field",
     "link": "Link",
+    "annotations": "Annotations",
+    "redactions": "Redactions",
+    "links": "Links",
     "other": "Other",
     "3D": "3D",
-    "sound": "Sound"
+    "sound": "Sound",
+    "private":"private",
+    "visibility": "Visibility"
   },
   "rubberStamp": {
     "Approved": "Approved",
@@ -547,7 +552,8 @@
     "pan": "Pan",
     "select": "Select",
     "Marquee": "Marquee Zoom",
-    "Link": "Link URL or Page",
+    "Link": "Link to Page",
+    "LinkUrl": "Link to URL",
     "Standard": "Standard",
     "Custom": "Custom"
   },

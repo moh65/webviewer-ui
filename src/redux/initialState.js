@@ -394,6 +394,7 @@ export default {
       { dataElement: 'textStrikeoutToolButton' },
       { dataElement: 'textRedactToolButton' },
       { dataElement: 'linkButton' },
+      { dataElement: 'linkButtonToUrl' },
     ],
     contextMenuPopup: [
       { dataElement: 'panToolButton' },
@@ -622,6 +623,9 @@ export default {
     validationModalWidgetName: '',
     verificationResult: {},
     watermarkModalOptions: null,
+    //customization
+    annotationIdsToBeHidden:[]
+    //customization
   },
   search: {
     value: '',
@@ -650,7 +654,7 @@ export default {
   advanced: {
     customCSS: getHashParams('css', null),
     defaultDisabledElements: getHashParams('disabledElements', ''),
-    fullAPI: getHashParams('pdfnet', false),
+    fullAPI: true,/*getHashParams('pdfnet', false), customization*/
     preloadWorker: getHashParams('preloadWorker', false),
     serverUrl: getHashParams('server_url', ''),
     serverUrlHeaders: JSON.parse(getHashParams('serverUrlHeaders', '{}')),
@@ -659,6 +663,8 @@ export default {
     pdfWorkerTransportPromise: null,
     officeWorkerTransportPromise: null,
     disableIndexedDB: getHashParams('disableIndexedDB', false),
+    getAnnotationTagsUrl: null,
+    createAnnotationTagUrl: null
   },
   featureFlags: {
   }

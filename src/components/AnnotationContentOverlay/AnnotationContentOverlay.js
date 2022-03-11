@@ -25,12 +25,14 @@ const AnnotationContentOverlay = () => {
   );
   const [t] = useTranslation();
   const [annotation, setAnnotation] = useState();
+  const [annotationVisibility, setAnnotationVisibility] = useState(false);
+  const [annotationDate, setAnnotationDate] = useState('');
+  const [tagsName, setTagsName] = useState('');
   const [overlayPosition, setOverlayPosition] = useState({
     left: 0,
     top: 0,
   });
   const dispatch = useDispatch();
-
   // Clients have the option to customize how the tooltip is rendered
   // by passing a handler
   const customHandler = useSelector(state =>
@@ -73,6 +75,16 @@ const AnnotationContentOverlay = () => {
         const groupedAnnots = core.getAnnotationManager().getGroupAnnotations(annotation);
         const ungroupedAnnots = groupedAnnots.filter(annot => !annot.isGrouped());
         annotation = ungroupedAnnots.length > 0 ? ungroupedAnnots[0] : annotation;
+        
+        setAnnotationVisibility(annotation.getCustomData('custom-private'));
+        setAnnotationDate(annotation.getCustomData('custom-date'));
+        let tags = annotation.getCustomData('custom-tag-options');
+        debugger
+        if (tags != null && tags !== ''){
+          tags = JSON.parse(tags).map(m => m.label).join(',');
+        }
+        setTagsName(tags);
+        
 
         if (isUsingCustomHandler || !(annotation instanceof Annotations.FreeTextAnnotation)) {
           setAnnotation(annotation);
@@ -112,6 +124,21 @@ const AnnotationContentOverlay = () => {
         {contents.length > MAX_CHARACTERS
           ? `${contents.slice(0, MAX_CHARACTERS)}...`
           : contents}
+      </div>
+      <div>
+        {
+          annotationVisibility != null && annotationVisibility != '' ? `Private :${annotationVisibility}` : ``
+        }
+      </div>
+      <div>
+        {
+          annotationDate != null && annotationDate != '' && annotationDate != 'yyyy-mm-dd' ? `Date: ${annotationDate}` : ''
+        }
+      </div>
+      <div>
+        {
+          tagsName != null && tagsName != '' ? `Tags: ${tagsName}` : ''
+        }
       </div>
       {numberOfReplies > 0 && (
         <div className="replies">

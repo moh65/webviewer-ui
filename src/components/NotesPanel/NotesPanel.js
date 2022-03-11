@@ -19,6 +19,7 @@ import actions from 'actions';
 import selectors from 'selectors';
 import useMedia from 'hooks/useMedia';
 import { isIE } from 'helpers/device';
+import fireEvent from 'helpers/fireEvent';
 
 import './NotesPanel.scss';
 
@@ -73,6 +74,12 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
   const [scrollToSelectedAnnot, setScrollToSelectedAnnot] = useState(false);
   const [t] = useTranslation();
   const listRef = useRef();
+
+
+  //const [filterAnnotationObject, setFilterAnnotationObject] = useState(false)
+
+
+
   // a ref that is used to keep track of the current scroll position
   // when the number of notesToRender goes over/below the threshold, we will unmount the current list and mount the other one
   // this will result in losing the scroll position and we will use this ref to recover
@@ -91,11 +98,18 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
 
   useEffect(() => {
     const _setNotes = () => {
+      // setNotes(
+      //   core
+      //     .getAnnotationsList()
+      //     .filter(annot => annot.Listable && !annot.isReply() && !annot.Hidden && !annot.isGrouped() && annot.ToolName !== window.Core.Tools.ToolNames.CROP && !annot.isContentEditPlaceholder()),
+      // );
+      //customization
       setNotes(
         core
           .getAnnotationsList()
-          .filter(annot => annot.Listable && !annot.isReply() && !annot.Hidden && !annot.isGrouped() && annot.ToolName !== window.Core.Tools.ToolNames.CROP && !annot.isContentEditPlaceholder()),
+          .filter(annot => annot.Listable && !annot.isReply() && /* !annot.Hidden &&*/ !annot.isGrouped() && annot.ToolName !== window.Core.Tools.ToolNames.CROP && !annot.isContentEditPlaceholder()),
       );
+      //customization
     };
 
     const toggleFilterStyle = (e) => {
@@ -179,8 +193,15 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     return shouldRender;
   };
 
+
   const notesToRender = getSortStrategies()[sortStrategy].getSortedNotes(notes)
     .filter(filterNote);
+
+    // setTimeout(() => {
+    //   core.getAnnotationManager().hideAnnotations(core.getAnnotationsList())
+    //   core.getAnnotationManager().showAnnotations(notesToRender)
+    //   }, 200)
+      
 
   useEffect(() => {
     if (Object.keys(selectedNoteIds).length && singleSelectedNoteIndex !== -1) {
@@ -255,6 +276,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
 
     //Collapse an expanded note when the top non-reply NoteContent is clicked
     const handleNoteClicked = () => {
+      //debugger
       if (selectedNoteIds[currNote.Id]) {
         setSelectedNoteIds(currIds => {
           const clone = { ...currIds };
@@ -407,7 +429,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
               })}
               disabled={notes.length === 0}
               img="icon-comments-filter"
-              onClick={() => dispatch(actions.openElement('filterModal'))}
+              onClick={() => { dispatch(actions.openElement('filterModal')); }}
               title={t('component.filter')}
             />
           </div>

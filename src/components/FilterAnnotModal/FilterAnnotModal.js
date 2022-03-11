@@ -10,7 +10,6 @@ import actions from 'actions';
 import selectors from 'selectors';
 import fireEvent from 'helpers/fireEvent';
 import { rgbaToHex, hexToRgba } from 'helpers/color';
-import { getAnnotationClass } from 'helpers/getAnnotationClass';
 
 import Choice from 'components/Choice';
 import Button from 'components/Button';
@@ -19,6 +18,13 @@ import { Swipeable } from 'react-swipeable';
 import { FocusTrap } from '@pdftron/webviewer-react-toolkit';
 
 import './FilterAnnotModal.scss';
+import { bool } from 'prop-types';
+
+//customization
+
+import { getAnnotationClass, getAnnotationClassForFilterModal } from 'helpers/getAnnotationClass';
+
+//customization
 
 const FilterAnnotModal = () => {
   const [isDisabled, isOpen] = useSelector(state => [
@@ -39,6 +45,19 @@ const FilterAnnotModal = () => {
   const [checkRepliesForAuthorFilter, setCheckRepliesForAuthorFilter] = useState(true);
   const [statusFilter, setStatusFilter] = useState([]);
 
+  //customization
+
+  const [privateFilter, setPrivateFilter] = useState(false);
+  let [applyFilterButtonClicked, setApplyFilterButtonClicked] = useState(false);
+  const [toDateRange, setToDateRange] = useState('yyyy-mm-dd');
+  const [fromDateRange, setFromDateRange] = useState('yyyy-mm-dd');
+  let [listOfAnnotationsToBeShown, setListOfAnnotationsToBeShown] = useState(core.getAnnotationsList().map(m => m.Id))
+  let [listOfAnnotationsToBeHidden, setListOfAnnotationsToBeHidden] = useState([])
+
+  //customization
+
+
+
   const similarColorExist = (currColor, newColor) => {
     const colorObject = currColor.map(c => Object.assign({
       R: parseInt(`${c[1]}${c[2]}`, 16),
@@ -48,23 +67,41 @@ const FilterAnnotModal = () => {
 
     const threshold = 10;
     const similarColors = colorObject
-    .filter(c => Math.abs(newColor.R - c.R) < threshold
-      && Math.abs(newColor.G - c.G) < threshold
-      && Math.abs(newColor.B - c.B) < threshold);
+      .filter(c => Math.abs(newColor.R - c.R) < threshold
+        && Math.abs(newColor.G - c.G) < threshold
+        && Math.abs(newColor.B - c.B) < threshold);
 
     return !!similarColors.length;
   }
 
   const filterApply = () => {
+    //customization
+    //debugger
+    const annots = core.getAnnotationsList();
+    applyFilterButtonClicked = true;
+    listOfAnnotationsToBeShown= [];
+    listOfAnnotationsToBeHidden= [];
+    //customization
+
     dispatch(
       actions.setCustomNoteFilter(annot => {
         let type = true;
         let author = true;
         let color = true;
         let status = true;
+
         if (typesFilter.length > 0) {
-          type = typesFilter.includes(getAnnotationClass(annot));
+          //customization
+
+          type = annots.some(s => s.Subject === 'Link' && s.InReplyTo === annot.Id);
+          if (!type) {
+            let annotType = getAnnotationClassForFilterModal(annot);
+            type = typesFilter.includes(annotType);
+          }
+
+          //customization
         }
+
         if (authorFilter.length > 0) {
           author = authorFilter.includes(core.getDisplayAuthor(annot['Author']));
           if (!author && checkRepliesForAuthorFilter) {
@@ -94,9 +131,60 @@ const FilterAnnotModal = () => {
             status = statusFilter.includes('None');
           }
         }
-        return type && author && color && status;
-      }),
+
+        //customization
+        let fromDateApply = false;
+        let toDateApply = false;
+        let annotDate = annot.getCustomData('custom-date');
+
+        if (annotDate !== "") {
+          debugger
+        }
+
+        if (fromDateRange !== '' && fromDateRange !== "yyyy-mm-dd") {
+          if (annotDate !== "" && annotDate != null) {
+            fromDateApply = annotDate < fromDateRange;
+          } else
+            fromDateApply = true;
+        }
+
+        if (toDateRange !== '' && toDateRange !== "yyyy-mm-dd") {
+          if (annotDate !== "" && annotDate != null) {
+            toDateApply = annotDate > toDateRange;
+          } else
+            toDateApply = true;
+        }
+        //customization
+
+        //customization
+        let isPrivate = annot.getCustomData("custom-private");
+        if (isPrivate.toLocaleLowerCase() === "true") {
+          isPrivate = true;
+        } else if (isPrivate.toLocaleLowerCase() === "false") {
+          isPrivate = false;
+        } else
+          isPrivate = (isPrivate == null || isPrivate == undefined || isPrivate === "" ? false : isPrivate);
+
+        let privatePublicShow = (isPrivate && privateFilter) || (!isPrivate && !privateFilter);
+
+        let showComment = type && author && privatePublicShow && !fromDateApply && !toDateApply;
+
+        // if (!showComment) {
+        //   listOfAnnotationsToBeHidden.push(annot.Id);
+        // } else {
+        //   listOfAnnotationsToBeShown.push(annot.Id);
+        // }
+
+        return showComment;
+        //customization
+
+
+        // return type && author && color && status;
+      })
+
     );
+
+
     fireEvent(
       Events.ANNOTATION_FILTER_CHANGED,
       {
@@ -111,8 +199,12 @@ const FilterAnnotModal = () => {
   };
 
   const filterClear = () => {
+    setListOfAnnotationsToBeHidden([]);
+    setListOfAnnotationsToBeShown(core.getAnnotationsList().map(m => m.Id));
+
     dispatch(
       actions.setCustomNoteFilter(annot => {
+
         return true;
       }),
     );
@@ -121,8 +213,20 @@ const FilterAnnotModal = () => {
     setTypesFilter([]);
     setColorFilter([]);
     setStatusFilter([]);
+
+    //customization
+
+    setPrivateFilter(false);
+    setToDateRange('');
+    setFromDateRange('');
+
+    //customization
+
     fireEvent('annotationFilterChanged', {
       types: [],
+      //customization
+      private: false,
+      //customization
       authors: [],
       colors: [],
       statuses: [],
@@ -151,12 +255,18 @@ const FilterAnnotModal = () => {
       // We don't show it in the filter for WidgetAnnotation or StickyAnnotation or LinkAnnotation from the comments
       if (
         annot instanceof Annotations.WidgetAnnotation ||
-        (annot instanceof Annotations.StickyAnnotation && annot.isReply()) ||
-        annot instanceof Annotations.Link
+        (annot instanceof Annotations.StickyAnnotation && annot.isReply())
+        //customization
+        //|| annot instanceof Annotations.Link //customization needs to be changed - since we want to have links in filter as well
+        || (annot instanceof Annotations.Link && annot.Subject == null)  //customization needs to be changed - since we want to have links in filter as well
+        //customization
       ) {
         return;
       }
-      annotTypesToBeAdded.add(getAnnotationClass(annot));
+      if (annot.Subject === 'Link')
+        debugger
+
+      annotTypesToBeAdded.add(getAnnotationClassForFilterModal(annot));
       if (annot.Color && !similarColorExist([...annotColorsToBeAdded], annot.Color)) {
         annotColorsToBeAdded.add(rgbaToHex(annot.Color.R, annot.Color.G, annot.Color.B, annot.Color.A));
       } else {
@@ -170,16 +280,41 @@ const FilterAnnotModal = () => {
       }
     });
 
+    // if (applyFilterButtonClicked) {
+    //   setTimeout(() => {
+    //   debugger
+    //   for (const annotId of listOfAnnotationsToBeHidden)
+    //       core.getAnnotationManager().hideAnnotation(core.getAnnotationManager().getAnnotationById(annotId));
+    //     for (const annotId of listOfAnnotationsToBeShown)
+    //       core.getAnnotationManager().showAnnotation(core.getAnnotationManager().getAnnotationById(annotId));
+    //     // debugger
+    //     // core.getAnnotationManager().showAnnotations(core.getAnnotationsList());
+    //   }, 2000)
+    //   setApplyFilterButtonClicked(false);
+    // }
+
     setAuthors([...authorsToBeAdded]);
     setAnnotTypes([...annotTypesToBeAdded]);
     setColorTypes([...annotColorsToBeAdded]);
     setStatusTypes([...annotStatusesToBeAdded]);
+
+    //setFilterAnnotationObject(true);
+    // debugger
+    // setTimeout(() => {
+    //   core.getAnnotationManager().hideAnnotations(core.getAnnotationsList());
+    //   debugger
+    //   core.getAnnotationManager().showAnnotations(core.getAnnotationsList());
+    // }, 500)
 
     core.addEventListener('documentUnloaded', closeModal);
     return () => {
       core.removeEventListener('documentUnloaded', closeModal);
     };
   }, [isOpen]);
+
+
+
+
 
   const renderAuthors = () => {
     return (
@@ -317,12 +452,79 @@ const FilterAnnotModal = () => {
     );
   };
 
+  //customization
+  const renderPrivateField = () => {
+
+    return (
+      <div className="filter">
+        <div className="heading">{t('annotation.visibility')}</div>
+        <div className="buttons">
+          <Choice
+            type="checkbox"
+
+            checked={privateFilter}
+            label={t('annotation.private')}
+
+            onChange={e => {
+              setPrivateFilter(e.target.checked);
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const renderDateRange = () => {
+
+    return (
+      <div className="filter">
+        <div className="heading">Date Range Filter</div>
+        <div className="buttons">
+          <span>
+            <label for="fromDateRange">From Date: </label>
+            <input
+              type="date"
+              id="fromDateRange"
+              value={fromDateRange}
+              onChange={e => {
+                e.stopPropagation();
+                setFromDateRange(e.target.value);
+              }
+
+              } />
+          </span>
+          <br />
+          <span>
+            <label for="toDateRange">To Date: </label>
+            <input
+              type="date"
+              id="toDateRange"
+              value={toDateRange}
+              onChange={
+                e => {
+                  e.stopPropagation();
+                  setToDateRange(e.target.value);
+                }
+              } />
+          </span>
+        </div>
+      </div>
+    );
+  };
+  //customization
+
   const modalClass = classNames({
     Modal: true,
     FilterAnnotModal: true,
     open: isOpen,
     closed: !isOpen,
   });
+
+  //customization
+  // these two lines were removed from below method
+  // {renderColorTypes()}
+  // {renderStatusTypes()}
+  //customization
 
   return isDisabled ? null : (
     <Swipeable onSwipedUp={closeModal} onSwipedDown={closeModal} preventDefaultTouchmoveEvent>
@@ -335,8 +537,8 @@ const FilterAnnotModal = () => {
                 <div className="filter-options">
                   {renderAuthors()}
                   {renderAnnotTypes()}
-                  {renderColorTypes()}
-                  {renderStatusTypes()}
+                  {renderPrivateField()}
+                  {renderDateRange()}
                 </div>
                 <div className="footer">
                   <Button className="filter-annot-clear" onClick={filterClear} label={t('action.clear')} />

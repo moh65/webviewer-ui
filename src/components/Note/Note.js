@@ -130,6 +130,7 @@ const Note = ({
   }, [isDocumentReadOnly, isContentEditable, setIsEditing])
 
   const handleNoteClick = e => {
+    //debugger
     // stop bubbling up otherwise the note will be closed
     // due to annotation deselection
     e && e.stopPropagation();
@@ -176,6 +177,7 @@ const Note = ({
   const showReplyArea = !Object.values(isEditingMap).some(val => val);
 
   const handleNoteKeydown = e => {
+    
     // Click if enter or space is pressed and is current target.
     const isNote = e.target === e.currentTarget;
     if (isNote && (e.key === 'Enter' || e.key === ' ')) {

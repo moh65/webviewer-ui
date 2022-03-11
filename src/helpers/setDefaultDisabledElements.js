@@ -40,10 +40,11 @@ export default store => {
     disableFeatures([Feature.Annotations]);
   }
 
-  const filePickerDisabled = !getHashParameters('filepicker', false);
-  if (filePickerDisabled) {
-    disableFeatures([Feature.FilePicker]);
-  }
+  const filePickerDisabled = false;
+  // !getHashParameters('filepicker', false);
+  // if (filePickerDisabled) {
+  //   disableFeatures([Feature.FilePicker]);
+  // }
 
   const hideAnnotationPanel = getHashParameters('hideAnnotationPanel', false);
   if (hideAnnotationPanel) {
@@ -60,9 +61,12 @@ export default store => {
     disableFeatures([Feature.Measurement]);
   }
 
-  const redactionsDisabled = !(
-    getHashParameters('enableRedaction', false) || core.isCreateRedactionEnabled()
-  );
+  //customization
+  // const redactionsDisabled = !(
+  //   getHashParameters('enableRedaction', false) || core.isCreateRedactionEnabled()
+  // );
+  //customization
+  const redactionsDisabled = false;
   if (redactionsDisabled) {
     disableFeatures([Feature.Redaction]);
   }

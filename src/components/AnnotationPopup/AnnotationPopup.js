@@ -161,6 +161,7 @@ const AnnotationPopup = () => {
     };
 
     const onAnnotationSelected = (annotations, action) => {
+      debugger
       if (action === 'selected' && annotations.length) {
         setFirstAnnotation(annotations[0]);
         setIncludesFormFieldAnnotation(annotations.some(annotation => annotation.isFormFieldPlaceholder()));
@@ -316,6 +317,8 @@ const AnnotationPopup = () => {
       ) : (shortCutKeysFor3DVisible && firstAnnotation instanceof Annotations.Model3DAnnotation) ?
         <ShortCutKeysFor3DComponent /> : (
           <CustomizablePopup dataElement="annotationPopup">
+            {/* 
+    //customization
             {showCommentButton && (
               <ActionButton
                 dataElement="annotationCommentButton"
@@ -323,7 +326,9 @@ const AnnotationPopup = () => {
                 img="icon-header-chat-line"
                 onClick={commentOnAnnotation}
               />
-            )}
+            )} 
+    //customization
+            */}
             {showEditStyleButton && (
               <ActionButton
                 dataElement="annotationStyleEditButton"
@@ -382,17 +387,22 @@ const AnnotationPopup = () => {
               />
             )
             }
+            {/* 
+    //customization
             {canModify && (
               <ActionButton
                 dataElement="annotationDeleteButton"
                 title="action.delete"
                 img="icon-delete-line"
                 onClick={() => {
+                  debugger
                   core.deleteAnnotations(core.getSelectedAnnotations());
                   dispatch(actions.closeElement('annotationPopup'));
                 }}
               />
-            )}
+            )} 
+    //customization
+            */}
             {showCalibrateButton && (
               <ActionButton
                 dataElement="calibrateButton"
@@ -404,6 +414,8 @@ const AnnotationPopup = () => {
                 }}
               />
             )}
+            {/* 
+    //customization
             {showLinkButton && (
               <ActionButton
                 title="tool.Link"
@@ -429,7 +441,9 @@ const AnnotationPopup = () => {
                 }
                 dataElement="linkButton"
               />
-            )}
+            )} 
+    //customization
+            */}
             {showFileDownloadButton &&
               (
                 <ActionButton

@@ -27,6 +27,9 @@ export default store => async () => {
   }, 300);
 
   if (onFirstLoad) {
+    //customization
+    window.documentViewer.getAnnotationManager().enableRedaction();
+    //customization
     onFirstLoad = false;
     // redaction button starts hidden. when the user first loads a document, check HashParams the first time
     core.enableRedaction(getHashParams('enableRedaction', false) || core.isCreateRedactionEnabled());

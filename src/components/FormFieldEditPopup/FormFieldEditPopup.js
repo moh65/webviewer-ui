@@ -24,6 +24,7 @@ const FormFieldEditPopup = ({
   getPageWidth,
   redrawAnnotation,
 }) => {
+  debugger
   const { t } = useTranslation();
   const className = classNames({
     Popup: true,

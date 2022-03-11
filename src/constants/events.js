@@ -47,7 +47,8 @@ export default {
   'OUTLINE_BOOKMARKS_CHANGED': 'outlineBookmarksChanged',
   'VIEWER_LOADED': 'viewerLoaded',
   'VISIBILITY_CHANGED': 'visibilityChanged',
-  'FULLSCREEN_MODE_TOGGLED': 'fullscreenModeToggled'
+  'FULLSCREEN_MODE_TOGGLED': 'fullscreenModeToggled',
+  'NOTES_FILTER_OPENING': 'notesFilterOpening'
 };
 
 /**

@@ -17,19 +17,28 @@ import './LinkModal.scss';
 const LinkModal = () => {
   const [
     isDisabled,
+    isDisabledForUrl,
     isOpen,
+    isOpenForUrl,
     totalPages,
     currentPage,
     tabSelected,
     pageLabels,
   ] = useSelector(state => [
     selectors.isElementDisabled(state, 'linkModal'),
+    //customization
+    selectors.isElementDisabled(state, 'linkModalUrl'),
+    //customization
     selectors.isElementOpen(state, 'linkModal'),
+    //customization
+    selectors.isElementOpen(state, 'linkModalUrl'),
+    //customization
     selectors.getTotalPages(state),
     selectors.getCurrentPage(state),
     selectors.getSelectedTab(state, 'linkModal'),
     selectors.getPageLabels(state),
   ]);
+  debugger
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
@@ -40,7 +49,12 @@ const LinkModal = () => {
   const [pageLabel, setPageLabel] = useState("");
 
   const closeModal = () => {
-    dispatch(actions.closeElement('linkModal'));
+    //customization
+    if (isOpenForUrl)
+      dispatch(actions.closeElement('linkModalUrl'));
+    if (isOpen)
+      dispatch(actions.closeElement('linkModal'));
+    //customization
     setURL('');
     core.setToolMode(defaultTool);
   };
@@ -179,7 +193,7 @@ const LinkModal = () => {
   };
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen || isOpenForUrl) {
       //  prepopulate URL if URL is selected
       const selectedText = core.getSelectedText();
       if (selectedText) {
@@ -192,15 +206,15 @@ const LinkModal = () => {
 
       setPageLabel(pageLabels.length > 0 ? pageLabels[0] : "1");
     }
-  }, [totalPages, isOpen]);
+  }, [totalPages, isOpen, isOpenForUrl]);
 
-  useEffect(() => {
-    if (tabSelected === 'PageNumberPanelButton' && isOpen) {
-      pageLabelInput.current.focus();
-    } else if (tabSelected === 'URLPanelButton' && isOpen) {
-      urlInput.current.focus();
-    }
-  }, [tabSelected, isOpen, pageLabelInput, urlInput]);
+  // useEffect(() => {
+  //   if (tabSelected === 'PageNumberPanelButton' && isOpen) {
+  //     pageLabelInput.current.focus();
+  //   } else if (tabSelected === 'URLPanelButton' && isOpen) {
+  //     urlInput.current.focus();
+  //   }
+  // }, [tabSelected, isOpen, pageLabelInput, urlInput]);
 
   useEffect(() => {
     core.addEventListener('documentUnloaded', closeModal);
@@ -212,11 +226,11 @@ const LinkModal = () => {
   const modalClass = classNames({
     Modal: true,
     LinkModal: true,
-    open: isOpen,
-    closed: !isOpen,
+    open: isOpen || isOpenForUrl,
+    closed: !isOpen && !isOpenForUrl,
   });
 
-  return isDisabled ? null : (
+  return isDisabled && isDisabledForUrl ? null : (
     <Swipeable
       onSwipedUp={closeModal}
       onSwipedDown={closeModal}
@@ -234,10 +248,17 @@ const LinkModal = () => {
               <Tab dataElement="URLPanelButton">
                 <div className="tab-options-button">{t('link.url')}</div>
               </Tab>
+              {/* 
+    //customization
               <div className="divider" />
+              {
+                !isOpenForUrl &&
               <Tab dataElement="PageNumberPanelButton">
                 <div className="tab-options-button">{t('link.page')}</div>
               </Tab>
+    //customization
+
+              } */}
             </div>
 
             <TabPanel dataElement="URLPanel">
@@ -259,6 +280,8 @@ const LinkModal = () => {
                 </div>
               </form>
             </TabPanel>
+            {/* 
+    //customization
             <TabPanel dataElement="PageNumberPanel">
               <form onSubmit={addPageLink}>
                 <div>{t('link.enterpage')}</div>
@@ -276,7 +299,9 @@ const LinkModal = () => {
                   />
                 </div>
               </form>
-            </TabPanel>
+            </TabPanel> */
+    //customization
+  }
           </Tabs>
         </div>
       </div>

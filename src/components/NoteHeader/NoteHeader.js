@@ -93,12 +93,12 @@ function NoteHeader(props) {
           </div>
           <div className="state-and-overflow">
             <NoteUnpostedCommentIndicator annotationId={annotation.Id} />
-            {!isNoteStateDisabled && !isReply &&
+            {/* {!isNoteStateDisabled && !isReply &&
               <NoteState
                 annotation={annotation}
                 isSelected={isSelected}
               />
-            }
+            } */}
             {!isEditing && isSelected &&
               <NotePopup
                 noteIndex={noteIndex}

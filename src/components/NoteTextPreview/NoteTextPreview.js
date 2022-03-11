@@ -15,6 +15,7 @@ function NoteTextPreview(props) {
   const { t } = useTranslation();
 
   const onClickHandler = (event) => {
+    debugger
     event.stopPropagation();
     setExpand(!expanded)
   };

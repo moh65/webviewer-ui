@@ -117,13 +117,24 @@ const TextPopup = ({ t }) => {
           role="option"
         />
         <ActionButton
-          title="tool.Link"
+          title="tool.LinkUrl"
           img="icon-tool-link"
-          onClick={() => dispatch(actions.openElement('linkModal'))}
+          onClick={() => {
+            dispatch(actions.openElement('linkModalUrl'))
+          }}
           dataElement="linkButton"
           role="option"
         />
-        {core.isCreateRedactionEnabled() && (
+        <ActionButton
+          title="tool.Link"
+          img="icon-tool-link"
+          onClick={() => {
+            dispatch(actions.openElement('linkModal'))
+          }}
+          dataElement="linkButtonToUrl"
+          role="option"
+        />
+        {/* {core.isCreateRedactionEnabled() && (
           <ActionButton
             dataElement="textRedactToolButton"
             title="option.redaction.markForRedaction"
@@ -131,7 +142,7 @@ const TextPopup = ({ t }) => {
             onClick={() => createTextAnnotationAndSelect(dispatch, Annotations.RedactionAnnotation)}
             role="option"
           />
-        )}
+        )} */}
       </CustomizablePopup>
     </div>
   );
