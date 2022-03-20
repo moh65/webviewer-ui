@@ -556,7 +556,7 @@ export default {
       signatureModal: 'inkSignaturePanelButton',
       pageReplacementModal: 'urlInputPanelButton',
       linkModal: 'URLPanelButton',
-      rubberStampTab: 'standardStampPanelButton',
+      rubberStampTab: 'standardStampPanelButton'      
     },
     customElementOverrides: {},
     activeHeaderGroup: 'default',
@@ -624,7 +624,21 @@ export default {
     verificationResult: {},
     watermarkModalOptions: null,
     //customization
-    annotationIdsToBeHidden:[]
+    customized:{
+      loadSectionsInfo: false,
+      authToken: '',
+      sectionUrl:'',
+      documentUrl:'',
+      createTagUrl:'',
+      getTagsUrl:'',
+      generateThumbnailUrl:'',
+      pageThumbnailUrl:'',
+      documentPagesUrl:'',
+      thisDocumentInfo:{},
+      loadDocumentInNewTabUrl:'',
+      filteredAnnotationToBeHidden:[],
+      hideFilteredAnnotation:false
+    },
     //customization
   },
   search: {

@@ -188,6 +188,10 @@ import pageManipulationOverlay from './pageManipulationOverlay';
 import getWatermarkModalOptions from './getWatermarkModalOptions';
 import enableNoteSubmissionWithEnter from './enableNoteSubmissionWithEnter';
 import reloadOutline from './reloadOutline';
+import setCustomURLs from './setCustomURLs';
+import setThisDocumentInfo from './setThisDocumentInfo';
+
+
 
 export default store => {
   const CORE_NAMESPACE = 'Core';
@@ -258,6 +262,8 @@ export default store => {
     showOutlineControl: showOutlineControl(store),
     setCustomNoteFilter: setCustomNoteFilter(store),
     setCustomPanel: setCustomPanel(store),
+    setCustomURLs: setCustomURLs(store),
+    setThisDocumentInfo: setThisDocumentInfo(store),
     exportBookmarks: exportBookmarks(store),
     extractPagesWithAnnotations,
     importBookmarks: importBookmarks(store),
@@ -400,7 +406,7 @@ export default store => {
     disableDesktopOnlyMode: disableDesktopOnlyMode(store),
     isInDesktopOnlyMode: isInDesktopOnlyMode(store),
     disablePageDeletionConfirmationModal: disablePageDeletionConfirmationModal(store),
-    enablePageDeletionConfirmationModal: enablePageDeletionConfirmationModal(store),
+    enablePageDeletionConfirmationModal: enablePageDeletionConfirmationModal(store)
   };
 
   window.instance = {

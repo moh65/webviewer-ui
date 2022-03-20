@@ -264,6 +264,32 @@ export const getSignatureFonts = state => state.viewer.signatureFonts;
 
 export const getSelectedTab = (state, id) => state.viewer.tab[id];
 
+export const getLoadSectionsInfo = state => state.viewer.customized.loadSectionsInfo
+
+export const getAuthToken = state => state.viewer.customized.authToken
+
+export const getSectionUrl = state => state.viewer.customized.sectionUrl
+
+export const getDocumentUrl = state => state.viewer.customized.documentUrl
+
+export const getCreateTagUrl = state => state.viewer.customized.createTagUrl
+
+export const getGetTagsUrl = state => state.viewer.customized.getTagsUrl
+
+export const getPageThumbnailUrl = state => state.viewer.customized.pageThumbnailUrl
+
+export const getGenerateThumbnailUrl = state => state.viewer.customized.generateThumbnailUrl
+
+export const getDocumentPagesUrl = state => state.viewer.customized.documentPagesUrl
+
+export const getThisDocumentInfo = state => state.viewer.customized.thisDocumentInfo
+
+export const getLoadDocumentInNewTabUrl = state => state.viewer.customized.loadDocumentInNewTabUrl
+
+export const getFilteredAnnotationToBeHidden = state => state.viewer.customized.filteredAnnotationToBeHidden
+
+export const getHideFilteredAnnotation = state => state.viewer.customized.hideFilteredAnnotation
+
 export const getCustomElementOverrides = (state, dataElement = '') => state.viewer.customElementOverrides[dataElement];
 
 export const getPopupItems = (state, popupDataElement) =>

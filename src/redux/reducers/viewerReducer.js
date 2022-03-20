@@ -367,6 +367,35 @@ export default initialState => (state = initialState, action) => {
       return { ...state, signatureFonts: payload.signatureFonts };
     case 'SET_SELECTED_TAB':
       return { ...state, tab: { ...state.tab, [payload.id]: payload.dataElement } };
+    case 'LOAD_SECTIONS_INFO':
+      return { ...state, customized: { ...state.customized, loadSectionsInfo: payload.needToLoadSectionsInfo } };
+    case 'UPDATE_AUTH_TOKEN':
+      return { ...state, customized: { ...state.customized, authToken: payload.token } };
+    case 'SET_SETCTION_URL':
+      return { ...state, customized: { ...state.customized, sectionUrl: payload.sectionUrl } };
+    case 'SET_DOCUMENT_URL':
+      return { ...state, customized: { ...state.customized, documentUrl: payload.documentUrl } };
+    case 'SET_CREATE_TAG_URL':
+      return { ...state, customized: { ...state.customized, createTagUrl: payload.createTagUrl } };
+    case 'SET_GET_PAGE_THUMBNAIL_URL':
+      return { ...state, customized: { ...state.customized, pageThumbnailUrl: payload.pageThumbnailUrl } };
+    case 'SET_GENERATE_THUMBNAIL_URL':
+      return { ...state, customized: { ...state.customized, generateThumbnailUrl: payload.generateThumbnailUrl } };
+    case 'SET_GET_TAGS_URL':
+      return { ...state, customized: { ...state.customized, getTagsUrl: payload.getTagsUrl } };
+    case 'SET_DOCUMENT_PAGES_URL':
+      return { ...state, customized: { ...state.customized, documentPagesUrl: payload.documentPagesUrl } };
+    case 'SET_THIS_DOCUMENT_INFO':
+      return { ...state, customized: { ...state.customized, thisDocumentInfo: payload.thisDocumentInfo } };
+    case 'SET_LOAD_DOCUMENT_IN_NEW_TAB_URL':
+      return { ...state, customized: { ...state.customized, loadDocumentInNewTabUrl: payload.loadDocumentInNewTabUrl } };
+    case 'ADD_TO_FILTERED_ANNOTATION_TO_BE_HIDDEN':
+      return { ...state, customized: { ...state.customized, filteredAnnotationToBeHidden: [...state.customized.filteredAnnotationToBeHidden, payload.annotation] } };
+    case 'CLEAR_FILTERED_ANNOTATION_TO_BE_HIDDEN':
+      return { ...state, customized: { ...state.customized, filteredAnnotationToBeHidden: [] } };
+    case 'SET_HIDE_FILTERED_ANNOTATION':
+      return { ...state, customized: { ...state.customized, hideFilteredAnnotation: payload.hideFilteredAnnotation } };
+      
     case 'SET_CUSTOM_ELEMENT_OVERRIDES':
       return { ...state, customElementOverrides: { ...state.customElementOverrides, [payload.dataElement]: payload.overrides } };
     case 'SET_PAGE_REPLACEMENT_FILE_LIST':
@@ -379,7 +408,7 @@ export default initialState => (state = initialState, action) => {
     case 'SET_ANNOTATION_CONTENT_OVERLAY_HANDLER':
       return { ...state, annotationContentOverlayHandler: payload.annotationContentOverlayHandler };
     case 'SET_CUSTOM_MODAL': {
-      const existingDataElementFiltered = state.customModals.filter(function(modal) {
+      const existingDataElementFiltered = state.customModals.filter(function (modal) {
         return modal.dataElement !== payload.dataElement;
       });
       return {

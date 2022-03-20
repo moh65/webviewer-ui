@@ -293,6 +293,7 @@ const FilterAnnotModal = () => {
     //   setApplyFilterButtonClicked(false);
     // }
 
+    debugger
     setAuthors([...authorsToBeAdded]);
     setAnnotTypes([...annotTypesToBeAdded]);
     setColorTypes([...annotColorsToBeAdded]);

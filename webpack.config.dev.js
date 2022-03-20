@@ -1,6 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
 
+const nodeModulesPath = path.resolve(__dirname, 'node_modules');
+
 module.exports = {
   name: 'ui',
   mode: 'development',
@@ -64,11 +66,15 @@ module.exports = {
           },
           'sass-loader',
         ],
-        include: path.resolve(__dirname, 'src'),
+        include: [path.resolve(__dirname, 'src'), path.resolve(__dirname, 'node_modules')],
       },
       {
         test: /\.svg$/,
         use: ['svg-inline-loader'],
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.woff(2)?$/,

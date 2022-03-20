@@ -49,36 +49,35 @@ export default ({ setDropDownChanged, setSelectedTags, selectedTags, creatable }
     }, []);
 
     return (
-        <ThumbnailsPanel />
-        // !showTagCreateForm ? <Select
-        //     onChange={(o, {option, action}) => {
-        //         if (action === 'select-option'){
-        //             if (option.value === 'create-tag'){
-        //                 setShowTagCreateForm(true);
-        //                 return;
-        //             }
-        //         }
-        //         setDropDownChanged(true);
-        //         setSelectedTags(option);
-        //     }
-        //     }
-        //     defaultValue={selectedTags}
-        //     isSearchable
-        //     isClearable
-        //     options={tagOptions}
-        //     styles={customStyles}
-        //     closeMenuOnSelect={false}
-        //     isMulti
-        //     noOptionsMessage={e => "no tags available"}
+        !showTagCreateForm ? <Select
+            onChange={(o, {option, action}) => {
+                if (action === 'select-option'){
+                    if (option.value === 'create-tag'){
+                        setShowTagCreateForm(true);
+                        return;
+                    }
+                }
+                setDropDownChanged(true);
+                setSelectedTags(option);
+            }
+            }
+            defaultValue={selectedTags}
+            isSearchable
+            isClearable
+            options={tagOptions}
+            styles={customStyles}
+            closeMenuOnSelect={false}
+            isMulti
+            noOptionsMessage={e => "no tags available"}
             
-        // /> : 
-        // <div>
-        //     <label htmlFor='tagName'>Tag Name</label>
-        //     <input type='text' id='tagName' value={tagName} onChange={e => setTagName(e.target.value)}/>
-        //     <label htmlFor='tagColor'>Tag Color</label>
-        //     <SketchPicker color={ tagColor } onChange={colorPickerHandler}/>
-        //     <button onClick={e => true}>save</button>
-        //     <button onClick={e => setShowTagCreateForm(false)}>cancel</button>
-        // </div>
+        /> : 
+        <div>
+            <label htmlFor='tagName'>Tag Name</label>
+            <input type='text' id='tagName' value={tagName} onChange={e => setTagName(e.target.value)}/>
+            <label htmlFor='tagColor'>Tag Color</label>
+            <SketchPicker color={ tagColor } onChange={colorPickerHandler}/>
+            <button onClick={e => true}>save</button>
+            <button onClick={e => setShowTagCreateForm(false)}>cancel</button>
+        </div>
     )
 }

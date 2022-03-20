@@ -486,6 +486,63 @@ export const setSelectedTab = (id, dataElement) => ({
   type: 'SET_SELECTED_TAB',
   payload: { id, dataElement },
 });
+export const loadSectionsInfo = (needToLoadSectionsInfo) => ({
+  type: 'LOAD_SECTIONS_INFO',
+  payload: { needToLoadSectionsInfo: needToLoadSectionsInfo },
+});
+export const setSectionUrl = (sectionUrl) => ({
+  type: 'SET_SETCTION_URL',
+  payload: { sectionUrl: sectionUrl },
+});
+export const setDocumentUrl = (documentUrl) => ({
+  type: 'SET_DOCUMENT_URL',
+  payload: { documentUrl: documentUrl },
+});
+export const setCreateTagUrl = (createTagUrl) => ({
+  type: 'SET_CREATE_TAG_URL',
+  payload: { createTagUrl: createTagUrl },
+});
+export const setGetTagsUrl = (getTagsUrl) => ({
+  type: 'SET_GET_TAGS_URL',
+  payload: { getTagsUrl: getTagsUrl },
+});
+export const setPageThumbnailUrl = (pageThumbnailUrl) => ({
+  type: 'SET_GET_PAGE_THUMBNAIL_URL',
+  payload: { pageThumbnailUrl: pageThumbnailUrl },
+});
+export const setGenerateThumbnailUrl = (generateThumbnailUrl) => ({
+  type: 'SET_GENERATE_THUMBNAIL_URL',
+  payload: { generateThumbnailUrl: generateThumbnailUrl },
+});
+export const setDocumentPagesUrl = (documentPagesUrl) => ({
+  type: 'SET_DOCUMENT_PAGES_URL',
+  payload: { documentPagesUrl: documentPagesUrl },
+});
+export const setThisDocumentInfo = (thisDocumentInfo) => ({
+  type: 'SET_THIS_DOCUMENT_INFO',
+  payload: { thisDocumentInfo: thisDocumentInfo },
+});
+export const addToFilteredAnnotationToBeHidden = (annotation) => ({
+  type: 'ADD_TO_FILTERED_ANNOTATION_TO_BE_HIDDEN',
+  payload: { annotation: annotation },
+});
+export const clearFilteredAnnotationToBeHidden = () => ({
+  type: 'CLEAR_FILTERED_ANNOTATION_TO_BE_HIDDEN',
+  payload: {},
+});
+export const setHideFilteredAnnotation = (hideFilteredAnnotation) => ({
+  type: 'SET_HIDE_FILTERED_ANNOTATION',
+  payload: {hideFilteredAnnotation: hideFilteredAnnotation},
+});
+export const setLoadDocumentInNewTabUrl = (loadDocumentInNewTabUrl) => ({
+  type: 'SET_LOAD_DOCUMENT_IN_NEW_TAB_URL',
+  payload: { loadDocumentInNewTabUrl: loadDocumentInNewTabUrl },
+});
+
+export const updateAuthToken = (token) => ({
+  type: 'UPDATE_AUTH_TOKEN',
+  payload: { token: token },
+});
 export const setCustomElementOverrides = (dataElement, overrides) => ({
   type: 'SET_CUSTOM_ELEMENT_OVERRIDES',
   payload: { dataElement, overrides },

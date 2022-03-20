@@ -79,7 +79,7 @@ const AnnotationContentOverlay = () => {
         setAnnotationVisibility(annotation.getCustomData('custom-private'));
         setAnnotationDate(annotation.getCustomData('custom-date'));
         let tags = annotation.getCustomData('custom-tag-options');
-        debugger
+        //debugger
         if (tags != null && tags !== ''){
           tags = JSON.parse(tags).map(m => m.label).join(',');
         }

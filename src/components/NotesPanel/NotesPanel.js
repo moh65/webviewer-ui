@@ -34,7 +34,9 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     notesInLeftPanel,
     isDocumentReadOnly,
     enableNotesPanelVirtualizedList,
-    isInDesktopOnlyMode
+    isInDesktopOnlyMode,
+    hideFilteredAnnotation,
+    filteredAnnotationToBeHidden
   ] = useSelector(
     state => [
       selectors.getSortStrategy(state),
@@ -46,7 +48,9 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       selectors.getNotesInLeftPanel(state),
       selectors.isDocumentReadOnly(state),
       selectors.getEnableNotesPanelVirtualizedList(state),
-      selectors.isInDesktopOnlyMode(state)
+      selectors.isInDesktopOnlyMode(state),
+      selectors.getHideFilteredAnnotation(state),
+      selectors.getFilteredAnnotationToBeHidden(state)
     ],
     shallowEqual,
   );
@@ -62,6 +66,17 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     // Default value
     false,
   );
+
+  useEffect(()=>{
+    debugger
+    if (!hideFilteredAnnotation){
+      //show all annotations
+      core.getAnnotationManager().showAnnotations(core.getAnnotationsList())
+    } else {
+      //hide annotations that are appeared in the annotation to be hidden array
+      core.getAnnotationManager().hideAnnotations(filteredAnnotationToBeHidden)
+    }
+  }, [hideFilteredAnnotation])
 
   const [notes, setNotes] = useState([]);
 
@@ -178,6 +193,9 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
 
     if (customNoteFilter) {
       shouldRender = shouldRender && customNoteFilter(note);
+      if (!shouldRender) {
+        dispatch(actions.addToFilteredAnnotationToBeHidden(note))
+      }
     }
 
     if (searchInput) {
@@ -197,11 +215,13 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
   const notesToRender = getSortStrategies()[sortStrategy].getSortedNotes(notes)
     .filter(filterNote);
 
-    // setTimeout(() => {
-    //   core.getAnnotationManager().hideAnnotations(core.getAnnotationsList())
-    //   core.getAnnotationManager().showAnnotations(notesToRender)
-    //   }, 200)
-      
+  //   debugger
+
+  // setTimeout(() => {
+  //   core.getAnnotationManager().hideAnnotations(core.getAnnotationsList())
+  //   core.getAnnotationManager().showAnnotations(notesToRender)
+  //   }, 200)
+
 
   useEffect(() => {
     if (Object.keys(selectedNoteIds).length && singleSelectedNoteIndex !== -1) {

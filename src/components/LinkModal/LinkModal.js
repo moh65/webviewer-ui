@@ -7,6 +7,7 @@ import defaultTool from 'constants/defaultTool';
 import core from 'core';
 import { Tabs, Tab, TabPanel } from 'components/Tabs';
 import Button from 'components/Button';
+import BundlePageSelector from 'components/BundlePageSelector';
 import actions from 'actions';
 import selectors from 'selectors';
 
@@ -38,12 +39,13 @@ const LinkModal = () => {
     selectors.getSelectedTab(state, 'linkModal'),
     selectors.getPageLabels(state),
   ]);
-  debugger
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
   const urlInput = React.createRef();
   const pageLabelInput = React.createRef();
+  const urlTab = React.createRef();
+  const pageTab = React.createRef();
 
   const [url, setURL] = useState('');
   const [pageLabel, setPageLabel] = useState("");
@@ -147,7 +149,7 @@ const LinkModal = () => {
 
     linkAnnotArray.forEach((link, index) => {
       link.addAction('U', action);
-      index === 0 ?  core.addAnnotations([link, highlight]) : core.addAnnotations([link]);
+      index === 0 ? core.addAnnotations([link, highlight]) : core.addAnnotations([link]);
     });
     annotManager.groupAnnotations(highlight, linkAnnotArray);
   };
@@ -194,6 +196,14 @@ const LinkModal = () => {
 
   useEffect(() => {
     if (isOpen || isOpenForUrl) {
+      if (isOpenForUrl) {
+        dispatch(actions.setSelectedTab('linkModal', 'URLPanelButton'));
+      }
+      if (isOpen) {
+        dispatch(actions.setSelectedTab('linkModal', 'PageNumberPanelButton'));
+        dispatch(actions.loadSectionsInfo(true));
+      }
+
       //  prepopulate URL if URL is selected
       const selectedText = core.getSelectedText();
       if (selectedText) {
@@ -208,15 +218,23 @@ const LinkModal = () => {
     }
   }, [totalPages, isOpen, isOpenForUrl]);
 
-  // useEffect(() => {
-  //   if (tabSelected === 'PageNumberPanelButton' && isOpen) {
-  //     pageLabelInput.current.focus();
-  //   } else if (tabSelected === 'URLPanelButton' && isOpen) {
-  //     urlInput.current.focus();
-  //   }
-  // }, [tabSelected, isOpen, pageLabelInput, urlInput]);
+  useEffect(() => {
+    if (tabSelected === 'PageNumberPanelButton' && !isOpenForUrl) {
+      pageLabelInput.current.focus();
+    } else if (tabSelected === 'URLPanelButton' && isOpenForUrl) {
+      urlInput.current.focus();
+    }
+  }, [tabSelected, isOpen, isOpenForUrl, pageLabelInput, urlInput]);
 
   useEffect(() => {
+    if (isOpenForUrl) {
+      dispatch(actions.setSelectedTab('linkModal', 'URLPanelButton'));
+    }
+    if (isOpen) {
+      dispatch(actions.setSelectedTab('linkModal', 'PageNumberPanelButton'));
+      dispatch(actions.loadSectionsInfo(true));
+    }
+
     core.addEventListener('documentUnloaded', closeModal);
     return () => {
       core.removeEventListener('documentUnloaded', closeModal);
@@ -245,63 +263,55 @@ const LinkModal = () => {
           <div className="swipe-indicator" />
           <Tabs id="linkModal">
             <div className="tab-list">
-              <Tab dataElement="URLPanelButton">
-                <div className="tab-options-button">{t('link.url')}</div>
-              </Tab>
-              {/* 
-    //customization
-              <div className="divider" />
               {
+                isOpenForUrl &&
+                <Tab dataElement="URLPanelButton">
+                  <div className="tab-options-button" ref={urlTab}>{t('link.url')}</div>
+                </Tab>
+              }
+
+              {
+                //customization
                 !isOpenForUrl &&
-              <Tab dataElement="PageNumberPanelButton">
-                <div className="tab-options-button">{t('link.page')}</div>
-              </Tab>
-    //customization
+                <Tab dataElement="PageNumberPanelButton">
+                  <div className="tab-options-button" ref={pageTab}>{t('link.page')}</div>
+                </Tab>
+                //customization
 
-              } */}
+              }
+
             </div>
-
-            <TabPanel dataElement="URLPanel">
-              <form onSubmit={addURLLink}>
-                <div>{t('link.enterurl')}</div>
-                <div className="linkInput">
-                  <input
-                    className="urlInput"
-                    type="url"
-                    ref={urlInput}
-                    value={url}
-                    onChange={e => setURL(e.target.value)}
-                  />
-                  <Button
-                    dataElement="linkSubmitButton"
-                    label={t('action.link')}
-                    onClick={addURLLink}
-                  />
+            {isOpenForUrl &&
+              <TabPanel dataElement="URLPanel">
+                <form onSubmit={addURLLink}>
+                  <div>{t('link.enterurl')}</div>
+                  <div className="linkInput">
+                    <input
+                      className="urlInput"
+                      type="url"
+                      ref={urlInput}
+                      value={url}
+                      onChange={e => setURL(e.target.value)}
+                    />
+                    <Button
+                      dataElement="linkSubmitButton"
+                      label={t('action.link')}
+                      onClick={addURLLink}
+                    />
+                  </div>
+                </form>
+              </TabPanel>
+            }
+            {
+              !isOpenForUrl &&
+              //customization
+              <TabPanel dataElement="PageNumberPanel">
+                <div ref={pageLabelInput}>
+                  <BundlePageSelector isModalOpen={isOpen}/>
                 </div>
-              </form>
-            </TabPanel>
-            {/* 
-    //customization
-            <TabPanel dataElement="PageNumberPanel">
-              <form onSubmit={addPageLink}>
-                <div>{t('link.enterpage')}</div>
-                <div className="linkInput">
-                  <input
-                    ref={pageLabelInput}
-                    value={pageLabel}
-                    onChange={e => setPageLabel(e.target.value)}
-                  />
-                  <Button
-                    dataElement="linkSubmitButton"
-                    label={t('action.link')}
-                    onClick={addPageLink}
-                    disabled={!isValidPageLabel()}
-                  />
-                </div>
-              </form>
-            </TabPanel> */
-    //customization
-  }
+              </TabPanel>
+              //customization
+            }
           </Tabs>
         </div>
       </div>
