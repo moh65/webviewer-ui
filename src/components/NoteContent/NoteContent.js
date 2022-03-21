@@ -27,7 +27,7 @@ import isString from 'lodash/isString';
 import Choice from 'components/Choice';
 import { webViewerApply } from 'helpers/applyRedactions';
 import TagDropDown from 'components/TagDropDown'
-console.log('drop down = ' + TagDropDown)
+
 //customization
 
 dayjs.extend(LocalizedFormat);
@@ -432,14 +432,14 @@ const ContentArea = ({
             setDropDownChanged={setCustomDataChanged}
             setSelectedTags={setSelectedTags}
             selectedTags={selectedTags}
-            creatable
+            creatable={false}
           />
 
           <Choice
             type="checkbox"
             label="Private"
             checked={isPrivate}
-
+            
             onChange={e => {
               e.stopPropagation();
               setCustomDataChanged(true);
@@ -498,8 +498,7 @@ const ContentArea = ({
           onClick={e => {
             e.stopPropagation();
             setContents(e);
-            debugger
-            
+                        
             annotation.setCustomData('custom-private', isPrivate);
             annotation.setCustomData("custom-date", noteDate);
             annotation.setCustomData('custom-tag-options', selectedTags);

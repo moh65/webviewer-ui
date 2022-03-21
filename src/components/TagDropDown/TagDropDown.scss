@@ -1,0 +1,54 @@
+@import '../../constants/styles';
+@import '../../constants/note';
+
+.drop-down-container {
+    padding: 0px;
+}
+
+.drop-down-button {
+    width: 50%;
+    float: left;
+    padding: 0px;
+}  
+
+.save-button {
+    @include button-reset;
+    cursor: pointer;
+    flex-shrink: 0;
+    background: var(--primary-button);
+    border-radius: 4px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: var(--primary-button-text);
+    padding: 0 13px;
+
+    &:hover {
+      background: var(--primary-button-hover);
+      color: var(--primary-button-text);
+    }
+
+    &.disabled {
+      background: var(--gray-6);
+      border-color: var(--gray-6);
+      cursor: not-allowed;
+    }
+  }
+
+  .cancel-button {
+    @include button-reset;
+    color: var(--secondary-button-text);
+    padding: 0 10px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-right: 2px;
+
+    &:hover {
+      color: var(--secondary-button-hover);
+    }
+}

@@ -83,7 +83,8 @@
     "moveToBottom": "Move to bottom",
     "playAudio": "Play audio",
     "pauseAudio": "Pause audio",
-    "changeDocument": "Change Document"
+    "changeDocument": "Change Document",
+    "showPages": "Show pages"
   },
   "annotation": {
     "areaMeasurement": "Area",

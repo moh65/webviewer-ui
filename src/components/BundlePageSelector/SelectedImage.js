@@ -71,25 +71,25 @@ const SelectedImage = ({
   }, [selected]);
 
   useEffect(() => {
-    debugger
     if (selectedPhoto.id === photo.id){
       setIsSelected(true)
     } else {
       setIsSelected(false);
     }
   }, [selectedPhoto]);
-  
+
+
   return (
     <div
-      style={{ margin, ...cont }}
+      
       className={!isSelected ? "not-selected" : ""}
     >
       <Checkmark selected={isSelected ? true : false} />
       <img
         alt={photo.title}
         src={photo.src}
-        width={"150px"}
-        height={"200px"}
+        width={photo.width}
+        height={photo.height}
         onClick={handleOnClick}
       />
       <style>{`.not-selected:hover{outline:2px solid #06befa}`}</style>

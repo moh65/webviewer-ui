@@ -127,7 +127,7 @@ const TextPopup = ({ t }) => {
         />
         <ActionButton
           title="tool.Link"
-          img="icon-tool-link"
+          img="icon-page-link"
           onClick={() => {
             dispatch(actions.openElement('linkModal'))
           }}

@@ -6,6 +6,7 @@ import HeaderItems from 'components/HeaderItems';
 
 import selectors from 'selectors';
 import classNames from 'classnames';
+import TagDropDown from 'components/TagDropDown'
 
 import './Header.scss';
 
@@ -24,6 +25,24 @@ class Header extends React.PureComponent {
     if (isDisabled || !isOpen) {
       return null;
     }
+
+    let tagDropDown = activeHeaderItems.find(f => f.id === 'tagDropDown');
+    if (!tagDropDown){
+      let tagDropDownItem = {
+        type: 'customElement',
+        img: 'icon-header-sidebar-line',
+        render: () =>
+          <div style={{width: '200px'}}>
+            <TagDropDown creatable={true} placeholder={"Select default Tag..."} />
+          </div>
+        ,
+        id:'tagDropDown',
+        title: 'component.leftPanel'
+      };
+  
+      activeHeaderItems.push(tagDropDownItem);
+    }
+    
 
     return (
       <React.Fragment>

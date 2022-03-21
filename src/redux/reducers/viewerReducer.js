@@ -389,12 +389,14 @@ export default initialState => (state = initialState, action) => {
       return { ...state, customized: { ...state.customized, thisDocumentInfo: payload.thisDocumentInfo } };
     case 'SET_LOAD_DOCUMENT_IN_NEW_TAB_URL':
       return { ...state, customized: { ...state.customized, loadDocumentInNewTabUrl: payload.loadDocumentInNewTabUrl } };
-    case 'ADD_TO_FILTERED_ANNOTATION_TO_BE_HIDDEN':
-      return { ...state, customized: { ...state.customized, filteredAnnotationToBeHidden: [...state.customized.filteredAnnotationToBeHidden, payload.annotation] } };
+    // case 'ADD_TO_FILTERED_ANNOTATION_TO_BE_HIDDEN':
+    //   return { ...state, customized: { ...state.customized, filteredAnnotationToBeHidden: [...state.customized.filteredAnnotationToBeHidden, payload.annotation] } };
     case 'CLEAR_FILTERED_ANNOTATION_TO_BE_HIDDEN':
       return { ...state, customized: { ...state.customized, filteredAnnotationToBeHidden: [] } };
     case 'SET_HIDE_FILTERED_ANNOTATION':
       return { ...state, customized: { ...state.customized, hideFilteredAnnotation: payload.hideFilteredAnnotation } };
+    case 'SET_DEFAULT_TAG':
+      return { ...state, customized: { ...state.customized, defaultTag: payload.defaultTag } };
       
     case 'SET_CUSTOM_ELEMENT_OVERRIDES':
       return { ...state, customElementOverrides: { ...state.customElementOverrides, [payload.dataElement]: payload.overrides } };

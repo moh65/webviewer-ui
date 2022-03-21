@@ -288,6 +288,8 @@ export const getLoadDocumentInNewTabUrl = state => state.viewer.customized.loadD
 
 export const getFilteredAnnotationToBeHidden = state => state.viewer.customized.filteredAnnotationToBeHidden
 
+export const getDefaultTag = state => state.viewer.customized.defaultTag
+
 export const getHideFilteredAnnotation = state => state.viewer.customized.hideFilteredAnnotation
 
 export const getCustomElementOverrides = (state, dataElement = '') => state.viewer.customElementOverrides[dataElement];

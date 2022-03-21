@@ -36,7 +36,7 @@ export default ({ isModalOpen }) => {
         console.log('currentDocumentInfo = ' + currentDocumentInfo.id + ' ' + currentDocumentInfo.title)
     sectionUrl = sectionUrl ? sectionUrl : 'http://localhost:5600/api/bundle/632/items/sections';
     documentUrl = documentUrl ? documentUrl : 'http://localhost:5600/api/bundle/sections/ca7fead101d8449798980b144be511e2/632/{sectionId}/documents/list';
-    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDc3NzY2NDYsImV4cCI6MTY0Nzc4MDI0NiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiIyNGRiOTMyZGU4MWM0Y2Q3YTU2MzY0YzRiZDZkYTAwNyIsImF1dGhfdGltZSI6MTY0NTU2NjQyMCwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJjYTdmZWFkMTAxZDg0NDk3OTg5ODBiMTQ0YmU1MTFlMiIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiVXNlciIsIlN1cGVyQWRtaW4iXSwic2NvcGUiOlsicGVybWlzc2lvbnMiLCJyb2xlcyIsInByb2ZpbGUiLCJvcGVuaWQiLCJidW5kbGUiXSwiYW1yIjpbInB3ZCJdfQ.l2b1BR_rFdSXPlZRblLwzefzjNJwAE0yTbI-I3PSLQlUxRogD8t-sUV9sVf7lbRrUuiwDhTAHKQs_z6goLEMtEEQ2Flny_cZdbpAf0MxCIFzJIP4uRVc4qfMikuW-0PsFBa5LJ9tdiHZTwW4uD1NeAunp4qRx9Y1zTBb2iKkMNP2lnyly2Bu27SwgNPrJhZYS_rQWurE7d3wwrMYsXpH5tGm13mPDLFYQ6UCcRrKU6I4lfOyVTFv3XRTCH_-9vqMO-yOLCi6fKLzXnRJPbwtw7TAuPeCbv9sZPcKm1lu37MjzwLDg1gT7mb8d0YirL6yPXDVXoZoOxUops2d6q-anQ';
+    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDc4MzM1OTIsImV4cCI6MTY0NzgzNzE5MiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiIyNGRiOTMyZGU4MWM0Y2Q3YTU2MzY0YzRiZDZkYTAwNyIsImF1dGhfdGltZSI6MTY0NTU2NjQyMCwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJjYTdmZWFkMTAxZDg0NDk3OTg5ODBiMTQ0YmU1MTFlMiIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiVXNlciIsIlN1cGVyQWRtaW4iXSwic2NvcGUiOlsicGVybWlzc2lvbnMiLCJyb2xlcyIsInByb2ZpbGUiLCJvcGVuaWQiLCJidW5kbGUiXSwiYW1yIjpbInB3ZCJdfQ.u1Izx-WUUErr7hoTg9uD4oR0sG1sMzhotcEIqky4fUtHmUgnFsl6pPF2V3KYecQeEdW1BbD-6MMXv27LbTyoXf46ThXVhdyooieQhpwhSQ08UodvlTg4PoAs5re1H3MG8P_T6OPOmmZ7AfgoQJxCtNLNQe459R8pgkCFr0hiXNJ0xT980UjuCtstAYNlxwRPjRHTuWq8bXocV_fWmMufxZkJ1q5XoBPT956n6f_PeMHZ31uao5RNcOi7aOXEqBlr0Rclt3DyXtkYKq6WzqTp5n3_7KoGJsFrc8EcxdjNotA41sFyVvGHB0f-j-VQQ9EpwXspByn5FkCPmzOZjEaYpQ';
     currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
         id: 210802,
         title: 'Annette Wallis Atkins Costs Disclosure Signed'
@@ -283,72 +283,74 @@ export default ({ isModalOpen }) => {
             {
                 !isThumbnailSelectorOpen &&
                 <div class="float-container">
-                    <div class="float-child-section">
-                        <h2>Sections</h2>
-                        <TreeView
-                            aria-label="rich object"
-                            sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-                            defaultCollapseIcon={<ExpandMoreIcon />}
-                            defaultExpandIcon={<ChevronRightIcon />}
-                            onNodeSelect={(e, n) => {
-                                setLoadingDocument(true)
-                                fetch(documentUrl.replace('{sectionId}', n), {
-                                    method: "GET",
-                                    headers: { "Authorization": `Bearer ${token}` }
-                                }).then(res => res.json())
-                                    .then(json => {
-                                        debugger
-                                        setDocs(json)
-                                        setLoadingDocument(false)
-                                    });
-                            }}
-                        >
-                            {data.map(m => renderTree(m))}
-                        </TreeView>
-                    </div>
-                    <div class="float-child-document">
-                        <h2>Documents</h2>
-                        {
-                            loadingDocument && <Loading />
-                        }
-                        {
-                            !loadingDocument &&
+                    <div>
+                        <div class="float-child-section">
+                            <h2>Sections</h2>
                             <TreeView
-                                style={{ width: '300px', height: '350px', display: 'block' }}
-                                aria-label="rich object 2"
+                                aria-label="rich object"
                                 sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                                 defaultCollapseIcon={<ExpandMoreIcon />}
                                 defaultExpandIcon={<ChevronRightIcon />}
                                 onNodeSelect={(e, n) => {
-
-                                    let selectedDoc = findNodeInDocs(docs, n);
-                                    // if (selectedDoc.children && selectedDoc.children.length > 0) {
-                                    //     return;
-                                    // }
-                                    setSelectedDocumentInfo({ id: n })
-
+                                    setLoadingDocument(true)
+                                    fetch(documentUrl.replace('{sectionId}', n), {
+                                        method: "GET",
+                                        headers: { "Authorization": `Bearer ${token}` }
+                                    }).then(res => res.json())
+                                        .then(json => {
+                                            debugger
+                                            setDocs(json)
+                                            setLoadingDocument(false)
+                                        });
                                 }}
                             >
-                                {docs.map(m => renderTree1(m))}
+                                {data.map(m => renderTree(m))}
                             </TreeView>
-                        }
+                        </div>
+                        <div class="float-child-document">
+                            <h2>Documents</h2>
+                            {
+                                loadingDocument && <div style={{ height: '100%' }}><Loading /></div>
+                            }
+                            {
+                                !loadingDocument &&
+                                <TreeView
+                                    style={{ width: '300px', height: '350px', display: 'block' }}
+                                    aria-label="rich object 2"
+                                    sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+                                    defaultCollapseIcon={<ExpandMoreIcon />}
+                                    defaultExpandIcon={<ChevronRightIcon />}
+                                    onNodeSelect={(e, n) => {
+
+                                        let selectedDoc = findNodeInDocs(docs, n);
+                                        // if (selectedDoc.children && selectedDoc.children.length > 0) {
+                                        //     return;
+                                        // }
+                                        setSelectedDocumentInfo({ id: n })
+
+                                    }}
+                                >
+                                    {docs.map(m => renderTree1(m))}
+                                </TreeView>
+                            }
+                        </div>
                     </div>
                     <div class="button-container">
-                        <span class="button-action">
-                            <Button
-                                dataElement="linkSubmitButton"
-                                label={t('action.link')}
-                                onClick={() => { setIsThumbnailSelectorOpen(true); }}
-                            />
-                        </span>
-
-                        <span class="button-action">
+                    <span class="button-action">
                             <Button
                                 dataElement="linkSubmitButton"
                                 label={t('action.cancel')}
                                 onClick={() => { dispatch(actions.closeElement('linkModal')); }}
                             />
                         </span>
+                        <span class="button-action">
+                            <Button
+                                dataElement="linkSubmitButton"
+                                label={t('action.showPages')}
+                                onClick={() => { setIsThumbnailSelectorOpen(true); }}
+                            />
+                        </span>
+                       
                     </div>
                 </div>
             }

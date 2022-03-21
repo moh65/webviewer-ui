@@ -22,7 +22,7 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
     ]);
     const [t] = useTranslation();
 
-    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDc3NzY2NDYsImV4cCI6MTY0Nzc4MDI0NiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiIyNGRiOTMyZGU4MWM0Y2Q3YTU2MzY0YzRiZDZkYTAwNyIsImF1dGhfdGltZSI6MTY0NTU2NjQyMCwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJjYTdmZWFkMTAxZDg0NDk3OTg5ODBiMTQ0YmU1MTFlMiIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiVXNlciIsIlN1cGVyQWRtaW4iXSwic2NvcGUiOlsicGVybWlzc2lvbnMiLCJyb2xlcyIsInByb2ZpbGUiLCJvcGVuaWQiLCJidW5kbGUiXSwiYW1yIjpbInB3ZCJdfQ.l2b1BR_rFdSXPlZRblLwzefzjNJwAE0yTbI-I3PSLQlUxRogD8t-sUV9sVf7lbRrUuiwDhTAHKQs_z6goLEMtEEQ2Flny_cZdbpAf0MxCIFzJIP4uRVc4qfMikuW-0PsFBa5LJ9tdiHZTwW4uD1NeAunp4qRx9Y1zTBb2iKkMNP2lnyly2Bu27SwgNPrJhZYS_rQWurE7d3wwrMYsXpH5tGm13mPDLFYQ6UCcRrKU6I4lfOyVTFv3XRTCH_-9vqMO-yOLCi6fKLzXnRJPbwtw7TAuPeCbv9sZPcKm1lu37MjzwLDg1gT7mb8d0YirL6yPXDVXoZoOxUops2d6q-anQ';
+    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDc4MzM1OTIsImV4cCI6MTY0NzgzNzE5MiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiIyNGRiOTMyZGU4MWM0Y2Q3YTU2MzY0YzRiZDZkYTAwNyIsImF1dGhfdGltZSI6MTY0NTU2NjQyMCwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJjYTdmZWFkMTAxZDg0NDk3OTg5ODBiMTQ0YmU1MTFlMiIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiVXNlciIsIlN1cGVyQWRtaW4iXSwic2NvcGUiOlsicGVybWlzc2lvbnMiLCJyb2xlcyIsInByb2ZpbGUiLCJvcGVuaWQiLCJidW5kbGUiXSwiYW1yIjpbInB3ZCJdfQ.u1Izx-WUUErr7hoTg9uD4oR0sG1sMzhotcEIqky4fUtHmUgnFsl6pPF2V3KYecQeEdW1BbD-6MMXv27LbTyoXf46ThXVhdyooieQhpwhSQ08UodvlTg4PoAs5re1H3MG8P_T6OPOmmZ7AfgoQJxCtNLNQe459R8pgkCFr0hiXNJ0xT980UjuCtstAYNlxwRPjRHTuWq8bXocV_fWmMufxZkJ1q5XoBPT956n6f_PeMHZ31uao5RNcOi7aOXEqBlr0Rclt3DyXtkYKq6WzqTp5n3_7KoGJsFrc8EcxdjNotA41sFyVvGHB0f-j-VQQ9EpwXspByn5FkCPmzOZjEaYpQ';
     generateThumbnailUrl = generateThumbnailUrl ? generateThumbnailUrl : `http://localhost:5600/api/bundleitem/${logicalItemInfo.id}/generate/thumbnails`;
     pageThumbnailUrl = pageThumbnailUrl ? pageThumbnailUrl : 'http://localhost:5600/api/bundleitem/{itemId}/page/{pageId}/thumbnail?w=200&h=250&access_token={token}';
     documentPagesUrl = documentPagesUrl ? documentPagesUrl : 'http://localhost:5600/api/bundle/ca7fead101d8449798980b144be511e2/632/{itemId}/pages';
@@ -31,9 +31,7 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
     const [showGallery, setShowGallery] = useState(false);
     const [error, setError] = useState(false);
     const [pageThumbnailData, setPageThumbnailData] = useState([]);
-    const [deselectThumbnail, setDeselectThumbnail] = useState('');
     const [selectedPage, setSelectedPage] = useState({});
-    const [pageData, setPageData] = useState([]);
 
 
     const thumbnailClickHandler = (img) => {
@@ -68,8 +66,8 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
                 }).then(data => {
                     data = data.map(m => ({
                         id: m.s.pageId,
-                        width: 1,
-                        height: 1,
+                        width: 10,
+                        height: 10,
                         num: m.pageNum,
                         src: pageThumbnailUrl.replace('{pageId}', m.s.pageId).replace('{itemId}', logicalItemInfo.id).replace('{token}', encodeURIComponent(token))
                     }))
@@ -86,7 +84,18 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
     }, [isOpen]);
 
     const imageRenderer = ({ index, left, top, key, photo }) => (
-        <div class="page-container">
+        <div className={"image-item"}
+            key={key}
+            role={"button"}
+            tabIndex={0}
+            style={{
+                width: photo.width,
+                height: photo.height,
+                //the important staff
+                position: "absolute",
+                left,
+                top
+            }}>
             <SelectedImage
                 selectedPhoto={selectedPage}
                 key={key}
@@ -125,8 +134,8 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
                             )
                         }
                     </div>
-                    <div>
-                        <Gallery direction='row' renderImage={imageRenderer} columns={4} photos={pageThumbnailData} />
+                    <div style={{overflowY:'scroll', maxHeight: '300px', width:'500px'}}>
+                        <Gallery direction='column' renderImage={imageRenderer} columns={3} photos={pageThumbnailData} />
                     </div>
                     <div class="button-container">
                         <span class="button-action">

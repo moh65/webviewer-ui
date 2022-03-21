@@ -522,10 +522,7 @@ export const setThisDocumentInfo = (thisDocumentInfo) => ({
   type: 'SET_THIS_DOCUMENT_INFO',
   payload: { thisDocumentInfo: thisDocumentInfo },
 });
-export const addToFilteredAnnotationToBeHidden = (annotation) => ({
-  type: 'ADD_TO_FILTERED_ANNOTATION_TO_BE_HIDDEN',
-  payload: { annotation: annotation },
-});
+
 export const clearFilteredAnnotationToBeHidden = () => ({
   type: 'CLEAR_FILTERED_ANNOTATION_TO_BE_HIDDEN',
   payload: {},
@@ -537,6 +534,10 @@ export const setHideFilteredAnnotation = (hideFilteredAnnotation) => ({
 export const setLoadDocumentInNewTabUrl = (loadDocumentInNewTabUrl) => ({
   type: 'SET_LOAD_DOCUMENT_IN_NEW_TAB_URL',
   payload: { loadDocumentInNewTabUrl: loadDocumentInNewTabUrl },
+});
+export const setDefaultTag = (defaultTag) => ({
+  type: 'SET_DEFAULT_TAG',
+  payload: { defaultTag: defaultTag },
 });
 
 export const updateAuthToken = (token) => ({

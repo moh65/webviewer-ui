@@ -636,8 +636,8 @@ export default {
       documentPagesUrl:'',
       thisDocumentInfo:{},
       loadDocumentInNewTabUrl:'',
-      filteredAnnotationToBeHidden:[],
-      hideFilteredAnnotation:false
+      hideFilteredAnnotation:false,
+      defaultTag:{}
     },
     //customization
   },
@@ -660,6 +660,7 @@ export default {
     printQuality: 1,
     passwordAttempts: -1,
     loadingProgress: 0,
+    filteredAnnotationToBeHidden:[],
   },
   user: {
     name: getHashParams('user', 'Guest'),

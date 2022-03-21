@@ -1,6 +1,6 @@
 export default initialState => (state = initialState, action) => {
   const { type, payload } = action;
-
+  debugger
   switch (type) {
     case 'SET_DOCUMENT_FILE':
       return { ...state, file: payload.documentFile, path: payload.documentFile.name, pdfDoc: null };
@@ -11,23 +11,23 @@ export default initialState => (state = initialState, action) => {
     case 'SET_OUTLINES':
       return { ...state, outlines: payload.outlines };
     case 'SET_BOOKMARKS':
-    {
-      return { ...state, bookmarks: payload.bookmarks };
-    }
+      {
+        return { ...state, bookmarks: payload.bookmarks };
+      }
     case 'ADD_BOOKMARK':
     case 'EDIT_BOOKMARK':
-    {
-      const newBookmarks = { ...state.bookmarks };
-      newBookmarks[payload.pageIndex] = payload.text;
-      return { ...state, bookmarks: newBookmarks };
-    }
+      {
+        const newBookmarks = { ...state.bookmarks };
+        newBookmarks[payload.pageIndex] = payload.text;
+        return { ...state, bookmarks: newBookmarks };
+      }
     case 'REMOVE_BOOKMARK':
-    {
-      const newBookmarks = { ...state.bookmarks };
-      delete newBookmarks[payload.pageIndex];
+      {
+        const newBookmarks = { ...state.bookmarks };
+        delete newBookmarks[payload.pageIndex];
 
-      return { ...state, bookmarks: newBookmarks };
-    }
+        return { ...state, bookmarks: newBookmarks };
+      }
     case 'SET_LAYERS':
       return { ...state, layers: payload.layers };
     case 'SET_PASSWORD_ATTEMPTS':
@@ -35,9 +35,12 @@ export default initialState => (state = initialState, action) => {
     case 'SET_PRINT_QUALITY':
       return { ...state, printQuality: payload.quality };
     case 'SET_DEFAULT_PRINT_OPTIONS':
-      return {...state, defaultPrintOptions: payload.options };
+      return { ...state, defaultPrintOptions: payload.options };
     case 'SET_LOADING_PROGRESS':
       return { ...state, loadingProgress: payload.progress };
+    case 'ADD_TO_FILTERED_ANNOTATION_TO_BE_HIDDEN':
+      debugger
+      return { ...state, filteredAnnotationToBeHidden: [...state.filteredAnnotationToBeHidden, payload.annotation] }
     default:
       return state;
   }

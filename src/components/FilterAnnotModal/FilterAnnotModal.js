@@ -48,11 +48,8 @@ const FilterAnnotModal = () => {
   //customization
 
   const [privateFilter, setPrivateFilter] = useState(false);
-  let [applyFilterButtonClicked, setApplyFilterButtonClicked] = useState(false);
   const [toDateRange, setToDateRange] = useState('yyyy-mm-dd');
   const [fromDateRange, setFromDateRange] = useState('yyyy-mm-dd');
-  let [listOfAnnotationsToBeShown, setListOfAnnotationsToBeShown] = useState(core.getAnnotationsList().map(m => m.Id))
-  let [listOfAnnotationsToBeHidden, setListOfAnnotationsToBeHidden] = useState([])
 
   //customization
 
@@ -78,9 +75,6 @@ const FilterAnnotModal = () => {
     //customization
     //debugger
     const annots = core.getAnnotationsList();
-    applyFilterButtonClicked = true;
-    listOfAnnotationsToBeShown= [];
-    listOfAnnotationsToBeHidden= [];
     //customization
 
     dispatch(
@@ -170,9 +164,8 @@ const FilterAnnotModal = () => {
         let showComment = type && author && privatePublicShow && !fromDateApply && !toDateApply;
 
         // if (!showComment) {
-        //   listOfAnnotationsToBeHidden.push(annot.Id);
-        // } else {
-        //   listOfAnnotationsToBeShown.push(annot.Id);
+        //   debugger
+        //   dispatch(actions.addToFilteredAnnotationToBeHidden(annot))
         // }
 
         return showComment;
@@ -199,8 +192,7 @@ const FilterAnnotModal = () => {
   };
 
   const filterClear = () => {
-    setListOfAnnotationsToBeHidden([]);
-    setListOfAnnotationsToBeShown(core.getAnnotationsList().map(m => m.Id));
+    
 
     dispatch(
       actions.setCustomNoteFilter(annot => {
@@ -280,32 +272,10 @@ const FilterAnnotModal = () => {
       }
     });
 
-    // if (applyFilterButtonClicked) {
-    //   setTimeout(() => {
-    //   debugger
-    //   for (const annotId of listOfAnnotationsToBeHidden)
-    //       core.getAnnotationManager().hideAnnotation(core.getAnnotationManager().getAnnotationById(annotId));
-    //     for (const annotId of listOfAnnotationsToBeShown)
-    //       core.getAnnotationManager().showAnnotation(core.getAnnotationManager().getAnnotationById(annotId));
-    //     // debugger
-    //     // core.getAnnotationManager().showAnnotations(core.getAnnotationsList());
-    //   }, 2000)
-    //   setApplyFilterButtonClicked(false);
-    // }
-
-    debugger
     setAuthors([...authorsToBeAdded]);
     setAnnotTypes([...annotTypesToBeAdded]);
     setColorTypes([...annotColorsToBeAdded]);
     setStatusTypes([...annotStatusesToBeAdded]);
-
-    //setFilterAnnotationObject(true);
-    // debugger
-    // setTimeout(() => {
-    //   core.getAnnotationManager().hideAnnotations(core.getAnnotationsList());
-    //   debugger
-    //   core.getAnnotationManager().showAnnotations(core.getAnnotationsList());
-    // }, 500)
 
     core.addEventListener('documentUnloaded', closeModal);
     return () => {
