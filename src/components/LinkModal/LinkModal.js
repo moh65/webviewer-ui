@@ -16,7 +16,7 @@ import { Swipeable } from 'react-swipeable';
 import './LinkModal.scss';
 
 const LinkModal = () => {
-  const [
+  let [
     isDisabled,
     isDisabledForUrl,
     isOpen,
@@ -25,6 +25,7 @@ const LinkModal = () => {
     currentPage,
     tabSelected,
     pageLabels,
+    annotationLinkToEdit
   ] = useSelector(state => [
     selectors.isElementDisabled(state, 'linkModal'),
     //customization
@@ -38,7 +39,11 @@ const LinkModal = () => {
     selectors.getCurrentPage(state),
     selectors.getSelectedTab(state, 'linkModal'),
     selectors.getPageLabels(state),
+    selectors.getAnnotationLinkToEdit(state)
   ]);
+
+  
+  
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
@@ -50,15 +55,28 @@ const LinkModal = () => {
   const [url, setURL] = useState('');
   const [pageLabel, setPageLabel] = useState("");
 
+  // if (showModal && openForUrlOrPage === 'url'){
+  //   setTimeout(() => dispatch(actions.closeElement('annotationNoteConnectorLine')), 100);
+
+  //   isOpenForUrl = true;
+  //   isDisabledForUrl = false;
+  // } else if (showModal && openForUrlOrPage === 'page'){
+  //   isOpen = true;
+  //   isDisabled = false;
+  // }
+
   const closeModal = () => {
     //customization
-    if (isOpenForUrl)
+    if (isOpenForUrl) {
       dispatch(actions.closeElement('linkModalUrl'));
-    if (isOpen)
+    }
+    if (isOpen){
       dispatch(actions.closeElement('linkModal'));
+    }
     //customization
     setURL('');
     core.setToolMode(defaultTool);
+    dispatch(actions.setAnnotationLinkToEdit(null))
   };
 
   const newLink = (x, y, width, height, linkPageNumber = currentPage) => {
@@ -78,12 +96,37 @@ const LinkModal = () => {
 
   const createLink = action => {
     const linksResults = [];
-
-    const quads = core.getSelectedTextQuads();
+    
+    
+    let quads = core.getSelectedTextQuads();
     const selectedAnnotations = core.getSelectedAnnotations();
 
+    if (quads && Object.keys(quads).length === 0){
+      let fakeQuads = {};
+      fakeQuads[annotationLinkToEdit.annotation.PageNumber] = [];
+      let highlightAnnot = core.getAnnotationManager().getAnnotationById(annotationLinkToEdit.annotation.InReplyTo);
+
+      for(const quad of highlightAnnot.Quads){
+        fakeQuads[annotationLinkToEdit.annotation.PageNumber].push({
+          x1:quad.x1, 
+          x2:quad.x2, 
+          x3:quad.x3, 
+          x4:quad.x4, 
+          y1:quad.y1, 
+          y2:quad.y2, 
+          y3:quad.y3, 
+          y4:quad.y4});
+      }
+      
+      quads = fakeQuads;
+    }
+
+
     if (quads) {
-      const selectedText = core.getSelectedText();
+      let selectedText = core.getSelectedText();
+      if (!selectedText || selectedText === '')
+        selectedText = selectedAnnotations[0].Wba;
+        
       for (const currPageNumber in quads) {
         const currPageLinks = [];
         quads[currPageNumber].forEach(quad => {
@@ -97,6 +140,11 @@ const LinkModal = () => {
             )
           );
         });
+        
+        if (annotationLinkToEdit && annotationLinkToEdit.annotation){
+          let highlightAnnot = core.getAnnotationManager().getAnnotationById(annotationLinkToEdit.annotation.InReplyTo);
+          core.deleteAnnotations([annotationLinkToEdit.annotation, highlightAnnot])
+        }
         createHighlightAnnot(
           currPageLinks,
           quads[currPageNumber],
@@ -107,27 +155,28 @@ const LinkModal = () => {
       }
     }
 
-    if (selectedAnnotations) {
-      selectedAnnotations.forEach(annot => {
-        const annotManager = core.getAnnotationManager();
-        const groupedAnnots = annotManager.getGroupAnnotations(annot);
+    // if (selectedAnnotations) {
+      
+    //   selectedAnnotations.forEach(annot => {
+    //     const annotManager = core.getAnnotationManager();
+    //     const groupedAnnots = annotManager.getGroupAnnotations(annot);
 
-        // ungroup and delete any previously created links
-        if (groupedAnnots.length > 1) {
-          const linksToDelete = groupedAnnots.filter(annot => annot instanceof Annotations.Link);
-          if (linksToDelete.length > 0) {
-            annotManager.ungroupAnnotations(groupedAnnots);
-            core.deleteAnnotations(linksToDelete);
-          }
-        }
+    //     // ungroup and delete any previously created links
+    //     if (groupedAnnots.length > 1) {
+    //       const linksToDelete = groupedAnnots.filter(annot => annot instanceof Annotations.Link);
+    //       if (linksToDelete.length > 0) {
+    //         annotManager.ungroupAnnotations(groupedAnnots);
+    //         core.deleteAnnotations(linksToDelete);
+    //       }
+    //     }
 
-        const link = newLink(annot.X, annot.Y, annot.Width, annot.Height);
-        link.addAction('U', action);
-        core.addAnnotations([link]);
-        linksResults.push(link);
-        annotManager.groupAnnotations(annot, [link]);
-      });
-    }
+    //     const link = newLink(annot.X, annot.Y, annot.Width, annot.Height);
+    //     link.addAction('U', action);
+    //     core.addAnnotations([link]);
+    //     linksResults.push(link);
+    //     annotManager.groupAnnotations(annot, [link]);
+    //   });
+    // }
 
     return linksResults;
   };
@@ -195,6 +244,10 @@ const LinkModal = () => {
   };
 
   useEffect(() => {
+    
+    if (annotationLinkToEdit && !annotationLinkToEdit.isPageLink){
+      setURL(annotationLinkToEdit.element.uri);
+    }
     if (isOpen || isOpenForUrl) {
       if (isOpenForUrl) {
         dispatch(actions.setSelectedTab('linkModal', 'URLPanelButton'));
@@ -206,6 +259,7 @@ const LinkModal = () => {
 
       //  prepopulate URL if URL is selected
       const selectedText = core.getSelectedText();
+      
       if (selectedText) {
         const urlRegex = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
         const urls = selectedText.match(urlRegex);
@@ -289,7 +343,7 @@ const LinkModal = () => {
                     <input
                       className="urlInput"
                       type="url"
-                      ref={urlInput}
+                      ref={urlInput}  
                       value={url}
                       onChange={e => setURL(e.target.value)}
                     />

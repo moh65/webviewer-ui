@@ -89,8 +89,10 @@ export default ({ setDropDownChanged, setSelectedTags, selectedTags, creatable, 
                         dispatch(actions.setDefaultTag(option));
                     }
                 } else {
-                    setDropDownChanged(true);
-                    setSelectedTags(option);
+                    if (setDropDownChanged)
+                        setDropDownChanged(true);
+                    if (setSelectedTags)
+                        setSelectedTags(option);
                 }
             }
             }

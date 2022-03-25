@@ -286,11 +286,13 @@ export const getThisDocumentInfo = state => state.viewer.customized.thisDocument
 
 export const getLoadDocumentInNewTabUrl = state => state.viewer.customized.loadDocumentInNewTabUrl
 
-export const getFilteredAnnotationToBeHidden = state => state.viewer.customized.filteredAnnotationToBeHidden
-
 export const getDefaultTag = state => state.viewer.customized.defaultTag
 
-export const getHideFilteredAnnotation = state => state.viewer.customized.hideFilteredAnnotation
+export const isEditLinkMode = state => state.viewer.customized.editLinkMode
+
+export const getAnnotationLinkToEdit = state => state.viewer.customized.annotationLinkToEdit
+
+export const isCtrlPressed = state => state.viewer.customized.isCtrlPressed
 
 export const getCustomElementOverrides = (state, dataElement = '') => state.viewer.customElementOverrides[dataElement];
 

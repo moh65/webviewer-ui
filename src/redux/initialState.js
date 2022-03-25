@@ -636,8 +636,10 @@ export default {
       documentPagesUrl:'',
       thisDocumentInfo:{},
       loadDocumentInNewTabUrl:'',
-      hideFilteredAnnotation:false,
-      defaultTag:{}
+      defaultTag:{},
+      editLinkMode:false,
+      annotationLinkToEdit:null,
+      isCtrlPressed:false
     },
     //customization
   },
@@ -659,8 +661,7 @@ export default {
     layers: [],
     printQuality: 1,
     passwordAttempts: -1,
-    loadingProgress: 0,
-    filteredAnnotationToBeHidden:[],
+    loadingProgress: 0
   },
   user: {
     name: getHashParams('user', 'Guest'),

@@ -350,10 +350,7 @@ export const setVerificationResult = result => ({
   type: 'SET_VERIFICATION_RESULT',
   payload: { result },
 });
-export const addToFilteredAnnotationToBeHidden = (annotation) => ({
-  type: 'ADD_TO_FILTERED_ANNOTATION_TO_BE_HIDDEN',
-  payload: { annotation: annotation },
-});
+
 // user
 export const setUserName = userName => ({
   type: 'SET_USER_NAME',

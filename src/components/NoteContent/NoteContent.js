@@ -27,6 +27,7 @@ import isString from 'lodash/isString';
 import Choice from 'components/Choice';
 import { webViewerApply } from 'helpers/applyRedactions';
 import TagDropDown from 'components/TagDropDown'
+import LinkEdition from '../LinkEdition';
 
 //customization
 
@@ -53,6 +54,8 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
     ],
     shallowEqual,
   );
+
+
 
   const { isSelected, searchInput, resize, pendingEditTextMap, onTopNoteContentClicked, sortStrategy } = useContext(
     NoteContext,
@@ -219,6 +222,8 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
       return;
     }
   };
+
+  
 
   const noteContentClass = classNames({
     NoteContent: true,
@@ -393,6 +398,10 @@ const ContentArea = ({
   const [noteDate, setNoteDate] = useState(annotNoteDate ? annotNoteDate : new Date().toISOString().split('T')[0]);
   const [customDataChanged, setCustomDataChanged] = useState(false);
   const [selectedTags, setSelectedTags] = useState( annotTags != null && annotTags != undefined && annotTags != '' ? JSON.parse(annotTags) : []);
+
+  const allAnnotations = core.getAnnotationsList();
+  const linkAnnotation = allAnnotations.find(s => s.Subject === 'Link' && s.InReplyTo === annotation.Id);
+  
   //customization
 
   const contentClassName = classNames('edit-content', { 'reply-content': isReply })
@@ -452,6 +461,10 @@ const ContentArea = ({
               }
             }}
           />
+
+          {
+            linkAnnotation && <LinkEdition annotation={linkAnnotation} />
+          }
         </div>
       )
       }

@@ -34,7 +34,8 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     notesInLeftPanel,
     isDocumentReadOnly,
     enableNotesPanelVirtualizedList,
-    isInDesktopOnlyMode
+    isInDesktopOnlyMode,
+    editLinkMode
   ] = useSelector(
     state => [
       selectors.getSortStrategy(state),
@@ -46,12 +47,13 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       selectors.getNotesInLeftPanel(state),
       selectors.isDocumentReadOnly(state),
       selectors.getEnableNotesPanelVirtualizedList(state),
-      selectors.isInDesktopOnlyMode(state)
+      selectors.isInDesktopOnlyMode(state),
+      selectors.isEditLinkMode(state),
     ],
     shallowEqual,
   );
   const currentWidth = currentLeftPanelWidth || currentNotesPanelWidth;
-  
+
   const dispatch = useDispatch();
   const inputRef = useRef(null);
 
@@ -198,13 +200,6 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
   const notesToRender = getSortStrategies()[sortStrategy].getSortedNotes(notes)
     .filter(filterNote);
 
-    if (customNoteFilter) {
-      dispatch(actions.addToFilteredAnnotationToBeHidden(core.getAnnotationsList()[0]))
-      //dispatch(actions.setCustomNoteFilter(null))
-      debugger
-    }
-
-
   useEffect(() => {
     if (Object.keys(selectedNoteIds).length && singleSelectedNoteIndex !== -1) {
       setTimeout(() => {
@@ -307,7 +302,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       sortStrategy,
     };
 
-    if (index === singleSelectedNoteIndex) {
+    if (index === singleSelectedNoteIndex && !editLinkMode) {
       setTimeout(() => {
         setScrollToSelectedAnnot(false);
         // open the 'annotationNoteConnectorLine' since the note it's pointing to is being rendered

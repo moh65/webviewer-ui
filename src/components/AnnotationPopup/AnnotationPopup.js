@@ -161,7 +161,6 @@ const AnnotationPopup = () => {
     };
 
     const onAnnotationSelected = (annotations, action) => {
-      debugger
       if (action === 'selected' && annotations.length) {
         setFirstAnnotation(annotations[0]);
         setIncludesFormFieldAnnotation(annotations.some(annotation => annotation.isFormFieldPlaceholder()));

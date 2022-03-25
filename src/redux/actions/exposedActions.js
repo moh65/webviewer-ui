@@ -522,15 +522,6 @@ export const setThisDocumentInfo = (thisDocumentInfo) => ({
   type: 'SET_THIS_DOCUMENT_INFO',
   payload: { thisDocumentInfo: thisDocumentInfo },
 });
-
-export const clearFilteredAnnotationToBeHidden = () => ({
-  type: 'CLEAR_FILTERED_ANNOTATION_TO_BE_HIDDEN',
-  payload: {},
-});
-export const setHideFilteredAnnotation = (hideFilteredAnnotation) => ({
-  type: 'SET_HIDE_FILTERED_ANNOTATION',
-  payload: {hideFilteredAnnotation: hideFilteredAnnotation},
-});
 export const setLoadDocumentInNewTabUrl = (loadDocumentInNewTabUrl) => ({
   type: 'SET_LOAD_DOCUMENT_IN_NEW_TAB_URL',
   payload: { loadDocumentInNewTabUrl: loadDocumentInNewTabUrl },
@@ -538,6 +529,18 @@ export const setLoadDocumentInNewTabUrl = (loadDocumentInNewTabUrl) => ({
 export const setDefaultTag = (defaultTag) => ({
   type: 'SET_DEFAULT_TAG',
   payload: { defaultTag: defaultTag },
+});
+export const setEditLinkMode = (editLinkMode) => ({
+  type: 'SET_EDIT_LINK_MODE',
+  payload: { editLinkMode: editLinkMode },
+});
+export const setAnnotationLinkToEdit = (annotationLinkToEdit) => ({
+  type: 'SET_ANNOTATION_LINK_TO_EDIT',
+  payload: { annotationLinkToEdit: annotationLinkToEdit },
+});
+export const setIsCtrlPressed = (isCtrlPressed) => ({
+  type: 'SET_IS_CTRL_PRESSED',
+  payload: { isCtrlPressed: isCtrlPressed },
 });
 
 export const updateAuthToken = (token) => ({

@@ -22,21 +22,21 @@ export default ({ isModalOpen }) => {
         sectionUrl,
         documentUrl,
         token,
-        currentDocumentInfo
+        currentDocumentInfo,
+        annotationLinkToEdit
     ] = useSelector(state => [
         selectors.getLoadSectionsInfo(state),
         selectors.getSectionUrl(state),
         selectors.getDocumentUrl(state),
         selectors.getAuthToken(state),
-        selectors.getThisDocumentInfo(state)
+        selectors.getThisDocumentInfo(state),
+        selectors.getAnnotationLinkToEdit(state)
     ]);
     const [t] = useTranslation();
 
-    if (currentDocumentInfo)
-        console.log('currentDocumentInfo = ' + currentDocumentInfo.id + ' ' + currentDocumentInfo.title)
     sectionUrl = sectionUrl ? sectionUrl : 'http://localhost:5600/api/bundle/632/items/sections';
     documentUrl = documentUrl ? documentUrl : 'http://localhost:5600/api/bundle/sections/ca7fead101d8449798980b144be511e2/632/{sectionId}/documents/list';
-    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDc4MzM1OTIsImV4cCI6MTY0NzgzNzE5MiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiIyNGRiOTMyZGU4MWM0Y2Q3YTU2MzY0YzRiZDZkYTAwNyIsImF1dGhfdGltZSI6MTY0NTU2NjQyMCwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJjYTdmZWFkMTAxZDg0NDk3OTg5ODBiMTQ0YmU1MTFlMiIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiVXNlciIsIlN1cGVyQWRtaW4iXSwic2NvcGUiOlsicGVybWlzc2lvbnMiLCJyb2xlcyIsInByb2ZpbGUiLCJvcGVuaWQiLCJidW5kbGUiXSwiYW1yIjpbInB3ZCJdfQ.u1Izx-WUUErr7hoTg9uD4oR0sG1sMzhotcEIqky4fUtHmUgnFsl6pPF2V3KYecQeEdW1BbD-6MMXv27LbTyoXf46ThXVhdyooieQhpwhSQ08UodvlTg4PoAs5re1H3MG8P_T6OPOmmZ7AfgoQJxCtNLNQe459R8pgkCFr0hiXNJ0xT980UjuCtstAYNlxwRPjRHTuWq8bXocV_fWmMufxZkJ1q5XoBPT956n6f_PeMHZ31uao5RNcOi7aOXEqBlr0Rclt3DyXtkYKq6WzqTp5n3_7KoGJsFrc8EcxdjNotA41sFyVvGHB0f-j-VQQ9EpwXspByn5FkCPmzOZjEaYpQ';
+    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDgxNjM0MDUsImV4cCI6MTY0ODE2NzAwNSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiIyNGRiOTMyZGU4MWM0Y2Q3YTU2MzY0YzRiZDZkYTAwNyIsImF1dGhfdGltZSI6MTY0Nzk4ODk2NywiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJjYTdmZWFkMTAxZDg0NDk3OTg5ODBiMTQ0YmU1MTFlMiIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiVXNlciIsIlN1cGVyQWRtaW4iXSwic2NvcGUiOlsicGVybWlzc2lvbnMiLCJyb2xlcyIsInByb2ZpbGUiLCJvcGVuaWQiLCJidW5kbGUiXSwiYW1yIjpbInB3ZCJdfQ.nJit1rki6v53HWD8DEQg7gFqf4b3LTYwAkSFkLpg3EOosM5MMpDZbNPc96oxp-ygQBwKw6ypfnpNuM5dDYAOiSWTHKST9EE2Gp8nVcFIciwz60BsAC-a4VlRwRAlcUUCk1ZZjFFS9z9AhhzVzA5zSulAECpUCEmnwc-dzS2CsHDi861lamuAIqGLwY06h8bLIXqDtFwUXoXkfhzxsKuPijb_XZHscgPAOOMf94O0klvEJTd1xP-HuuA8Bc9AVxGl7JVabK4Iynmrbg8FVHGz334CQP4mAnI4rN56B6fT3RAZPi9QKh4LMJet9y-AL2YUPyHQU1uOc_6IuWoQSFu14g';
     currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
         id: 210802,
         title: 'Annette Wallis Atkins Costs Disclosure Signed'
@@ -120,6 +120,7 @@ export default ({ isModalOpen }) => {
     }
 
     const onSelectThumbnailHandler = (img) => {
+        debugger
         setIsThumbnailSelectorOpen(false);
         let pageNumber = img.num;
         if (thisDocumentInfo.id === selectedDocumentInfo.id) {
@@ -172,11 +173,35 @@ export default ({ isModalOpen }) => {
     const createLink = action => {
         const linksResults = [];
 
-        const quads = core.getSelectedTextQuads();
+        let quads = core.getSelectedTextQuads();
         const selectedAnnotations = core.getSelectedAnnotations();
 
+        if (quads && Object.keys(quads).length === 0) {
+            let fakeQuads = {};
+            fakeQuads[annotationLinkToEdit.annotation.PageNumber] = [];
+            let highlightAnnot = core.getAnnotationManager().getAnnotationById(annotationLinkToEdit.annotation.InReplyTo);
+            debugger
+            for (const quad of highlightAnnot.Quads) {
+                fakeQuads[annotationLinkToEdit.annotation.PageNumber].push({
+                    x1: quad.x1,
+                    x2: quad.x2,
+                    x3: quad.x3,
+                    x4: quad.x4,
+                    y1: quad.y1,
+                    y2: quad.y2,
+                    y3: quad.y3,
+                    y4: quad.y4
+                });
+            }
+
+            quads = fakeQuads;
+        }
+        
         if (quads) {
-            const selectedText = core.getSelectedText();
+            let selectedText = core.getSelectedText();
+            if (!selectedText || selectedText === '')
+                selectedText = selectedAnnotations[0].Wba;
+
             for (const currPageNumber in quads) {
                 const currPageLinks = [];
                 quads[currPageNumber].forEach(quad => {
@@ -190,6 +215,10 @@ export default ({ isModalOpen }) => {
                         )
                     );
                 });
+                if (annotationLinkToEdit && annotationLinkToEdit.annotation) {
+                    let highlightAnnot = core.getAnnotationManager().getAnnotationById(annotationLinkToEdit.annotation.InReplyTo);
+                    core.deleteAnnotations([annotationLinkToEdit.annotation, highlightAnnot])
+                }
                 createHighlightAnnot(
                     currPageLinks,
                     quads[currPageNumber],
@@ -200,27 +229,27 @@ export default ({ isModalOpen }) => {
             }
         }
 
-        if (selectedAnnotations) {
-            selectedAnnotations.forEach(annot => {
-                const annotManager = core.getAnnotationManager();
-                const groupedAnnots = annotManager.getGroupAnnotations(annot);
+        // if (selectedAnnotations) {
+        //     selectedAnnotations.forEach(annot => {
+        //         const annotManager = core.getAnnotationManager();
+        //         const groupedAnnots = annotManager.getGroupAnnotations(annot);
 
-                // ungroup and delete any previously created links
-                if (groupedAnnots.length > 1) {
-                    const linksToDelete = groupedAnnots.filter(annot => annot instanceof Annotations.Link);
-                    if (linksToDelete.length > 0) {
-                        annotManager.ungroupAnnotations(groupedAnnots);
-                        core.deleteAnnotations(linksToDelete);
-                    }
-                }
+        //         // ungroup and delete any previously created links
+        //         if (groupedAnnots.length > 1) {
+        //             const linksToDelete = groupedAnnots.filter(annot => annot instanceof Annotations.Link);
+        //             if (linksToDelete.length > 0) {
+        //                 annotManager.ungroupAnnotations(groupedAnnots);
+        //                 core.deleteAnnotations(linksToDelete);
+        //             }
+        //         }
 
-                const link = newLink(annot.X, annot.Y, annot.Width, annot.Height);
-                link.addAction('U', action);
-                core.addAnnotations([link]);
-                linksResults.push(link);
-                annotManager.groupAnnotations(annot, [link]);
-            });
-        }
+        //         const link = newLink(annot.X, annot.Y, annot.Width, annot.Height);
+        //         link.addAction('U', action);
+        //         core.addAnnotations([link]);
+        //         linksResults.push(link);
+        //         annotManager.groupAnnotations(annot, [link]);
+        //     });
+        // }
 
         return linksResults;
     };
@@ -233,12 +262,13 @@ export default ({ isModalOpen }) => {
         const options = { dest: new Dest({ page: pageNum }) };
         const action = new window.Actions.GoTo(options);
 
-        const links = createLink(action);
-
-        console.log('add page link to page number ' + pageNum)
+        let links = null;
+        
         if (docId) {
             const otherDocumentAction = new window.Actions.URI({ uri: `bundle_custom_${docId}_${pageNum}` });
-            const links = createLink(otherDocumentAction);
+            links = createLink(otherDocumentAction);
+        } else {
+            links = createLink(action);
         }
 
         let pageNumbersToDraw = links.map(link => link.PageNumber);
@@ -336,7 +366,7 @@ export default ({ isModalOpen }) => {
                         </div>
                     </div>
                     <div class="button-container">
-                    <span class="button-action">
+                        <span class="button-action">
                             <Button
                                 dataElement="linkSubmitButton"
                                 label={t('action.cancel')}
@@ -350,7 +380,7 @@ export default ({ isModalOpen }) => {
                                 onClick={() => { setIsThumbnailSelectorOpen(true); }}
                             />
                         </span>
-                       
+
                     </div>
                 </div>
             }

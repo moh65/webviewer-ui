@@ -23,13 +23,15 @@ import { bool } from 'prop-types';
 //customization
 
 import { getAnnotationClass, getAnnotationClassForFilterModal } from 'helpers/getAnnotationClass';
-
+import TagDropDown from 'components/TagDropDown';
 //customization
+const hidden = [];
 
 const FilterAnnotModal = () => {
   const [isDisabled, isOpen] = useSelector(state => [
     selectors.isElementDisabled(state, 'filterModal'),
-    selectors.isElementOpen(state, 'filterModal'),
+    selectors.isElementOpen(state, 'filterModal')
+
   ]);
   const [t] = useTranslation();
   const dispatch = useDispatch();
@@ -50,7 +52,7 @@ const FilterAnnotModal = () => {
   const [privateFilter, setPrivateFilter] = useState(false);
   const [toDateRange, setToDateRange] = useState('yyyy-mm-dd');
   const [fromDateRange, setFromDateRange] = useState('yyyy-mm-dd');
-
+  const [filteredTags, setFilteredTags] = useState([]);
   //customization
 
 
@@ -71,10 +73,12 @@ const FilterAnnotModal = () => {
     return !!similarColors.length;
   }
 
+
+
   const filterApply = () => {
     //customization
-    //debugger
     const annots = core.getAnnotationsList();
+    hidden.splice(0, hidden.length);
     //customization
 
     dispatch(
@@ -148,6 +152,7 @@ const FilterAnnotModal = () => {
           } else
             toDateApply = true;
         }
+
         //customization
 
         //customization
@@ -158,15 +163,30 @@ const FilterAnnotModal = () => {
           isPrivate = false;
         } else
           isPrivate = (isPrivate == null || isPrivate == undefined || isPrivate === "" ? false : isPrivate);
-
         let privatePublicShow = (isPrivate && privateFilter) || (!isPrivate && !privateFilter);
 
-        let showComment = type && author && privatePublicShow && !fromDateApply && !toDateApply;
+        //customization
 
-        // if (!showComment) {
-        //   debugger
-        //   dispatch(actions.addToFilteredAnnotationToBeHidden(annot))
-        // }
+        //customization
+        let filteredTagShouldApply = false;
+        
+        if (filteredTags && filteredTags.length > 0){
+          let tag = annot.getCustomData('custom-tag');
+          let filteredTagValues = filteredTags.map(t => t.value.split('-')[0]);
+
+          let commonValues = filteredTagValues.filter((n) => tag.indexOf(n) !== -1);
+          filteredTagShouldApply = commonValues.length > 0 ? false : true;
+          debugger
+        }
+
+        //customization
+
+
+        let showComment = !filteredTagShouldApply && type && author && privatePublicShow && !fromDateApply && !toDateApply;
+
+        if (!showComment) {
+          hidden.push(annot);
+        }
 
         return showComment;
         //customization
@@ -192,7 +212,7 @@ const FilterAnnotModal = () => {
   };
 
   const filterClear = () => {
-    
+
 
     dispatch(
       actions.setCustomNoteFilter(annot => {
@@ -211,7 +231,8 @@ const FilterAnnotModal = () => {
     setPrivateFilter(false);
     setToDateRange('');
     setFromDateRange('');
-
+    hidden.splice(0, hidden.length);
+    showAnnot();
     //customization
 
     fireEvent('annotationFilterChanged', {
@@ -272,6 +293,8 @@ const FilterAnnotModal = () => {
       }
     });
 
+
+    hideAnnot();
     setAuthors([...authorsToBeAdded]);
     setAnnotTypes([...annotTypesToBeAdded]);
     setColorTypes([...annotColorsToBeAdded]);
@@ -424,6 +447,18 @@ const FilterAnnotModal = () => {
   };
 
   //customization
+  const renderTags = () => {
+
+    return (
+      <div className="filter">
+        <div className="heading">{t('annotation.tag')}</div>
+        <div className="buttons">
+          <TagDropDown creatable={false} setSelectedTags={setFilteredTags} />
+        </div>
+      </div>
+    );
+  };
+
   const renderPrivateField = () => {
 
     return (
@@ -444,6 +479,15 @@ const FilterAnnotModal = () => {
       </div>
     );
   };
+
+  const hideAnnot = () => {
+    showAnnot();
+    core.hideAnnotations(hidden);
+  }
+
+  const showAnnot = () => {
+    core.showAnnotations(core.getAnnotationsList());
+  }
 
   const renderDateRange = () => {
 
@@ -510,6 +554,7 @@ const FilterAnnotModal = () => {
                   {renderAnnotTypes()}
                   {renderPrivateField()}
                   {renderDateRange()}
+                  {renderTags()}
                 </div>
                 <div className="footer">
                   <Button className="filter-annot-clear" onClick={filterClear} label={t('action.clear')} />

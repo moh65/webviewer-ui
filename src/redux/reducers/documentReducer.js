@@ -1,6 +1,5 @@
 export default initialState => (state = initialState, action) => {
   const { type, payload } = action;
-  debugger
   switch (type) {
     case 'SET_DOCUMENT_FILE':
       return { ...state, file: payload.documentFile, path: payload.documentFile.name, pdfDoc: null };
@@ -38,9 +37,6 @@ export default initialState => (state = initialState, action) => {
       return { ...state, defaultPrintOptions: payload.options };
     case 'SET_LOADING_PROGRESS':
       return { ...state, loadingProgress: payload.progress };
-    case 'ADD_TO_FILTERED_ANNOTATION_TO_BE_HIDDEN':
-      debugger
-      return { ...state, filteredAnnotationToBeHidden: [...state.filteredAnnotationToBeHidden, payload.annotation] }
     default:
       return state;
   }

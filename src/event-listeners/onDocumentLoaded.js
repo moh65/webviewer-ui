@@ -153,11 +153,29 @@ export default store => async () => {
   }, 60 * 1000)
 
   const onTriggered = window.instance.Actions.URI.prototype.onTriggered;
+  const onTriggeredGoto = window.instance.Actions.GoTo.prototype.onTriggered;
+
+  Actions.GoTo.prototype.onTriggered = function(target, event) {
+    
+    if (!selectors.isCtrlPressed(getState())){
+      return;
+    }
+    onTriggeredGoto.apply(this, arguments);
+  }
+
   Actions.URI.prototype.onTriggered = function(target, event) {
     // console.log('this', this); //get the url from this
     // console.log('arguments', arguments);
     // debugger
+    // debugger
+    // alert(event.ctrlKey);
+
     if (target instanceof Annotations.Link) {
+
+      if (!selectors.isCtrlPressed(getState())){
+        return;
+      }
+      
       if (this.uri.includes('bundle_custom_')){
         console.log('new url tab before = ' + this.uri.replace('bundle_custom_',''))
         let parts = this.uri.replace('bundle_custom_','').split('_');//parts[0] = itemid, parts[1] = page
@@ -184,6 +202,20 @@ export default store => async () => {
     }
     onTriggered.apply(this, arguments);
   };
+
+  window.document.addEventListener('keydown', (e)=>{
+    if (e.ctrlKey && !selectors.isCtrlPressed(getState()))
+    {
+      dispatch(actions.setIsCtrlPressed(true))
+    }
+  });
+
+  window.document.addEventListener('keyup', (e)=>{
+    if (e.key === "Control"){
+      dispatch(actions.setIsCtrlPressed(false))
+
+    }
+  });
 
   setTimeout(()=>{
     let section = selectors.getSectionUrl(getState());

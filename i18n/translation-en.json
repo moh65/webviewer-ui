@@ -136,7 +136,8 @@
     "3D": "3D",
     "sound": "Sound",
     "private":"private",
-    "visibility": "Visibility"
+    "visibility": "Visibility",
+    "tag":"Tags filter"
   },
   "rubberStamp": {
     "Approved": "Approved",
