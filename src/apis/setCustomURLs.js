@@ -1,3 +1,4 @@
+//customization-new-file
 import actions from 'actions';
 
 export default store => (sectionUrl, 

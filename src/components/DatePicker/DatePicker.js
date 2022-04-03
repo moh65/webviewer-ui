@@ -1,18 +1,17 @@
 import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const DatePicker = ({ onClick, annotation, onDatePickerShow }) => {
+const DatePicker = ({ onClick, annotation, onDatePickerShow, dateFormat }) => {
   const dateRef = useRef(null);
   const dateContainerRef = useRef(null);
   useEffect(() => {
-    debugger
     let datePicker;
     const getDatePicker = async () => {
       datePicker = await window.Core.createDatePicker({
         field: dateRef.current,
         onClick,
         container: dateContainerRef.current,
-        format: 'dd-MM-yyyy',
+        format: dateFormat ? dateFormat : 'dd-MM-yyyy',
       });
       onDatePickerShow(true);
     };

@@ -1,3 +1,5 @@
+import core from 'core';
+
 export const getAnnotationClass = annotation => {
   if (annotation instanceof Annotations.CaretAnnotation) {
     return 'caret';
@@ -123,6 +125,10 @@ export const getAnnotationClassForFilterModal = annotation => {
     return 'annotations';
   }
   if (annotation instanceof Annotations.TextHighlightAnnotation) {
+    const annots = core.getAnnotationsList();
+    if (annots.some(s => s.Subject === 'Link' && s.InReplyTo === annotation.Id))
+      return 'links';
+
     return 'annotations';
   }
   if (annotation instanceof Annotations.TextStrikeoutAnnotation) {

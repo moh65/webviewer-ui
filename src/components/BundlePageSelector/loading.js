@@ -1,3 +1,4 @@
+//customization-new-file
 import React from 'react';
 
 export default ({ wd, ht }) => {

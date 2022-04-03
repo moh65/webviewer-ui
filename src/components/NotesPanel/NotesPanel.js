@@ -35,7 +35,9 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     isDocumentReadOnly,
     enableNotesPanelVirtualizedList,
     isInDesktopOnlyMode,
+    //customization
     editLinkMode
+    //customization
   ] = useSelector(
     state => [
       selectors.getSortStrategy(state),
@@ -48,7 +50,9 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       selectors.isDocumentReadOnly(state),
       selectors.getEnableNotesPanelVirtualizedList(state),
       selectors.isInDesktopOnlyMode(state),
+    //customization
       selectors.isEditLinkMode(state),
+    //customization
     ],
     shallowEqual,
   );
@@ -302,7 +306,8 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       sortStrategy,
     };
 
-    if (index === singleSelectedNoteIndex && !editLinkMode) {
+    
+    if (index === singleSelectedNoteIndex && /*customization*/ !editLinkMode /*customization*/) {
       setTimeout(() => {
         setScrollToSelectedAnnot(false);
         // open the 'annotationNoteConnectorLine' since the note it's pointing to is being rendered

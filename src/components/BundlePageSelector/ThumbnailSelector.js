@@ -22,17 +22,16 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
     ]);
     const [t] = useTranslation();
 
-    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDgxNjM0MDUsImV4cCI6MTY0ODE2NzAwNSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiIyNGRiOTMyZGU4MWM0Y2Q3YTU2MzY0YzRiZDZkYTAwNyIsImF1dGhfdGltZSI6MTY0Nzk4ODk2NywiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJjYTdmZWFkMTAxZDg0NDk3OTg5ODBiMTQ0YmU1MTFlMiIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiVXNlciIsIlN1cGVyQWRtaW4iXSwic2NvcGUiOlsicGVybWlzc2lvbnMiLCJyb2xlcyIsInByb2ZpbGUiLCJvcGVuaWQiLCJidW5kbGUiXSwiYW1yIjpbInB3ZCJdfQ.nJit1rki6v53HWD8DEQg7gFqf4b3LTYwAkSFkLpg3EOosM5MMpDZbNPc96oxp-ygQBwKw6ypfnpNuM5dDYAOiSWTHKST9EE2Gp8nVcFIciwz60BsAC-a4VlRwRAlcUUCk1ZZjFFS9z9AhhzVzA5zSulAECpUCEmnwc-dzS2CsHDi861lamuAIqGLwY06h8bLIXqDtFwUXoXkfhzxsKuPijb_XZHscgPAOOMf94O0klvEJTd1xP-HuuA8Bc9AVxGl7JVabK4Iynmrbg8FVHGz334CQP4mAnI4rN56B6fT3RAZPi9QKh4LMJet9y-AL2YUPyHQU1uOc_6IuWoQSFu14g';
+    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDgxODc0NjAsImV4cCI6MTY0ODE5MTA2MCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY0ODE3Njk2MiwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.TEVVxvt9SUfIVIczpDWldjqWM3A3Ejyef6xfDL7TUmvfwqoXX1BkxeZaAMHyXV2FHs9sMTDamzw5aKto6NKMvShf7pJm_wCypd-DxarsqwhcaqDmp8YF_3kVbe4xT-XudWTfvaZJ3aY0EpwcwDtuy5D63wl8LijN1EMR5H6S_MO50ImSQAS8egNDvvDYeekHegoM03kW0r8H2L-ugXNOBtaOUBrcAZFeQhqvBu38rrJqK1VOtmWryrTR7OCMZJ_HQJNYs5Uah_msWtpKsta5wFJXn3DqN77cBFPZMCbF9At8DedQAeH3942RnkWy0eZ1xMcuql_ZgaT4q46F5Ujc3Q';
     generateThumbnailUrl = generateThumbnailUrl ? generateThumbnailUrl : `http://localhost:5600/api/bundleitem/${logicalItemInfo.id}/generate/thumbnails`;
     pageThumbnailUrl = pageThumbnailUrl ? pageThumbnailUrl : 'http://localhost:5600/api/bundleitem/{itemId}/page/{pageId}/thumbnail?w=200&h=250&access_token={token}';
-    documentPagesUrl = documentPagesUrl ? documentPagesUrl : 'http://localhost:5600/api/bundle/ca7fead101d8449798980b144be511e2/632/{itemId}/pages';
+    documentPagesUrl = documentPagesUrl ? documentPagesUrl : 'http://localhost:5600/api/bundle/664/{itemId}/pages';
 
     const [thumbnailLoading, setThumbnailLoading] = useState(false);
     const [showGallery, setShowGallery] = useState(false);
     const [error, setError] = useState(false);
     const [pageThumbnailData, setPageThumbnailData] = useState([]);
     const [selectedPage, setSelectedPage] = useState({});
-
 
     const thumbnailClickHandler = (img) => {
         setSelectedPage(img);

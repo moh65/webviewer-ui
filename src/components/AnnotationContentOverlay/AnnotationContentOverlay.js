@@ -24,10 +24,13 @@ const AnnotationContentOverlay = () => {
 
   );
   const [t] = useTranslation();
+  //customization
   const [annotation, setAnnotation] = useState();
   const [annotationVisibility, setAnnotationVisibility] = useState(false);
   const [annotationDate, setAnnotationDate] = useState('');
   const [tagsName, setTagsName] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
+  //customization
   const [overlayPosition, setOverlayPosition] = useState({
     left: 0,
     top: 0,
@@ -75,16 +78,20 @@ const AnnotationContentOverlay = () => {
         const groupedAnnots = core.getAnnotationManager().getGroupAnnotations(annotation);
         const ungroupedAnnots = groupedAnnots.filter(annot => !annot.isGrouped());
         annotation = ungroupedAnnots.length > 0 ? ungroupedAnnots[0] : annotation;
-        
+
+        //customization
         setAnnotationVisibility(annotation.getCustomData('custom-private'));
         setAnnotationDate(annotation.getCustomData('custom-date'));
         let tags = annotation.getCustomData('custom-tag-options');
-        //debugger
-        if (tags != null && tags !== ''){
+
+        if (tags != null && tags !== '') {
           tags = JSON.parse(tags).map(m => m.label).join(',');
         }
         setTagsName(tags);
-        
+
+        let link = annotation.getCustomData('custom-link');
+        setLinkUrl(link && link !== '' && link != {} ? link : null);
+        //customization
 
         if (isUsingCustomHandler || !(annotation instanceof Annotations.FreeTextAnnotation)) {
           setAnnotation(annotation);
@@ -125,6 +132,7 @@ const AnnotationContentOverlay = () => {
           ? `${contents.slice(0, MAX_CHARACTERS)}...`
           : contents}
       </div>
+      {/*customization*/}
       <div>
         {
           annotationVisibility != null && annotationVisibility != '' ? `Private :${annotationVisibility}` : ``
@@ -140,6 +148,12 @@ const AnnotationContentOverlay = () => {
           tagsName != null && tagsName != '' ? `Tags: ${tagsName}` : ''
         }
       </div>
+      <div>
+        {
+          linkUrl != null ? `Link: ${linkUrl}` : ''
+        }
+      </div>
+      {/*customization*/}
       {numberOfReplies > 0 && (
         <div className="replies">
           {t('message.annotationReplyCount', { count: numberOfReplies })}

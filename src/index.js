@@ -36,6 +36,10 @@ import defineWebViewerInstanceUIAPIs from 'src/apis';
 
 import './index.scss';
 
+//customization
+import './fileman.scss';
+//customization
+
 const middleware = [thunk];
 
 let composeEnhancer = function noopStoreComposeEnhancer(middleware) {

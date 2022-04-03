@@ -188,9 +188,11 @@ import pageManipulationOverlay from './pageManipulationOverlay';
 import getWatermarkModalOptions from './getWatermarkModalOptions';
 import enableNoteSubmissionWithEnter from './enableNoteSubmissionWithEnter';
 import reloadOutline from './reloadOutline';
+//customization
 import setCustomURLs from './setCustomURLs';
 import setThisDocumentInfo from './setThisDocumentInfo';
 
+//customization
 
 
 export default store => {
@@ -262,8 +264,10 @@ export default store => {
     showOutlineControl: showOutlineControl(store),
     setCustomNoteFilter: setCustomNoteFilter(store),
     setCustomPanel: setCustomPanel(store),
+    //customization
     setCustomURLs: setCustomURLs(store),
     setThisDocumentInfo: setThisDocumentInfo(store),
+    //customization
     exportBookmarks: exportBookmarks(store),
     extractPagesWithAnnotations,
     importBookmarks: importBookmarks(store),

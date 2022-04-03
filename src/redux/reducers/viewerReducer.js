@@ -367,6 +367,8 @@ export default initialState => (state = initialState, action) => {
       return { ...state, signatureFonts: payload.signatureFonts };
     case 'SET_SELECTED_TAB':
       return { ...state, tab: { ...state.tab, [payload.id]: payload.dataElement } };
+    //customization
+
     case 'LOAD_SECTIONS_INFO':
       return { ...state, customized: { ...state.customized, loadSectionsInfo: payload.needToLoadSectionsInfo } };
     case 'UPDATE_AUTH_TOKEN':
@@ -397,7 +399,8 @@ export default initialState => (state = initialState, action) => {
       return { ...state, customized: { ...state.customized, annotationLinkToEdit: payload.annotationLinkToEdit } };
     case 'SET_IS_CTRL_PRESSED':
       return { ...state, customized: { ...state.customized, isCtrlPressed: payload.isCtrlPressed } };
-      
+    //customization
+
     case 'SET_CUSTOM_ELEMENT_OVERRIDES':
       return { ...state, customElementOverrides: { ...state.customElementOverrides, [payload.dataElement]: payload.overrides } };
     case 'SET_PAGE_REPLACEMENT_FILE_LIST':

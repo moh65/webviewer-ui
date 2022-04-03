@@ -264,6 +264,7 @@ export const getSignatureFonts = state => state.viewer.signatureFonts;
 
 export const getSelectedTab = (state, id) => state.viewer.tab[id];
 
+//customization
 export const getLoadSectionsInfo = state => state.viewer.customized.loadSectionsInfo
 
 export const getAuthToken = state => state.viewer.customized.authToken
@@ -293,6 +294,8 @@ export const isEditLinkMode = state => state.viewer.customized.editLinkMode
 export const getAnnotationLinkToEdit = state => state.viewer.customized.annotationLinkToEdit
 
 export const isCtrlPressed = state => state.viewer.customized.isCtrlPressed
+
+//customization
 
 export const getCustomElementOverrides = (state, dataElement = '') => state.viewer.customElementOverrides[dataElement];
 

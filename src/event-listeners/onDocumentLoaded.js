@@ -139,6 +139,7 @@ export default store => async () => {
   fireEvent(Events.DOCUMENT_LOADED);
 
 
+    //customization
   const updateToken = ()=> {
     let token = localStorage.getItem('bundle_auth_token');
     if (token != null && token !== ''){
@@ -152,6 +153,7 @@ export default store => async () => {
     updateToken();
   }, 60 * 1000)
 
+
   const onTriggered = window.instance.Actions.URI.prototype.onTriggered;
   const onTriggeredGoto = window.instance.Actions.GoTo.prototype.onTriggered;
 
@@ -164,11 +166,6 @@ export default store => async () => {
   }
 
   Actions.URI.prototype.onTriggered = function(target, event) {
-    // console.log('this', this); //get the url from this
-    // console.log('arguments', arguments);
-    // debugger
-    // debugger
-    // alert(event.ctrlKey);
 
     if (target instanceof Annotations.Link) {
 
@@ -177,27 +174,20 @@ export default store => async () => {
       }
       
       if (this.uri.includes('bundle_custom_')){
-        console.log('new url tab before = ' + this.uri.replace('bundle_custom_',''))
         let parts = this.uri.replace('bundle_custom_','').split('_');//parts[0] = itemid, parts[1] = page
-        console.log('parts = ' + parts[0] + ' ' + parts[1]);
         let newTabUrl = selectors.getLoadDocumentInNewTabUrl(getState());
-        console.log('new tab url = ' + newTabUrl);
         const token = selectors.getAuthToken(getState());
         newTabUrl = newTabUrl.replace('%7BitemId%7D', parts[0]).replace('%7BpageNum%7D', parts[1]);
         newTabUrl = newTabUrl + `?access_token=${token}`
-        console.log('final url tab = ' + newTabUrl);
         window.open(newTabUrl);
       } else {
-        console.log('uri = ' + this.uri)
         let url = this.uri;
         if (!url.startsWith('http')){
           url = 'http://' + url;
         }
         window.open(url);
       }
-      //console.log(target);
-      // do uri modification here
-      //window.open(modifiled url)
+
       return;
     }
     onTriggered.apply(this, arguments);
@@ -228,4 +218,5 @@ export default store => async () => {
     console.log('ctag = ' + ctag)
     console.log('gtag = ' + gtag)
   }, 5000)
+    //customization
 };

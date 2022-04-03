@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +24,9 @@ import { bool } from 'prop-types';
 
 import { getAnnotationClass, getAnnotationClassForFilterModal } from 'helpers/getAnnotationClass';
 import TagDropDown from 'components/TagDropDown';
+import QueryBuilder from 'components/QueryBuilder';
+import DatePicker from '../DatePicker';
+
 //customization
 const hidden = [];
 
@@ -35,6 +38,8 @@ const FilterAnnotModal = () => {
   ]);
   const [t] = useTranslation();
   const dispatch = useDispatch();
+
+  const dropRef = useRef();
 
   const [authors, setAuthors] = useState([]);
   const [annotTypes, setAnnotTypes] = useState([]);
@@ -52,7 +57,11 @@ const FilterAnnotModal = () => {
   const [privateFilter, setPrivateFilter] = useState(false);
   const [toDateRange, setToDateRange] = useState('yyyy-mm-dd');
   const [fromDateRange, setFromDateRange] = useState('yyyy-mm-dd');
+  const [isFromDatePickerShown, setIsFromDatePickerShown] = useState(false);
+  const [isToDatePickerShown, setIsToDatePickerShown] = useState(false);
   const [filteredTags, setFilteredTags] = useState([]);
+  const [openQueryBuilder, setOpenQueryBuilder] = useState(false);
+
   //customization
 
 
@@ -163,20 +172,22 @@ const FilterAnnotModal = () => {
           isPrivate = false;
         } else
           isPrivate = (isPrivate == null || isPrivate == undefined || isPrivate === "" ? false : isPrivate);
-        let privatePublicShow = (isPrivate && privateFilter) || (!isPrivate && !privateFilter);
+
+
+        let privatePublicShow = privateFilter ? (isPrivate ? true : false) : true;//    (isPrivate && privateFilter) || (!isPrivate && !privateFilter);
 
         //customization
 
         //customization
         let filteredTagShouldApply = false;
-        
-        if (filteredTags && filteredTags.length > 0){
+
+        if (filteredTags && filteredTags.length > 0) {
           let tag = annot.getCustomData('custom-tag');
           let filteredTagValues = filteredTags.map(t => t.value.split('-')[0]);
 
           let commonValues = filteredTagValues.filter((n) => tag.indexOf(n) !== -1);
           filteredTagShouldApply = commonValues.length > 0 ? false : true;
-          debugger
+
         }
 
         //customization
@@ -229,10 +240,14 @@ const FilterAnnotModal = () => {
     //customization
 
     setPrivateFilter(false);
-    setToDateRange('');
-    setFromDateRange('');
+    setToDateRange('yyyy-mm-dd');
+    setFromDateRange('yyyy-mm-dd');
     hidden.splice(0, hidden.length);
     showAnnot();
+    setFilteredTags([]);
+    dropRef.current.clearSelect();
+    setIsFromDatePickerShown(false);
+
     //customization
 
     fireEvent('annotationFilterChanged', {
@@ -276,8 +291,6 @@ const FilterAnnotModal = () => {
       ) {
         return;
       }
-      if (annot.Subject === 'Link')
-        debugger
 
       annotTypesToBeAdded.add(getAnnotationClassForFilterModal(annot));
       if (annot.Color && !similarColorExist([...annotColorsToBeAdded], annot.Color)) {
@@ -305,7 +318,6 @@ const FilterAnnotModal = () => {
       core.removeEventListener('documentUnloaded', closeModal);
     };
   }, [isOpen]);
-
 
 
 
@@ -447,13 +459,14 @@ const FilterAnnotModal = () => {
   };
 
   //customization
+
   const renderTags = () => {
 
     return (
       <div className="filter">
         <div className="heading">{t('annotation.tag')}</div>
         <div className="buttons">
-          <TagDropDown creatable={false} setSelectedTags={setFilteredTags} />
+          <TagDropDown ref={dropRef} creatable={false} setSelectedTags={setFilteredTags} />
         </div>
       </div>
     );
@@ -489,39 +502,64 @@ const FilterAnnotModal = () => {
     core.showAnnotations(core.getAnnotationsList());
   }
 
+  const renderQueryBuilder = () => {
+    return (
+      <div>
+        <button onClick={() => { setOpenQueryBuilder(true) }}>query...</button>
+        <QueryBuilder isOpen={openQueryBuilder} onClose={() => { setOpenQueryBuilder(false) }} />
+      </div>
+
+    )
+  }
+
   const renderDateRange = () => {
 
     return (
       <div className="filter">
         <div className="heading">Date Range Filter</div>
         <div className="buttons">
-          <span>
-            <label for="fromDateRange">From Date: </label>
-            <input
-              type="date"
-              id="fromDateRange"
-              value={fromDateRange}
-              onChange={e => {
-                e.stopPropagation();
-                setFromDateRange(e.target.value);
-              }
+          <div>
+            <label htmlFor="fromDateRange">From Date: {fromDateRange} </label>
+            {
+              isFromDatePickerShown && (
+                <DatePicker
+                  dateFormat='YYYY-MM-DD'
+                  onClick={(selectedDate) => {
+                    setFromDateRange(selectedDate);
+                    setIsFromDatePickerShown(false);
+                  }}
+                  onDatePickerShow={() => { }}
+                />
+              )
+            }
 
-              } />
-          </span>
+            <button onClick={(e) => {
+              e.stopPropagation();
+              setIsFromDatePickerShown(true);
+            }}>...</button>
+
+          </div>
           <br />
-          <span>
-            <label for="toDateRange">To Date: </label>
-            <input
-              type="date"
-              id="toDateRange"
-              value={toDateRange}
-              onChange={
-                e => {
-                  e.stopPropagation();
-                  setToDateRange(e.target.value);
-                }
-              } />
-          </span>
+          <div>
+            <label htmlFor="toDateRange">To Date: {toDateRange} </label>
+            {
+              isToDatePickerShown && (
+                <DatePicker
+                  dateFormat='YYYY-MM-DD'
+                  onClick={(selectedDate) => {
+                    setToDateRange(selectedDate);
+                    setIsToDatePickerShown(false);
+                  }}
+                  onDatePickerShow={() => { }}
+                />
+              )
+            }
+
+            <button onClick={(e) => {
+              e.stopPropagation();
+              setIsToDatePickerShown(true);
+            }}>...</button>
+          </div>
         </div>
       </div>
     );
@@ -555,6 +593,7 @@ const FilterAnnotModal = () => {
                   {renderPrivateField()}
                   {renderDateRange()}
                   {renderTags()}
+                  {renderQueryBuilder()}
                 </div>
                 <div className="footer">
                   <Button className="filter-annot-clear" onClick={filterClear} label={t('action.clear')} />

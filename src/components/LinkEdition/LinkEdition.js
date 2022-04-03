@@ -1,29 +1,52 @@
+//customization-new-file
+
 import React, { Component, useState, useEffect } from 'react'
 import actions from 'actions';
 import selectors from 'selectors';
+import core from 'core';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import LinkModal from 'components/LinkModal';
 
 export default ({ annotation }) => {
     const dispatch = useDispatch();
+    const [urlElement, setUrlElement] = useState({});
+    const [pageElement, setPageElement] = useState({});
+    const [url, setUrl] = useState('');
+
+    useEffect(() => {
+        let urlElement = annotation.actions.U.find(f => f.elementName === 'URI');
+        setUrlElement(urlElement)
+        let pageElement = annotation.actions.U.find(f => f.elementName === 'GoTo');
+        setPageElement(pageElement)
+        
+        let highlightAnnot = core.getAnnotationById(annotation.InReplyTo);
+        if (highlightAnnot){
+            setUrl(highlightAnnot.getCustomData('custom-link'));
+        }
+    })
 
     const showEditUrl = (e) => {
         e.preventDefault();
-        let urlElement = annotation.actions.U.find(f => f.elementName === 'URI');
-        let pageElement = annotation.actions.U.find(f => f.elementName === 'GoTo');
 
-        if (pageElement || (urlElement && urlElement.uri.includes('bundle_custom_'))) {            
-            dispatch(actions.setAnnotationLinkToEdit({annotation, element: pageElement, isPageLink: true}));
+        if (pageElement || (urlElement && urlElement.uri.includes('bundle_custom_'))) {
+            dispatch(actions.setAnnotationLinkToEdit({ annotation, element: pageElement, isPageLink: true }));
             dispatch(actions.openElement('linkModal'))
+
         } else if (urlElement) {
-            dispatch(actions.setAnnotationLinkToEdit({annotation, element: urlElement, isPageLink: false}));
+            dispatch(actions.setAnnotationLinkToEdit({ annotation, element: urlElement, isPageLink: false }));
             dispatch(actions.openElement('linkModalUrl'))
+
         }
     }
 
     return (
         <div>
-            <button onClick={showEditUrl}>Edit Link</button>
+            <div>
+                <span>Link:</span>
+                <strong>{url}</strong>
+            </div>
+            <div>
+                <button onClick={showEditUrl}>Edit</button>
+            </div>
         </div>
     )
 }

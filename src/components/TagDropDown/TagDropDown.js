@@ -1,15 +1,14 @@
-import React, { Component, useState, useEffect } from 'react'
+//customization-new-file
+import React, { Component, useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import Select from 'react-select'
 import { SketchPicker } from 'react-color'
 import actions from 'actions';
 import selectors from 'selectors';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import './TagDropDown.scss';
 
 // to load options from external URL provided by WebViewer constructor
 
-
-export default ({ setDropDownChanged, setSelectedTags, selectedTags, creatable, placeholder }) => {
+export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, creatable, placeholder }, ref) => {
     const [
         defaultTag
     ] = useSelector(
@@ -18,13 +17,24 @@ export default ({ setDropDownChanged, setSelectedTags, selectedTags, creatable, 
         ]
     );
 
+    const dropDownRef = useRef();
+
     const [tagOptions, setTagOptions] = useState([]);
     const [showTagCreateForm, setShowTagCreateForm] = useState(false);
     const [tagName, setTagName] = useState('');
     const [tagColor, setTagColor] = useState('');
-
     const [showNoTagOption, setShowNoTagOption] = useState(creatable ? true : false);
     const dispatch = useDispatch();
+
+    useImperativeHandle(ref, () => ({
+        
+        clearSelect(){
+            dropDownRef.current.select.clearValue();
+        }
+
+    }));
+
+
 
     const customStyles = {
         option: (provided, state) => {
@@ -69,7 +79,7 @@ export default ({ setDropDownChanged, setSelectedTags, selectedTags, creatable, 
         if (creatable) {
             options.push(createTagOption);
             options.unshift(noTagOption);
-        } 
+        }
         setTagOptions(options);
     }, []);
 
@@ -96,7 +106,7 @@ export default ({ setDropDownChanged, setSelectedTags, selectedTags, creatable, 
                 }
             }
             }
-
+            ref={dropDownRef}
             placeholder={placeholder}
             defaultValue={creatable ? noTagOption : (defaultTag && defaultTag.value ? defaultTag : selectedTags)}
             isSearchable
@@ -113,16 +123,14 @@ export default ({ setDropDownChanged, setSelectedTags, selectedTags, creatable, 
                 <br />
                 <label htmlFor='tagColor'>Tag Color:</label>
                 <SketchPicker color={tagColor} onChange={colorPickerHandler} />
-                <div className='drop-down-container'>
-                    <div className='drop-down-button'>
-                        <button className='save-button' onClick={e => true}>save</button>
+                <div className='fm-container'>
+                    <div className='fm-container-child'>
+                        <button className='fm-save-button' onClick={e => true}>save</button>
                     </div>
-                    <div className='drop-down-button'>
-                        <button className="cancel-button" onClick={e => setShowTagCreateForm(false)}>cancel</button>
+                    <div className='fm-container-child'>
+                        <button className="fm-cancel-button" onClick={e => setShowTagCreateForm(false)}>cancel</button>
                     </div>
                 </div>
-
-
             </div>
     )
-}
+})

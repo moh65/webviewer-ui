@@ -486,6 +486,7 @@ export const setSelectedTab = (id, dataElement) => ({
   type: 'SET_SELECTED_TAB',
   payload: { id, dataElement },
 });
+//customization
 export const loadSectionsInfo = (needToLoadSectionsInfo) => ({
   type: 'LOAD_SECTIONS_INFO',
   payload: { needToLoadSectionsInfo: needToLoadSectionsInfo },
@@ -547,6 +548,8 @@ export const updateAuthToken = (token) => ({
   type: 'UPDATE_AUTH_TOKEN',
   payload: { token: token },
 });
+//customization
+
 export const setCustomElementOverrides = (dataElement, overrides) => ({
   type: 'SET_CUSTOM_ELEMENT_OVERRIDES',
   payload: { dataElement, overrides },

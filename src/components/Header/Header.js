@@ -26,6 +26,7 @@ class Header extends React.PureComponent {
       return null;
     }
 
+    //customization
     let tagDropDown = activeHeaderItems.find(f => f.id === 'tagDropDown');
     if (!tagDropDown){
       let tagDropDownItem = {
@@ -42,6 +43,7 @@ class Header extends React.PureComponent {
   
       activeHeaderItems.push(tagDropDownItem);
     }
+    //customization
     
 
     return (

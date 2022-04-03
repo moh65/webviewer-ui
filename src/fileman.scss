@@ -1,17 +1,17 @@
-@import '../../constants/styles';
-@import '../../constants/note';
-
-.drop-down-container {
+.fm-container {
     padding: 0px;
 }
 
-.drop-down-button {
+.fm-container-child {
     width: 50%;
     float: left;
     padding: 0px;
 }  
 
-.save-button {
+@import 'constants/styles';
+@import 'constants/note';
+
+.fm-save-button {
     @include button-reset;
     cursor: pointer;
     flex-shrink: 0;
@@ -37,7 +37,7 @@
     }
   }
 
-  .cancel-button {
+  .fm-cancel-button {
     @include button-reset;
     color: var(--secondary-button-text);
     padding: 0 10px;

@@ -54,11 +54,13 @@ class Icon extends React.PureComponent {
     const filter = (color && (color === 'rgba(255, 255, 255, 1)' || color === 'rgb(255, 255, 255)')) ? 'drop-shadow(0 0 .5px #333)' : undefined;
     let svgElement;
     
+    //customization
     try {
       svgElement = this.isInlineSvg() ? glyph : require(`../../../assets/icons/${this.props.glyph}.svg`);
     } catch {
       svgElement = undefined;
     }
+    //customization
 
     const style = {
       filter

@@ -60,7 +60,7 @@ export default store => {
   if (measurementsDisabled) {
     disableFeatures([Feature.Measurement]);
   }
-
+  //redaction-enable
   //customization
   // const redactionsDisabled = !(
   //   getHashParameters('enableRedaction', false) || core.isCreateRedactionEnabled()

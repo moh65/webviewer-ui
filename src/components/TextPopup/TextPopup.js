@@ -116,6 +116,7 @@ const TextPopup = ({ t }) => {
           dataElement="textStrikeoutToolButton"
           role="option"
         />
+        {/*customization*/}
         <ActionButton
           title="tool.LinkUrl"
           img="icon-tool-link"
@@ -143,6 +144,7 @@ const TextPopup = ({ t }) => {
             role="option"
           />
         )} */}
+        {/*customization*/}
       </CustomizablePopup>
     </div>
   );

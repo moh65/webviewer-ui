@@ -28,13 +28,17 @@ const LinkModal = () => {
     annotationLinkToEdit
   ] = useSelector(state => [
     selectors.isElementDisabled(state, 'linkModal'),
+
     //customization
     selectors.isElementDisabled(state, 'linkModalUrl'),
     //customization
+
     selectors.isElementOpen(state, 'linkModal'),
+
     //customization
     selectors.isElementOpen(state, 'linkModalUrl'),
     //customization
+
     selectors.getTotalPages(state),
     selectors.getCurrentPage(state),
     selectors.getSelectedTab(state, 'linkModal'),
@@ -55,16 +59,6 @@ const LinkModal = () => {
   const [url, setURL] = useState('');
   const [pageLabel, setPageLabel] = useState("");
 
-  // if (showModal && openForUrlOrPage === 'url'){
-  //   setTimeout(() => dispatch(actions.closeElement('annotationNoteConnectorLine')), 100);
-
-  //   isOpenForUrl = true;
-  //   isDisabledForUrl = false;
-  // } else if (showModal && openForUrlOrPage === 'page'){
-  //   isOpen = true;
-  //   isDisabled = false;
-  // }
-
   const closeModal = () => {
     //customization
     if (isOpenForUrl) {
@@ -73,10 +67,10 @@ const LinkModal = () => {
     if (isOpen){
       dispatch(actions.closeElement('linkModal'));
     }
+    dispatch(actions.setAnnotationLinkToEdit(null))
     //customization
     setURL('');
     core.setToolMode(defaultTool);
-    dispatch(actions.setAnnotationLinkToEdit(null))
   };
 
   const newLink = (x, y, width, height, linkPageNumber = currentPage) => {
@@ -101,6 +95,8 @@ const LinkModal = () => {
     let quads = core.getSelectedTextQuads();
     const selectedAnnotations = core.getSelectedAnnotations();
 
+    
+    //customization
     if (quads && Object.keys(quads).length === 0){
       let fakeQuads = {};
       fakeQuads[annotationLinkToEdit.annotation.PageNumber] = [];
@@ -120,12 +116,16 @@ const LinkModal = () => {
       
       quads = fakeQuads;
     }
+    //customization
 
 
     if (quads) {
       let selectedText = core.getSelectedText();
+    //customization
+
       if (!selectedText || selectedText === '')
         selectedText = selectedAnnotations[0].Wba;
+    //customization
         
       for (const currPageNumber in quads) {
         const currPageLinks = [];
@@ -141,10 +141,15 @@ const LinkModal = () => {
           );
         });
         
+    //customization
+
         if (annotationLinkToEdit && annotationLinkToEdit.annotation){
           let highlightAnnot = core.getAnnotationManager().getAnnotationById(annotationLinkToEdit.annotation.InReplyTo);
           core.deleteAnnotations([annotationLinkToEdit.annotation, highlightAnnot])
         }
+
+    //customization
+
         createHighlightAnnot(
           currPageLinks,
           quads[currPageNumber],
@@ -155,6 +160,7 @@ const LinkModal = () => {
       }
     }
 
+    //customization
     // if (selectedAnnotations) {
       
     //   selectedAnnotations.forEach(annot => {
@@ -177,6 +183,7 @@ const LinkModal = () => {
     //     annotManager.groupAnnotations(annot, [link]);
     //   });
     // }
+    //customization
 
     return linksResults;
   };
@@ -195,12 +202,16 @@ const LinkModal = () => {
     highlight.Quads = quads;
     highlight.Author = core.getCurrentUser();
     highlight.setContents(text);
+    highlight.setCustomData('trn-annot-preview', text);
 
     linkAnnotArray.forEach((link, index) => {
       link.addAction('U', action);
       index === 0 ? core.addAnnotations([link, highlight]) : core.addAnnotations([link]);
     });
     annotManager.groupAnnotations(highlight, linkAnnotArray);
+    //customization
+    highlight.setCustomData('custom-link', action.uri)
+    //customization
   };
 
   const addURLLink = e => {
@@ -245,6 +256,7 @@ const LinkModal = () => {
 
   useEffect(() => {
     
+    //customization
     if (annotationLinkToEdit && !annotationLinkToEdit.isPageLink){
       setURL(annotationLinkToEdit.element.uri);
     }
@@ -270,6 +282,7 @@ const LinkModal = () => {
 
       setPageLabel(pageLabels.length > 0 ? pageLabels[0] : "1");
     }
+    //customization
   }, [totalPages, isOpen, isOpenForUrl]);
 
   useEffect(() => {
@@ -281,6 +294,7 @@ const LinkModal = () => {
   }, [tabSelected, isOpen, isOpenForUrl, pageLabelInput, urlInput]);
 
   useEffect(() => {
+    //customization
     if (isOpenForUrl) {
       dispatch(actions.setSelectedTab('linkModal', 'URLPanelButton'));
     }
@@ -288,6 +302,7 @@ const LinkModal = () => {
       dispatch(actions.setSelectedTab('linkModal', 'PageNumberPanelButton'));
       dispatch(actions.loadSectionsInfo(true));
     }
+    //customization
 
     core.addEventListener('documentUnloaded', closeModal);
     return () => {

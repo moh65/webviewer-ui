@@ -34,25 +34,23 @@ export default ({ isModalOpen }) => {
     ]);
     const [t] = useTranslation();
 
-    sectionUrl = sectionUrl ? sectionUrl : 'http://localhost:5600/api/bundle/632/items/sections';
-    documentUrl = documentUrl ? documentUrl : 'http://localhost:5600/api/bundle/sections/ca7fead101d8449798980b144be511e2/632/{sectionId}/documents/list';
-    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDgxNjM0MDUsImV4cCI6MTY0ODE2NzAwNSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiIyNGRiOTMyZGU4MWM0Y2Q3YTU2MzY0YzRiZDZkYTAwNyIsImF1dGhfdGltZSI6MTY0Nzk4ODk2NywiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJjYTdmZWFkMTAxZDg0NDk3OTg5ODBiMTQ0YmU1MTFlMiIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiVXNlciIsIlN1cGVyQWRtaW4iXSwic2NvcGUiOlsicGVybWlzc2lvbnMiLCJyb2xlcyIsInByb2ZpbGUiLCJvcGVuaWQiLCJidW5kbGUiXSwiYW1yIjpbInB3ZCJdfQ.nJit1rki6v53HWD8DEQg7gFqf4b3LTYwAkSFkLpg3EOosM5MMpDZbNPc96oxp-ygQBwKw6ypfnpNuM5dDYAOiSWTHKST9EE2Gp8nVcFIciwz60BsAC-a4VlRwRAlcUUCk1ZZjFFS9z9AhhzVzA5zSulAECpUCEmnwc-dzS2CsHDi861lamuAIqGLwY06h8bLIXqDtFwUXoXkfhzxsKuPijb_XZHscgPAOOMf94O0klvEJTd1xP-HuuA8Bc9AVxGl7JVabK4Iynmrbg8FVHGz334CQP4mAnI4rN56B6fT3RAZPi9QKh4LMJet9y-AL2YUPyHQU1uOc_6IuWoQSFu14g';
+    sectionUrl = sectionUrl ? sectionUrl : 'http://localhost:5600/api/bundle/664/items/sections';
+    documentUrl = documentUrl ? documentUrl : 'http://localhost:5600/api/bundle/sections/664/{sectionId}/documents/list';
+    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDgxODc0NjAsImV4cCI6MTY0ODE5MTA2MCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY0ODE3Njk2MiwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.TEVVxvt9SUfIVIczpDWldjqWM3A3Ejyef6xfDL7TUmvfwqoXX1BkxeZaAMHyXV2FHs9sMTDamzw5aKto6NKMvShf7pJm_wCypd-DxarsqwhcaqDmp8YF_3kVbe4xT-XudWTfvaZJ3aY0EpwcwDtuy5D63wl8LijN1EMR5H6S_MO50ImSQAS8egNDvvDYeekHegoM03kW0r8H2L-ugXNOBtaOUBrcAZFeQhqvBu38rrJqK1VOtmWryrTR7OCMZJ_HQJNYs5Uah_msWtpKsta5wFJXn3DqN77cBFPZMCbF9At8DedQAeH3942RnkWy0eZ1xMcuql_ZgaT4q46F5Ujc3Q';
     currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
-        id: 210802,
+        id: 231423,
         title: 'Annette Wallis Atkins Costs Disclosure Signed'
     };
 
     const [data, setData] = useState([]);
     const [docs, setDocs] = useState([]);
 
-    const [deselectAll, setDeselectAll] = useState([]);
     const [isThumbnailSelectorOpen, setIsThumbnailSelectorOpen] = useState(false);
     const [loadingDocument, setLoadingDocument] = useState(false);
     const [thisDocumentInfo, setThisDocumentInfo] = useState({});
     const [selectedDocumentInfo, setSelectedDocumentInfo] = useState({});
     const dispatch = useDispatch();
-    const ref = React.createRef();
-
+    
     const renderSections = (jsonData) => {
         let children = [];
         if (jsonData.Children && jsonData.Children.length > 0) {
@@ -120,7 +118,6 @@ export default ({ isModalOpen }) => {
     }
 
     const onSelectThumbnailHandler = (img) => {
-        debugger
         setIsThumbnailSelectorOpen(false);
         let pageNumber = img.num;
         if (thisDocumentInfo.id === selectedDocumentInfo.id) {
@@ -129,7 +126,8 @@ export default ({ isModalOpen }) => {
             dispatch(actions.closeElement('linkModal'));
         } else {
             //created page link to other document
-            addPageLink(selectedDocumentInfo.id, pageNumber);
+
+            addPageLink(selectedDocumentInfo, pageNumber);
             dispatch(actions.closeElement('linkModal'));
         }
     }
@@ -147,12 +145,27 @@ export default ({ isModalOpen }) => {
         highlight.Quads = quads;
         highlight.Author = core.getCurrentUser();
         highlight.setContents(text);
-
+        highlight.setCustomData('trn-annot-preview', text);
+        
         linkAnnotArray.forEach((link, index) => {
             link.addAction('U', action);
             index === 0 ? core.addAnnotations([link, highlight]) : core.addAnnotations([link]);
         });
         annotManager.groupAnnotations(highlight, linkAnnotArray);
+
+        //customization
+        if (action.dest) {
+            highlight.setCustomData('custom-link', `page-${action.dest.page}`)
+        } else if (action.uri) {
+            if (action.uri.includes('bundle_custom')) {
+                highlight.setCustomData('custom-link', `doc: ${action.doc_title} p-(${action.doc_page})`)
+
+            } else {
+                //error it should not come here
+            }
+        }
+        //customization
+
     };
 
     const newLink = (x, y, width, height, linkPageNumber = currentPage) => {
@@ -180,7 +193,7 @@ export default ({ isModalOpen }) => {
             let fakeQuads = {};
             fakeQuads[annotationLinkToEdit.annotation.PageNumber] = [];
             let highlightAnnot = core.getAnnotationManager().getAnnotationById(annotationLinkToEdit.annotation.InReplyTo);
-            debugger
+
             for (const quad of highlightAnnot.Quads) {
                 fakeQuads[annotationLinkToEdit.annotation.PageNumber].push({
                     x1: quad.x1,
@@ -196,7 +209,7 @@ export default ({ isModalOpen }) => {
 
             quads = fakeQuads;
         }
-        
+
         if (quads) {
             let selectedText = core.getSelectedText();
             if (!selectedText || selectedText === '')
@@ -254,7 +267,7 @@ export default ({ isModalOpen }) => {
         return linksResults;
     };
 
-    const addPageLink = (docId, pageNum) => {
+    const addPageLink = (bundleDoc, pageNum) => {
 
 
         const Dest = window.Actions.GoTo.Dest;
@@ -263,13 +276,16 @@ export default ({ isModalOpen }) => {
         const action = new window.Actions.GoTo(options);
 
         let links = null;
-        
-        if (docId) {
-            const otherDocumentAction = new window.Actions.URI({ uri: `bundle_custom_${docId}_${pageNum}` });
+
+        if (bundleDoc) {
+            const otherDocumentAction = new window.Actions.URI({ uri: `bundle_custom_${bundleDoc.id}_${pageNum}` });
+            otherDocumentAction.doc_page = pageNum;
+            otherDocumentAction.doc_title = bundleDoc.title;
             links = createLink(otherDocumentAction);
         } else {
             links = createLink(action);
         }
+
 
         let pageNumbersToDraw = links.map(link => link.PageNumber);
         pageNumbersToDraw = [...new Set(pageNumbersToDraw)];
@@ -298,7 +314,7 @@ export default ({ isModalOpen }) => {
 
     const changeDocument = (isOpen) => {
         if (!isOpen) {
-            debugger
+
             setDocs([]);
             setIsThumbnailSelectorOpen(false);
         }
@@ -328,7 +344,7 @@ export default ({ isModalOpen }) => {
                                         headers: { "Authorization": `Bearer ${token}` }
                                     }).then(res => res.json())
                                         .then(json => {
-                                            debugger
+
                                             setDocs(json)
                                             setLoadingDocument(false)
                                         });
@@ -356,7 +372,8 @@ export default ({ isModalOpen }) => {
                                         // if (selectedDoc.children && selectedDoc.children.length > 0) {
                                         //     return;
                                         // }
-                                        setSelectedDocumentInfo({ id: n })
+
+                                        setSelectedDocumentInfo({ id: n, title: selectedDoc.text })
 
                                     }}
                                 >

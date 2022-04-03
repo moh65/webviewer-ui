@@ -207,7 +207,6 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
   }
 
   const handleNoteContentClicked = () => {
-    //debugger
     if (isReply) {
       onReplyClicked(annotation);
     } else if (!isEditing) {
@@ -406,12 +405,9 @@ const ContentArea = ({
 
   const contentClassName = classNames('edit-content', { 'reply-content': isReply })
 
-  //debugger
-
 
 
   return (
-    //customization
     <div className={contentClassName}>
       <NoteTextarea
         ref={el => {
@@ -424,6 +420,7 @@ const ContentArea = ({
         aria-label={`${t('action.comment')}...`}
       />
       {!isReply && (
+    //customization
         <div>
           <input type="date"
             value={noteDate}
@@ -431,9 +428,7 @@ const ContentArea = ({
               e.stopPropagation();
               setCustomDataChanged(true);
               let date = e.target.value;
-
               setNoteDate(date);
-              //annotation.setCustomData("custom-date", date);
             }}
           />
 
@@ -442,6 +437,7 @@ const ContentArea = ({
             setSelectedTags={setSelectedTags}
             selectedTags={selectedTags}
             creatable={false}
+            placeholder={"No tag ..."}
           />
 
           <Choice
@@ -453,10 +449,8 @@ const ContentArea = ({
               e.stopPropagation();
               setCustomDataChanged(true);
               if (e.target.checked) {
-                //annotation.setCustomData('custom-private', true);
                 setIsPrivate(true);
               } else {
-                //annotation.setCustomData('custom-private', false);
                 setIsPrivate(false);
               }
             }}
@@ -466,6 +460,8 @@ const ContentArea = ({
             linkAnnotation && <LinkEdition annotation={linkAnnotation} />
           }
         </div>
+    //customization
+
       )
       }
       <div className="edit-buttons">
@@ -483,8 +479,7 @@ const ContentArea = ({
             {t('action.apply')}
           </button>
         }
-
-
+        {/*customization*/}
         <button
           className="cancel-button"
           onClick={e => {
@@ -494,6 +489,7 @@ const ContentArea = ({
         >
           {t('action.delete')}
         </button>
+        {/*customization*/}
         <button
           className="cancel-button"
           onClick={e => {
@@ -511,11 +507,12 @@ const ContentArea = ({
           onClick={e => {
             e.stopPropagation();
             setContents(e);
-                        
+            //customization
             annotation.setCustomData('custom-private', isPrivate);
             annotation.setCustomData("custom-date", noteDate);
             annotation.setCustomData('custom-tag-options', selectedTags);
             annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0]));
+            //customization
           }}
         >
           {t('action.save')}
