@@ -63,6 +63,8 @@ const propTypes = {
   removeEventHandlers: PropTypes.func.isRequired,
 };
 
+
+
 const App = ({ removeEventHandlers }) => {
   const store = useStore();
   const dispatch = useDispatch();
@@ -133,6 +135,8 @@ const App = ({ removeEventHandlers }) => {
     tabletBreakpoint.addListener(onBreakpoint);
   }, []);
 
+
+
   return (
     <React.Fragment>
       <div className={classNames({ "App": true, 'is-in-desktop-only-mode': isInDesktopOnlyMode })}>
@@ -196,5 +200,7 @@ const App = ({ removeEventHandlers }) => {
 };
 
 App.propTypes = propTypes;
+
+
 
 export default hot(App);

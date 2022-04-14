@@ -289,7 +289,7 @@ export const closeElement = dataElement => (dispatch, getState) => {
   if (isElementDisabled || isElementClosed) {
     return;
   }
-
+  
   if (
     isDataElementLeftPanel(dataElement, state) &&
     state.viewer.openElements['leftPanel']
@@ -544,9 +544,29 @@ export const setIsCtrlPressed = (isCtrlPressed) => ({
   payload: { isCtrlPressed: isCtrlPressed },
 });
 
+export const setMetadataTypeUrl = (metadataTypeUrl) => ({
+  type: 'SET_METADATA_TYPE_URL',
+  payload: { metadataTypeUrl: metadataTypeUrl },
+});
+
+export const setRedactionBurninDateUrl = (redactonBurninDateUrl) => ({
+  type: 'SET_REDACTION_BURNIN_DATE_URL',
+  payload: { redactonBurninDateUrl: redactonBurninDateUrl },
+});
+
+export const setAllMimeTypesUrl = (allMimeTypesUrl) => ({
+  type: 'SET_ALL_MIMETYPES_URL',
+  payload: { allMimeTypesUrl: allMimeTypesUrl },
+});
+
 export const updateAuthToken = (token) => ({
   type: 'UPDATE_AUTH_TOKEN',
   payload: { token: token },
+});
+
+export const setTagOptions = (tagOptions) => ({
+  type: 'SET_TAG_OPTIONS',
+  payload: { tagOptions: tagOptions },
 });
 //customization
 

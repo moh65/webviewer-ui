@@ -8,7 +8,9 @@ export default store => (sectionUrl,
     generateThumbnailUrl, 
     pageThumbnailUrl, 
     documentPagesUrl,
-    loadDocumentInNewTabUrl) => {
+    loadDocumentInNewTabUrl,
+    metadataTypeUrl,
+    redactionBurninDateUrl) => {
 
     store.dispatch(actions.setSectionUrl(sectionUrl));
 
@@ -26,4 +28,7 @@ export default store => (sectionUrl,
 
     store.dispatch(actions.setLoadDocumentInNewTabUrl(loadDocumentInNewTabUrl));
     
+    store.dispatch(actions.setMetadataTypeUrl(metadataTypeUrl));
+
+    store.dispatch(actions.setRedactionBurninDateUrl(redactionBurninDateUrl));
 };

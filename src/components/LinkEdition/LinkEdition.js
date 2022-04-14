@@ -38,11 +38,17 @@ export default ({ annotation }) => {
         }
     }
 
+    const goToUrl= (e) => {
+        e.preventDefault();
+        debugger
+        annotation.actions.U[0].onTriggered(annotation, {rc: true}, annotation.cE);
+    }
+
     return (
         <div>
             <div>
                 <span>Link:</span>
-                <strong>{url}</strong>
+                <strong><a href="#" onClick={goToUrl}>{url}</a></strong>
             </div>
             <div>
                 <button onClick={showEditUrl}>Edit</button>

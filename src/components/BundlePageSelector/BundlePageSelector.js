@@ -12,7 +12,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Button from 'components/Button';
 import { useTranslation } from 'react-i18next';
-import Loading from './loading';
+import Loading from 'components/loading';
 
 
 
@@ -36,7 +36,7 @@ export default ({ isModalOpen }) => {
 
     sectionUrl = sectionUrl ? sectionUrl : 'http://localhost:5600/api/bundle/664/items/sections';
     documentUrl = documentUrl ? documentUrl : 'http://localhost:5600/api/bundle/sections/664/{sectionId}/documents/list';
-    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDgxODc0NjAsImV4cCI6MTY0ODE5MTA2MCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY0ODE3Njk2MiwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.TEVVxvt9SUfIVIczpDWldjqWM3A3Ejyef6xfDL7TUmvfwqoXX1BkxeZaAMHyXV2FHs9sMTDamzw5aKto6NKMvShf7pJm_wCypd-DxarsqwhcaqDmp8YF_3kVbe4xT-XudWTfvaZJ3aY0EpwcwDtuy5D63wl8LijN1EMR5H6S_MO50ImSQAS8egNDvvDYeekHegoM03kW0r8H2L-ugXNOBtaOUBrcAZFeQhqvBu38rrJqK1VOtmWryrTR7OCMZJ_HQJNYs5Uah_msWtpKsta5wFJXn3DqN77cBFPZMCbF9At8DedQAeH3942RnkWy0eZ1xMcuql_ZgaT4q46F5Ujc3Q';
+    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDk3NDgzNjEsImV4cCI6MTY0OTc1MTk2MSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY0OTcxODYzNiwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.bSNITjJg3bNvhv0iou-EhSKW0i5tfsqNx5qSUVOAmkCsEVq1HD0SYHdadRFvBoKwO4Ra8ZsiJLmXKScI_BcUNLvVVRIW0iv5BhUf-bqDau1x8mhLNkC2kTcP3qBgMotFPMurlRwO3SoYHIsanY3udWgRsseulS3QqB3nXQB7QVHZ8-whxEmZ6z0ot85XID541o1IDjtoK3FlPwtUk0uxFNgbnA3RA_COKlMNVjYxvKayPaE9o4f3Ij-oha2dfoe60HZIYioZ2LxBsXIiVv62ZMD_9ffozAU5TCda7pwYx7ZH564Rz34pfUb0f78i44Tu108xtFMB5zot5Sm_qbOQTw';
     currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
         id: 231423,
         title: 'Annette Wallis Atkins Costs Disclosure Signed'
@@ -155,11 +155,12 @@ export default ({ isModalOpen }) => {
 
         //customization
         if (action.dest) {
-            highlight.setCustomData('custom-link', `page-${action.dest.page}`)
+            highlight.setCustomData('custom-link', `page-${action.dest.page}`);
+            highlight.setCustomData('custom-link-type', 'page');
         } else if (action.uri) {
             if (action.uri.includes('bundle_custom')) {
                 highlight.setCustomData('custom-link', `doc: ${action.doc_title} p-(${action.doc_page})`)
-
+                highlight.setCustomData('custom-link', 'page');
             } else {
                 //error it should not come here
             }

@@ -570,6 +570,14 @@ const map = {
       annotation instanceof window.Annotations.RectangleAnnotation &&
       annotation.getCustomData('trn-form-field-type') === 'ComboBoxFormField'
   },
+  urlLink: {
+    icon: 'icon-tool-link',
+    iconColor: 'StrokeColor',
+    currentPalette: 'StrokeColor',
+    availablePalettes: ['TextColor', 'StrokeColor', 'FillColor'],
+    toolNames: [],
+    annotationCheck: annotation => true
+  }
 };
 
 export const mapToolNameToKey = toolName =>

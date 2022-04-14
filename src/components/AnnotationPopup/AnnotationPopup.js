@@ -386,9 +386,8 @@ const AnnotationPopup = () => {
               />
             )
             }
-            {/* 
-    //customization
-            {canModify && (
+            {
+            canModify && (
               <ActionButton
                 dataElement="annotationDeleteButton"
                 title="action.delete"
@@ -400,8 +399,7 @@ const AnnotationPopup = () => {
                 }}
               />
             )} 
-    //customization
-            */}
+            
             {showCalibrateButton && (
               <ActionButton
                 dataElement="calibrateButton"

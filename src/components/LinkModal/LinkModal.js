@@ -143,8 +143,14 @@ const LinkModal = () => {
         
     //customization
 
+        let previousCustomDatas = [];
         if (annotationLinkToEdit && annotationLinkToEdit.annotation){
+          debugger
           let highlightAnnot = core.getAnnotationManager().getAnnotationById(annotationLinkToEdit.annotation.InReplyTo);
+          previousCustomDatas.push({name: 'custom-private', value: highlightAnnot.getCustomData('custom-private')});
+          previousCustomDatas.push({name: 'custom-date', value: highlightAnnot.getCustomData('custom-date')});
+          previousCustomDatas.push({name: 'custom-tag-options', value: highlightAnnot.getCustomData('custom-tag-options')});
+          previousCustomDatas.push({name: 'custom-tag', value: highlightAnnot.getCustomData('custom-tag')});
           core.deleteAnnotations([annotationLinkToEdit.annotation, highlightAnnot])
         }
 
@@ -154,7 +160,8 @@ const LinkModal = () => {
           currPageLinks,
           quads[currPageNumber],
           selectedText,
-          action
+          action,
+          previousCustomDatas
         );
         linksResults.push(...currPageLinks);
       }
@@ -188,7 +195,7 @@ const LinkModal = () => {
     return linksResults;
   };
 
-  const createHighlightAnnot = async (linkAnnotArray, quads, text, action) => {
+  const createHighlightAnnot = async (linkAnnotArray, quads, text, action, previousCustomDatas) => {
     const annotManager = core.getAnnotationManager();
     const linkAnnot = linkAnnotArray[0];
     const highlight = new Annotations.TextHighlightAnnotation();
@@ -210,13 +217,16 @@ const LinkModal = () => {
     });
     annotManager.groupAnnotations(highlight, linkAnnotArray);
     //customization
-    highlight.setCustomData('custom-link', action.uri)
+    highlight.setCustomData('custom-link', action.uri);
+    highlight.setCustomData('custom-link-type', 'url');
+    previousCustomDatas.forEach( e => highlight.setCustomData(e.name, e.value))
     //customization
   };
 
   const addURLLink = e => {
     e.preventDefault();
 
+    debugger
     const action = new window.Actions.URI({ uri: url });
     const links = createLink(action);
 

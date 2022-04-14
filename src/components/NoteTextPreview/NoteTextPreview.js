@@ -5,8 +5,9 @@ import classNames from 'classnames';
 import './NoteTextPreview.scss'
 
 function NoteTextPreview(props) {
+  debugger
   const text = props.children;
-  const { notePanelWidth, linesToBreak, comment } = props;
+  const { notePanelWidth, linesToBreak, comment, annotation } = props;
   const [expanded, setExpand] = useState(false);
   const [previewElementWidth, setPreviewWidth] = useState(null);
   const [charsPerLine, setCharsperLine] = useState(null);
@@ -51,7 +52,11 @@ function NoteTextPreview(props) {
 
   return (
     <div className={noteTextPreviewClass} ref={ref}>
+      
       {textToDisplay} {showPrompt && <a className="note-text-preview-prompt" onClick={onClickHandler}>{prompt}</a>}
+      <div>
+        {annotation ? annotation.getCustomData('custom-link') : ''}
+      </div>
     </div>
   )
 };

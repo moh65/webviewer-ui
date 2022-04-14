@@ -295,6 +295,14 @@ export const getAnnotationLinkToEdit = state => state.viewer.customized.annotati
 
 export const isCtrlPressed = state => state.viewer.customized.isCtrlPressed
 
+export const getMetadataTypeUrl = state => state.viewer.customized.metadataTypeUrl
+
+export const getAllMimeTypesUrl = state => state.viewer.customized.allMimeTypesUrl
+
+export const getTagOptions = state => state.viewer.customized.tagOptions
+
+export const getRedactonBurninDateUrl = state => state.viewer.customized.redactonBurninDateUrl
+
 //customization
 
 export const getCustomElementOverrides = (state, dataElement = '') => state.viewer.customElementOverrides[dataElement];

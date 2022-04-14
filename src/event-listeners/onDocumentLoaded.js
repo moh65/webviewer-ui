@@ -140,18 +140,18 @@ export default store => async () => {
 
 
     //customization
-  const updateToken = ()=> {
-    let token = localStorage.getItem('bundle_auth_token');
-    if (token != null && token !== ''){
-      dispatch(actions.updateAuthToken(token))
-    }
-  }
+  // const updateToken = ()=> {
+  //   let token = localStorage.getItem('bundle_auth_token');
+  //   if (token != null && token !== ''){
+  //     dispatch(actions.updateAuthToken(token))
+  //   }
+  // }
 
-  updateToken();
+  // updateToken();
 
-  setInterval(()=>{
-    updateToken();
-  }, 60 * 1000)
+  // setInterval(()=>{
+  //   updateToken();
+  // }, 60 * 1000)
 
 
   const onTriggered = window.instance.Actions.URI.prototype.onTriggered;

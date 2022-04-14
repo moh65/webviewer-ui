@@ -413,6 +413,8 @@ export default store => {
     enablePageDeletionConfirmationModal: enablePageDeletionConfirmationModal(store)
   };
 
+
+  
   window.instance = {
     // keys needed for webviewer.js
     CORE_NAMESPACE_KEY: CORE_NAMESPACE,

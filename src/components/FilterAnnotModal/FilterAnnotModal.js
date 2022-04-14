@@ -593,7 +593,7 @@ const FilterAnnotModal = () => {
                   {renderPrivateField()}
                   {renderDateRange()}
                   {renderTags()}
-                  {renderQueryBuilder()}
+                  {/* {renderQueryBuilder()} */}
                 </div>
                 <div className="footer">
                   <Button className="filter-annot-clear" onClick={filterClear} label={t('action.clear')} />

@@ -25,7 +25,7 @@ import isString from 'lodash/isString';
 
 //customization
 import Choice from 'components/Choice';
-import { webViewerApply } from 'helpers/applyRedactions';
+import { applyRedactionFromCommentBox } from 'helpers/applyRedactions';
 import TagDropDown from 'components/TagDropDown'
 import LinkEdition from '../LinkEdition';
 
@@ -43,7 +43,8 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
     iconColor,
     isNoteStateDisabled,
     language,
-    notesShowLastUpdatedDate
+    notesShowLastUpdatedDate,
+    redactionBurninDateUrl
   ] = useSelector(
     state => [
       selectors.getNoteDateFormat(state),
@@ -51,6 +52,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
       selectors.isElementDisabled(state, 'notePopupState'),
       selectors.getCurrentLanguage(state),
       selectors.notesShowLastUpdatedDate(state),
+      selectors.getRedactonBurninDateUrl(state),
     ],
     shallowEqual,
   );
@@ -120,7 +122,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
         if (isString(highlightResult)) {
           // Only support preview for pure text contents
           return (
-            <NoteTextPreview linesToBreak={3} comment>
+            <NoteTextPreview linesToBreak={3} comment annotation={annotation}>
               {highlightResult}
             </NoteTextPreview>
           )
@@ -184,13 +186,26 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
     [searchInput]
   );
 
-  const icon = getDataWithKey(mapAnnotationToKey(annotation)).icon;
+  
+  let icon = getDataWithKey(mapAnnotationToKey(annotation)).icon;
   let customData;
   try {
     customData = JSON.parse(annotation.getCustomData('trn-mention'));
   } catch (e) {
     customData = annotation.getCustomData('trn-mention');
   }
+
+  //customization
+  try {
+    let isLink = annotation.getCustomData('custom-link-type');
+    if (isLink !== '' && isLink != null) {
+      icon = isLink === 'url' ? 'icon-tool-link' : 'icon-page-link';
+      
+    }    
+  }catch(e){
+
+  }
+  //customization
   const contents = customData?.contents || annotation.getContents();
   const contentsToRender = annotation.getContents();
   const richTextStyle = annotation.getRichTextStyle();
@@ -396,6 +411,7 @@ const ContentArea = ({
   const [isPrivate, setIsPrivate] = useState(isAnnotPrivate === 'true' ? true : false);
   const [noteDate, setNoteDate] = useState(annotNoteDate ? annotNoteDate : new Date().toISOString().split('T')[0]);
   const [customDataChanged, setCustomDataChanged] = useState(false);
+  const [commentTextChanged, setCommentTextChanged] = useState(false);
   const [selectedTags, setSelectedTags] = useState( annotTags != null && annotTags != undefined && annotTags != '' ? JSON.parse(annotTags) : []);
 
   const allAnnotations = core.getAnnotationsList();
@@ -414,7 +430,7 @@ const ContentArea = ({
           textareaRef.current = el;
         }}
         value={textAreaValue}
-        onChange={value => onTextAreaValueChange(value, annotation.Id)}
+        onChange={value => {setCommentTextChanged(true); onTextAreaValueChange(value, annotation.Id)}}
         onSubmit={setContents}
         placeholder={`${t('action.comment')}...`}
         aria-label={`${t('action.comment')}...`}
@@ -471,9 +487,10 @@ const ContentArea = ({
             className="cancel-button"
             onClick={async e => {
               e.stopPropagation();
+              
               window.documentViewer.getAnnotationManager().enableRedaction();
               let isEnabled = core.isCreateRedactionEnabled();
-              webViewerApply([annotation], dispatch)
+              applyRedactionFromCommentBox([annotation], dispatch, redactionBurninDateUrl);
             }}
           >
             {t('action.apply')}
@@ -502,8 +519,8 @@ const ContentArea = ({
           {t('action.cancel')}
         </button>
         <button
-          className={`save-button${!textAreaValue && !customDataChanged ? ' disabled' : ''}`}
-          disabled={!textAreaValue && !customDataChanged}
+          className={`save-button${!commentTextChanged && !customDataChanged ? ' disabled' : ''}`}
+          disabled={!commentTextChanged && !customDataChanged}
           onClick={e => {
             e.stopPropagation();
             setContents(e);

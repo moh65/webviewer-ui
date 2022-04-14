@@ -40,6 +40,7 @@ import './index.scss';
 import './fileman.scss';
 //customization
 
+
 const middleware = [thunk];
 
 let composeEnhancer = function noopStoreComposeEnhancer(middleware) {
@@ -217,5 +218,18 @@ function onMouse() {
   window.removeEventListener('mousedown', onMouse);
   window.addEventListener('keydown', onTab);
 }
+
+const updateToken = ()=> {
+  let token = localStorage.getItem('bundle_auth_token');
+  if (token != null && token !== ''){
+    store.dispatch(actions.updateAuthToken(token))
+  }
+}
+
+updateToken();
+
+setInterval(()=>{
+  updateToken();
+}, 60 * 1000)
 
 window.addEventListener('keydown', onTab);

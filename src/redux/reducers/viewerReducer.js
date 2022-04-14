@@ -399,6 +399,16 @@ export default initialState => (state = initialState, action) => {
       return { ...state, customized: { ...state.customized, annotationLinkToEdit: payload.annotationLinkToEdit } };
     case 'SET_IS_CTRL_PRESSED':
       return { ...state, customized: { ...state.customized, isCtrlPressed: payload.isCtrlPressed } };
+    case 'SET_METADATA_TYPE_URL':
+      return { ...state, customized: { ...state.customized, metadataTypeUrl: payload.metadataTypeUrl } };
+    case 'SET_ALL_MIMETYPES_URL':
+      return { ...state, customized: { ...state.customized, allMimeTypesUrl: payload.allMimeTypesUrl } };
+    case 'SET_TAG_OPTIONS':
+      return { ...state, customized: { ...state.customized, tagOptions: payload.tagOptions } };
+    case 'SET_REDACTION_BURNIN_DATE_URL':
+      return { ...state, customized: { ...state.customized, redactonBurninDateUrl: payload.redactonBurninDateUrl } };
+      
+
     //customization
 
     case 'SET_CUSTOM_ELEMENT_OVERRIDES':

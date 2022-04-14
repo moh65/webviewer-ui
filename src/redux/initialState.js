@@ -639,7 +639,11 @@ export default {
       defaultTag:{},
       editLinkMode:false,
       annotationLinkToEdit:null,
-      isCtrlPressed:false
+      isCtrlPressed:false,
+      metadataTypeUrl: '',
+      allMimeTypesUrl: '',
+      tagOptions:{loaded: false, options:[]},
+      redactonBurninDateUrl: ''
     },
     //customization
   },

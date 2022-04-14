@@ -58,8 +58,10 @@ function NoteHeader(props) {
   const [t] = useTranslation();
   const date = (sortStrategy === NotesPanelSortStrategy.MODIFIED_DATE || (notesShowLastUpdatedDate && sortStrategy !== NotesPanelSortStrategy.CREATED_DATE)) ? getLatestActivityDate(annotation) : annotation.DateCreated;
   const numberOfReplies = annotation.getReplies().length;
-  const color = annotation[iconColor]?.toHexString?.();
+  let color = annotation[iconColor]?.toHexString?.();
   const fillColor = getColor(annotation.FillColor);
+
+
 
   const authorAndDateClass = classNames('author-and-date', { isReply });
   const noteHeaderClass = classNames('NoteHeader', { parent: !isReply })
