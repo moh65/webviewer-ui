@@ -33,9 +33,9 @@ class Header extends React.PureComponent {
         type: 'customElement',
         img: 'icon-header-sidebar-line',
         render: () =>
-          <div style={{width: '200px'}}>
+          // 
             <TagDropDown creatable={true} placeholder={"Select default Tag..."} />
-          </div>
+          // </div>
         ,
         id:'tagDropDown',
         title: 'component.leftPanel'
