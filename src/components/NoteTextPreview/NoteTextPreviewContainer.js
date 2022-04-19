@@ -11,9 +11,9 @@ function NoteTextPreviewContainer(props) {
     ],
     shallowEqual,
   );
-    debugger
+    
   return (
-    <NoteTextPreview {...props} notePanelWidth={notePanelWidth} />
+  <NoteTextPreview {...props} notePanelWidth={notePanelWidth} />
   )
 };
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import NotePopup from 'components/NotePopup';
 import NoteState from 'components/NoteState';
@@ -10,6 +10,9 @@ import dayjs from 'dayjs';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { NotesPanelSortStrategy } from 'constants/sortStrategies';
+import selectors from 'selectors';
+import { useDispatch, useSelector } from 'react-redux';
+import actions from 'actions';
 
 
 import './NoteHeader.scss';
@@ -61,7 +64,58 @@ function NoteHeader(props) {
   let color = annotation[iconColor]?.toHexString?.();
   const fillColor = getColor(annotation.FillColor);
 
+  const [customLink, setCustomLink] = useState(null);
+  const [customPrivate, setCustomPrivate] = useState(null);
+  const [customDate, setCustomDate] = useState(null);
+  const [customTag, setCustomTag] = useState(null);
+  const [showHeader, setShowHeader] = useState(true);
 
+  const setCustomData = () => {
+    let cl = annotation.getCustomData('custom-link');
+    let cp = annotation.getCustomData('custom-private');
+    let cd = annotation.getCustomData('custom-date');
+    let ct = annotation.getCustomData('custom-tag-options');
+
+    if (cl != null && cl != undefined)
+    {
+      setCustomLink(cl)
+    }
+
+    if (cp != null && cp != undefined)
+    {
+      setCustomPrivate(cp)
+    }
+
+    if (cd != null && cd != undefined)
+    {
+      setCustomDate(cd)
+    }
+
+    if (ct != null && ct != undefined){
+      setCustomTag(ct)
+    }
+  }
+
+  // useEffect(() => {
+  //   console.log(`for annotation ${annotation.Id} noteIndex = ${noteIndex} isEditing = ${isEditing}`)
+  //   setCustomData();
+  // })
+
+  useEffect(() => {
+    setCustomData();
+  }, [])
+
+  useEffect(()=>{
+    if (annotation.Subject === 'Redact'){
+      debugger
+    }
+    if (isEditing === true && isSelected === true){
+      setShowHeader(false)
+    } else {
+      setCustomData();
+      setShowHeader(true)
+    }
+  }, [isEditing, isSelected])
 
   const authorAndDateClass = classNames('author-and-date', { isReply });
   const noteHeaderClass = classNames('NoteHeader', { parent: !isReply })
@@ -82,6 +136,20 @@ function NoteHeader(props) {
             <div className='author'>
               {renderAuthorName(annotation)}
             </div>
+            { showHeader && (<div>
+              <div>
+                {`Visibility : ${customPrivate === 'true' ? 'private' : 'public'}`}
+              </div>
+              <div>
+                {`Date : ${customDate === '' ? 'not set' : customDate}`}
+              </div>
+              <div>
+                {customLink != '' ? `URL : ${customLink}` : ''}
+              </div>
+              <div>
+                {customTag !== '[]' ? customTag : ''}
+              </div>
+            </div>)}
             <div className="date-and-num-replies">
               <div className="date-and-time">
                 {date ? dayjs(date).locale(language).format(noteDateFormat) : t('option.notesPanel.noteContent.noDate')}

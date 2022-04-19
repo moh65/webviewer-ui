@@ -407,7 +407,8 @@ export default initialState => (state = initialState, action) => {
       return { ...state, customized: { ...state.customized, tagOptions: payload.tagOptions } };
     case 'SET_REDACTION_BURNIN_DATE_URL':
       return { ...state, customized: { ...state.customized, redactonBurninDateUrl: payload.redactonBurninDateUrl } };
-      
+    case 'SET_ANNOTATION_COMMENT_CHANGE':
+      return { ...state, customized: { ...state.customized, changedCommentAnnotationId: payload.changedCommentAnnotationId } };
 
     //customization
 

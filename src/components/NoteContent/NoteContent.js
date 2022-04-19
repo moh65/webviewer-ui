@@ -43,8 +43,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
     iconColor,
     isNoteStateDisabled,
     language,
-    notesShowLastUpdatedDate,
-    redactionBurninDateUrl
+    notesShowLastUpdatedDate
   ] = useSelector(
     state => [
       selectors.getNoteDateFormat(state),
@@ -52,10 +51,10 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
       selectors.isElementDisabled(state, 'notePopupState'),
       selectors.getCurrentLanguage(state),
       selectors.notesShowLastUpdatedDate(state),
-      selectors.getRedactonBurninDateUrl(state),
     ],
     shallowEqual,
   );
+
 
 
 
@@ -286,10 +285,10 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
       if (text === '') {
         return null;
       }
-
+      console.log('annotation = ' + annotation.Subject)
       return (
         <div className="selected-text-preview">
-          <NoteTextPreview linesToBreak={1}>
+          <NoteTextPreview linesToBreak={1} annotation={annotation}>
             {`"${text}"`}
           </NoteTextPreview>
         </div>
@@ -342,7 +341,7 @@ const ContentArea = ({
   noteIndex,
   setIsEditing,
   textAreaValue,
-  onTextAreaValueChange,
+  onTextAreaValueChange
 }) => {
   const [
     autoFocusNoteOnAnnotationSelection,
@@ -353,6 +352,15 @@ const ContentArea = ({
     selectors.getIsMentionEnabled(state),
     selectors.isElementOpen(state, 'notesPanel'),
   ]);
+
+  let [redactionBurninDateUrl, token] = useSelector(state => [
+    selectors.getRedactonBurninDateUrl(state),
+    selectors.getAuthToken(state)
+  ])
+
+  token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NTAzMjUxMjMsImV4cCI6MTY1MDMyODcyMywiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY1MDMyNTA5NywiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.l6FmOoDGkynAisF15huzWL2taBxEeTX6otBQRxfNPEbWPLU3hHauhFPBE38y4NA-5j_xEeTM6bL3L25Lg2AVlid1yACjov0oe0KuxWZIPbCWXeLGggsFANVfDZloLGjVN8zl27DpZajY9BCMAmpygVgCvVIUyGU58mzPzXaTyDQr52VrMjJDP0wujhKsqa_vV07rQGHiDeUPPU5hRJWNk74PuTQ4pvm2_rPPeJsgMapKV_GfqwLjiJrRSAPYGNLhgALCXJJuOBl5VIsOCKGrZ2RS_qgxW5FUDZK6Rsla1MiUKkMdMkFwJhn08TlwjCHV2r7ITmlvheJZTUNhyHMWUA';
+  redactionBurninDateUrl = redactionBurninDateUrl ? redactionBurninDateUrl : `http://localhost:5600/api/apply/redactions/664?access_token=${token}`;
+
   const [t] = useTranslation();
   const textareaRef = useRef();
   const isReply = annotation.isReply();
@@ -396,6 +404,7 @@ const ContentArea = ({
     }
 
     setIsEditing(false, noteIndex);
+    
     // Only set comment to unposted state if it is not empty
     if (textAreaValue !== '') {
       onTextAreaValueChange(undefined, annotation.Id);
@@ -413,7 +422,6 @@ const ContentArea = ({
   const [customDataChanged, setCustomDataChanged] = useState(false);
   const [commentTextChanged, setCommentTextChanged] = useState(false);
   const [selectedTags, setSelectedTags] = useState( annotTags != null && annotTags != undefined && annotTags != '' ? JSON.parse(annotTags) : []);
-
   const allAnnotations = core.getAnnotationsList();
   const linkAnnotation = allAnnotations.find(s => s.Subject === 'Link' && s.InReplyTo === annotation.Id);
   
@@ -490,7 +498,7 @@ const ContentArea = ({
               
               window.documentViewer.getAnnotationManager().enableRedaction();
               let isEnabled = core.isCreateRedactionEnabled();
-              applyRedactionFromCommentBox([annotation], dispatch, redactionBurninDateUrl);
+              applyRedactionFromCommentBox(annotation, dispatch, redactionBurninDateUrl);
             }}
           >
             {t('action.apply')}
@@ -514,6 +522,8 @@ const ContentArea = ({
             setIsEditing(false, noteIndex);
             // Clear pending text
             onTextAreaValueChange(undefined, annotation.Id);
+
+            dispatch(actions.disableElements(['tag-drop-down']))
           }}
         >
           {t('action.cancel')}
@@ -529,6 +539,8 @@ const ContentArea = ({
             annotation.setCustomData("custom-date", noteDate);
             annotation.setCustomData('custom-tag-options', selectedTags);
             annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0]));
+            debugger
+            dispatch(actions.setAnnotationCommentChanged(annotation.Id))
             //customization
           }}
         >

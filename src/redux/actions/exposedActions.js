@@ -568,6 +568,12 @@ export const setTagOptions = (tagOptions) => ({
   type: 'SET_TAG_OPTIONS',
   payload: { tagOptions: tagOptions },
 });
+
+export const setAnnotationCommentChanged = (changedCommentAnnotationId) => ({
+  type: 'SET_ANNOTATION_COMMENT_CHANGE',
+  payload: { changedCommentAnnotationId: changedCommentAnnotationId },
+});
+
 //customization
 
 export const setCustomElementOverrides = (dataElement, overrides) => ({

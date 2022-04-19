@@ -90,6 +90,7 @@ class ToolStylePopup extends React.PureComponent {
   };
 
   handleStyleChange = (property, value) => {
+    
     const { activeToolName } = this.props;
     const tool = core.getTool(activeToolName);
     if (typeof tool.complete === 'function') {
@@ -114,6 +115,7 @@ class ToolStylePopup extends React.PureComponent {
   }
 
   render() {
+    
     const { activeToolGroup, isDisabled, activeToolName, activeToolStyle, isMobile } = this.props;
     const isFreeText = activeToolName.includes('AnnotationCreateFreeText');
     let freeTextProperties = {};

@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
-
 import './NoteTextPreview.scss'
 
 function NoteTextPreview(props) {
-  debugger
+
+
+
   const text = props.children;
-  const { notePanelWidth, linesToBreak, comment, annotation } = props;
+  const { notePanelWidth, linesToBreak, comment } = props;
   const [expanded, setExpand] = useState(false);
   const [previewElementWidth, setPreviewWidth] = useState(null);
   const [charsPerLine, setCharsperLine] = useState(null);
@@ -16,7 +17,7 @@ function NoteTextPreview(props) {
   const { t } = useTranslation();
 
   const onClickHandler = (event) => {
-    debugger
+
     event.stopPropagation();
     setExpand(!expanded)
   };
@@ -50,13 +51,14 @@ function NoteTextPreview(props) {
 
   }, [text, previewElementWidth])
 
+  
+
+
   return (
     <div className={noteTextPreviewClass} ref={ref}>
-      
+
       {textToDisplay} {showPrompt && <a className="note-text-preview-prompt" onClick={onClickHandler}>{prompt}</a>}
-      <div>
-        {annotation ? annotation.getCustomData('custom-link') : ''}
-      </div>
+      
     </div>
   )
 };

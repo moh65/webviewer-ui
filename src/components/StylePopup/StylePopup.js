@@ -146,6 +146,7 @@ class StylePopup extends React.PureComponent {
   };
 
   render() {
+
     const {
       toolName,
       isColorPaletteDisabled,

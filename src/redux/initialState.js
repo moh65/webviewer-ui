@@ -642,8 +642,9 @@ export default {
       isCtrlPressed:false,
       metadataTypeUrl: '',
       allMimeTypesUrl: '',
-      tagOptions:{loaded: false, options:[]},
-      redactonBurninDateUrl: ''
+      tagOptions:{loaded: false, options:[{label:'tag1', value:'1-#afafaf'}, {label:'tag2', value:'1-#1a2f4d'},{label:'tag3', value:'1-#987654'}]},
+      redactonBurninDateUrl: '',
+      changedCommentAnnotationId:''
     },
     //customization
   },

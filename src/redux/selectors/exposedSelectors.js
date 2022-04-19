@@ -303,6 +303,8 @@ export const getTagOptions = state => state.viewer.customized.tagOptions
 
 export const getRedactonBurninDateUrl = state => state.viewer.customized.redactonBurninDateUrl
 
+export const getChangedCommentAnnotationId = state => state.viewer.customized.changedCommentAnnotationId
+
 //customization
 
 export const getCustomElementOverrides = (state, dataElement = '') => state.viewer.customElementOverrides[dataElement];

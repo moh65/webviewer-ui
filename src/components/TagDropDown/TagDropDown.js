@@ -7,6 +7,9 @@ import selectors from 'selectors';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { Swipeable } from 'react-swipeable';
 import { FocusTrap } from '@pdftron/webviewer-react-toolkit';
+import { hexToRgba2 } from 'helpers/color';
+import setToolStyles from 'helpers/setToolStyles';
+
 
 // to load options from external URL provided by WebViewer constructor
 
@@ -17,7 +20,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
         createTagUrl,
         getTagsUrl,
         tagOptionsState,
-        openElements
+        disabledElements
     ] = useSelector(
         state => [
             selectors.getAuthToken(state),
@@ -25,7 +28,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
             selectors.getCreateTagUrl(state),
             selectors.getGetTagsUrl(state),
             selectors.getTagOptions(state),
-            selectors.getOpenElements(state)
+            selectors.getDisabledElements(state)
         ]
     );
 
@@ -46,18 +49,17 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     const dispatch = useDispatch();
 
     useEffect(() => {
-
-        const disableElement = openElements['tag-drop-down'];
-        if (disableElement === false) {
+        const disableElement = disabledElements['tag-drop-down'];
+        if (disableElement == undefined) {
+            setShowElement(true);
+            dispatch(actions.enableElement('tag-drop-down'));
+        } else if (disableElement.disabled === false) {
+            setShowElement(true);
+        } else if (disableElement.disabled === true) {
             setShowElement(false);
-        } else if (disableElement == undefined) {
-            setShowElement(true);
-            dispatch(actions.openElement('tag-drop-down'));
-        } else {
-            setShowElement(true);
         }
 
-    }, [openElements]);
+    }, [disabledElements]);
 
     useImperativeHandle(ref, () => ({
 
@@ -166,6 +168,30 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
                                         dispatch(actions.setDefaultTag({}));
                                         return;
                                     }
+                                    let toolNames = ['AnnotationCreateTextHighlight',
+                                        'AnnotationCreateEllipse',
+                                        'AnnotationCreateRectangle',
+                                        'AnnotationCreateLine',
+                                        'AnnotationCreateFreeHand',
+                                        'AnnotationCreateFreeHandHighlight',
+                                        'AnnotationCreatePolygon',
+                                        'AnnotationCreatePolygonCloud',
+                                        'AnnotationCreatePolyline',
+                                        'AnnotationCreateArrow',
+                                        'AnnotationCreateFreeText',
+                                        'AnnotationCreateTextUnderline',
+                                        'AnnotationCreateTextStrikeout',
+                                        'AnnotationCreateTextSquiggly',
+                                        'AnnotationCreateSticky'];
+                                    let color = new window.Annotations.Color(option.value.split('-')[1]);
+                                    toolNames.forEach(toolName => {
+                                        if (toolName === 'AnnotationCreateFreeText'){
+                                            setToolStyles(toolName, 'TextColor', color);
+                                        } else {
+                                            setToolStyles(toolName, 'StrokeColor', color);
+                                        }
+                                    });
+
                                     dispatch(actions.setDefaultTag(option));
                                 }
                             } else {

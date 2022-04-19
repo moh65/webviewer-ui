@@ -44,7 +44,8 @@ const webViewerApply = (annotations, dispatch) => {
   return dispatch(actions.showWarningMessage(warning));
 };
 
-const applyRedactionFromCommentBox = (annotations, dispatch, redactionBurninDateUrl) => {
+const applyRedactionFromCommentBox = (annotation, dispatch, redactionBurninDateUrl) => {
+  
   const message = 'You are about to apply this redaction. This process is not reversible. Are you sure?';
   const title = i18next.t('warning.redaction.applyTile');
   const confirmBtnText = i18next.t('action.apply');
@@ -54,17 +55,18 @@ const applyRedactionFromCommentBox = (annotations, dispatch, redactionBurninDate
     title,
     confirmBtnText,
     onConfirm: () => {
-      let body = {};//becareful to pass the exact name and case of the property names
+      let body = [annotation.Id];//becareful to pass the exact name and case of the property names
       fetch(redactionBurninDateUrl, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
+        
         body: JSON.stringify(body)
       })
       .then(r => r.json())
       .catch(e => fireError(e));
 
       //call to 
-      core.applyRedactions(annotations).catch(err => fireError(err));
+      core.applyRedactions([annotation]).catch(err => fireError(err));
       return Promise.resolve();
     },
   };
@@ -72,4 +74,4 @@ const applyRedactionFromCommentBox = (annotations, dispatch, redactionBurninDate
   return dispatch(actions.showWarningMessage(warning));
 }
 
-export {webViewerApply, webViewerServerApply}
+export {webViewerApply, webViewerServerApply, applyRedactionFromCommentBox}

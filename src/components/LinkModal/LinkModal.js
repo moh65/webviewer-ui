@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { hexToRgba2 } from 'helpers/color';
 
 import defaultTool from 'constants/defaultTool';
 import core from 'core';
@@ -19,6 +20,7 @@ const LinkModal = () => {
   let [
     isDisabled,
     isDisabledForUrl,
+    defaultTag,
     isOpen,
     isOpenForUrl,
     totalPages,
@@ -31,6 +33,7 @@ const LinkModal = () => {
 
     //customization
     selectors.isElementDisabled(state, 'linkModalUrl'),
+    selectors.getDefaultTag(state),
     //customization
 
     selectors.isElementOpen(state, 'linkModal'),
@@ -46,8 +49,8 @@ const LinkModal = () => {
     selectors.getAnnotationLinkToEdit(state)
   ]);
 
-  
-  
+
+
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
@@ -64,7 +67,7 @@ const LinkModal = () => {
     if (isOpenForUrl) {
       dispatch(actions.closeElement('linkModalUrl'));
     }
-    if (isOpen){
+    if (isOpen) {
       dispatch(actions.closeElement('linkModal'));
     }
     dispatch(actions.setAnnotationLinkToEdit(null))
@@ -90,30 +93,31 @@ const LinkModal = () => {
 
   const createLink = action => {
     const linksResults = [];
-    
-    
+
+
     let quads = core.getSelectedTextQuads();
     const selectedAnnotations = core.getSelectedAnnotations();
 
-    
+
     //customization
-    if (quads && Object.keys(quads).length === 0){
+    if (quads && Object.keys(quads).length === 0) {
       let fakeQuads = {};
       fakeQuads[annotationLinkToEdit.annotation.PageNumber] = [];
       let highlightAnnot = core.getAnnotationManager().getAnnotationById(annotationLinkToEdit.annotation.InReplyTo);
 
-      for(const quad of highlightAnnot.Quads){
+      for (const quad of highlightAnnot.Quads) {
         fakeQuads[annotationLinkToEdit.annotation.PageNumber].push({
-          x1:quad.x1, 
-          x2:quad.x2, 
-          x3:quad.x3, 
-          x4:quad.x4, 
-          y1:quad.y1, 
-          y2:quad.y2, 
-          y3:quad.y3, 
-          y4:quad.y4});
+          x1: quad.x1,
+          x2: quad.x2,
+          x3: quad.x3,
+          x4: quad.x4,
+          y1: quad.y1,
+          y2: quad.y2,
+          y3: quad.y3,
+          y4: quad.y4
+        });
       }
-      
+
       quads = fakeQuads;
     }
     //customization
@@ -121,12 +125,12 @@ const LinkModal = () => {
 
     if (quads) {
       let selectedText = core.getSelectedText();
-    //customization
+      //customization
 
       if (!selectedText || selectedText === '')
         selectedText = selectedAnnotations[0].Wba;
-    //customization
-        
+      //customization
+
       for (const currPageNumber in quads) {
         const currPageLinks = [];
         quads[currPageNumber].forEach(quad => {
@@ -140,21 +144,21 @@ const LinkModal = () => {
             )
           );
         });
-        
-    //customization
+
+        //customization
 
         let previousCustomDatas = [];
-        if (annotationLinkToEdit && annotationLinkToEdit.annotation){
+        if (annotationLinkToEdit && annotationLinkToEdit.annotation) {
           debugger
           let highlightAnnot = core.getAnnotationManager().getAnnotationById(annotationLinkToEdit.annotation.InReplyTo);
-          previousCustomDatas.push({name: 'custom-private', value: highlightAnnot.getCustomData('custom-private')});
-          previousCustomDatas.push({name: 'custom-date', value: highlightAnnot.getCustomData('custom-date')});
-          previousCustomDatas.push({name: 'custom-tag-options', value: highlightAnnot.getCustomData('custom-tag-options')});
-          previousCustomDatas.push({name: 'custom-tag', value: highlightAnnot.getCustomData('custom-tag')});
+          previousCustomDatas.push({ name: 'custom-private', value: highlightAnnot.getCustomData('custom-private') });
+          previousCustomDatas.push({ name: 'custom-date', value: highlightAnnot.getCustomData('custom-date') });
+          previousCustomDatas.push({ name: 'custom-tag-options', value: highlightAnnot.getCustomData('custom-tag-options') });
+          previousCustomDatas.push({ name: 'custom-tag', value: highlightAnnot.getCustomData('custom-tag') });
           core.deleteAnnotations([annotationLinkToEdit.annotation, highlightAnnot])
         }
 
-    //customization
+        //customization
 
         createHighlightAnnot(
           currPageLinks,
@@ -169,7 +173,7 @@ const LinkModal = () => {
 
     //customization
     // if (selectedAnnotations) {
-      
+
     //   selectedAnnotations.forEach(annot => {
     //     const annotManager = core.getAnnotationManager();
     //     const groupedAnnots = annotManager.getGroupAnnotations(annot);
@@ -204,7 +208,11 @@ const LinkModal = () => {
     highlight.Y = linkAnnot.Y;
     highlight.Width = linkAnnot.Width;
     highlight.Height = linkAnnot.Height;
-    highlight.StrokeColor = new Annotations.Color(0, 0, 0, 0);
+
+    let c = defaultTag.value ? hexToRgba2(defaultTag.value.split('-')[1]) : '';
+    let color = defaultTag.value && c != '' ? new Annotations.Color(c.r, c.g, c.b, c.a) : new Annotations.Color(0, 0, 0, 0);
+    highlight.StrokeColor = color;
+
     highlight.Opacity = 0;
     highlight.Quads = quads;
     highlight.Author = core.getCurrentUser();
@@ -216,17 +224,17 @@ const LinkModal = () => {
       index === 0 ? core.addAnnotations([link, highlight]) : core.addAnnotations([link]);
     });
     annotManager.groupAnnotations(highlight, linkAnnotArray);
+    debugger
     //customization
     highlight.setCustomData('custom-link', action.uri);
     highlight.setCustomData('custom-link-type', 'url');
-    previousCustomDatas.forEach( e => highlight.setCustomData(e.name, e.value))
+    previousCustomDatas.forEach(e => highlight.setCustomData(e.name, e.value))
     //customization
   };
 
   const addURLLink = e => {
     e.preventDefault();
 
-    debugger
     const action = new window.Actions.URI({ uri: url });
     const links = createLink(action);
 
@@ -265,9 +273,9 @@ const LinkModal = () => {
   };
 
   useEffect(() => {
-    
+
     //customization
-    if (annotationLinkToEdit && !annotationLinkToEdit.isPageLink){
+    if (annotationLinkToEdit && !annotationLinkToEdit.isPageLink) {
       setURL(annotationLinkToEdit.element.uri);
     }
     if (isOpen || isOpenForUrl) {
@@ -281,7 +289,7 @@ const LinkModal = () => {
 
       //  prepopulate URL if URL is selected
       const selectedText = core.getSelectedText();
-      
+
       if (selectedText) {
         const urlRegex = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
         const urls = selectedText.match(urlRegex);
@@ -368,7 +376,7 @@ const LinkModal = () => {
                     <input
                       className="urlInput"
                       type="url"
-                      ref={urlInput}  
+                      ref={urlInput}
                       value={url}
                       onChange={e => setURL(e.target.value)}
                     />
@@ -386,7 +394,7 @@ const LinkModal = () => {
               //customization
               <TabPanel dataElement="PageNumberPanel">
                 <div ref={pageLabelInput}>
-                  <BundlePageSelector isModalOpen={isOpen}/>
+                  <BundlePageSelector isModalOpen={isOpen} />
                 </div>
               </TabPanel>
               //customization

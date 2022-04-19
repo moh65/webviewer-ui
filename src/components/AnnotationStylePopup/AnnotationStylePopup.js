@@ -33,6 +33,7 @@ class AnnotationStylePopup extends React.Component {
   }
 
   handleStyleChange = (property, value) => {
+    
     const { annotation } = this.props;
 
     core.setAnnotationStyles(annotation, {
