@@ -13,19 +13,20 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
         token,
         generateThumbnailUrl,
         documentPagesUrl,
-        pageThumbnailUrl
+        pageThumbnailUrl,
+        defaultBaseUrlAddress
     ] = useSelector(state => [
         selectors.getAuthToken(state),
         selectors.getGenerateThumbnailUrl(state),
         selectors.getDocumentPagesUrl(state),
-        selectors.getPageThumbnailUrl(state)
+        selectors.getPageThumbnailUrl(state),
+        selectors.getDefaultUrlBaseAddress(state)
     ]);
     const [t] = useTranslation();
 
-    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NTAzMzg4NjAsImV4cCI6MTY1MDM0MjQ2MCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY1MDMyNTA5NywiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.naiqaZ5SBYJXyUWhxQFwkZ9KDW-Iqb-K7MW7c9bi03DLH4fcjwV0TsdqUejiiZmV2e7d07Q7HfAFOL6YHz0xQrldcBnO5GjCdex7YuhaLil1FIwzGS3uOpB2_KJABRAyL5OojOuEcxsdoJoPMoJJATQQ_fLbXYwoykndASe4_jRXo8UzXOG6IcfScKPV0s7gFZoYrvWf_qBBM-Fdt31OItQwTWnFPCn2aDzs8OExM5OFN7B0T_7n0bFvOTjU83zjE9xiEL1fk8Ltsy2zrERrPIb572zzwo9mhDIOWtvbV3EiZctSKr-HWMrnYwk2PfpXdP20NmYXEzVnjeOvklQh-Q';
-    generateThumbnailUrl = generateThumbnailUrl ? generateThumbnailUrl : `http://localhost:5600/api/bundleitem/${logicalItemInfo.id}/generate/thumbnails`;
-    pageThumbnailUrl = pageThumbnailUrl ? pageThumbnailUrl : 'http://localhost:5600/api/bundleitem/{itemId}/page/{pageId}/thumbnail?w=200&h=250&access_token={token}';
-    documentPagesUrl = documentPagesUrl ? documentPagesUrl : 'http://localhost:5600/api/bundle/664/{itemId}/pages';
+    generateThumbnailUrl = generateThumbnailUrl ? generateThumbnailUrl : `${defaultBaseUrlAddress}/api/bundleitem/${logicalItemInfo.id}/generate/thumbnails`;
+    pageThumbnailUrl = pageThumbnailUrl ? pageThumbnailUrl : `${defaultBaseUrlAddress}/api/bundleitem/{itemId}/page/{pageId}/thumbnail?w=200&h=250&access_token={token}`;
+    documentPagesUrl = documentPagesUrl ? documentPagesUrl : `${defaultBaseUrlAddress}/api/bundle/664/{itemId}/pages`;
 
     const [thumbnailLoading, setThumbnailLoading] = useState(false);
     const [showGallery, setShowGallery] = useState(false);

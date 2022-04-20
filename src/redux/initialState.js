@@ -626,7 +626,7 @@ export default {
     //customization
     customized:{
       loadSectionsInfo: false,
-      authToken: '',
+      authToken: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IkI5QjBCMDY5MDg5MUY2QUJCQTFGRkJEQTAzOEZCNzU3Q0ZBQzg0QkMiLCJ0eXAiOiJhdCtqd3QiLCJ4NXQiOiJ1YkN3YVFpUjlxdTZIX3ZhQTQtM1Y4LXNoTHcifQ.eyJuYmYiOjE2NTA0MzEzNzcsImV4cCI6MTY1MDQzNDk3NywiaXNzIjoiaHR0cHM6Ly9sZWdhbHN0b3JlLnBvYy5maWxlbWFuLmNvbS5hdS9hdXRoIiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY1MDQzMTM1MCwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.Orhy0hQ2XaP9DVHdTsXx2uyY4XpEIkqjEk47U8izwS88ZNWeDvELLzbmSSZkaAanI7qK5g0JAxs1581OLbfF5kju1dUMaMjRrWOLzmqCLtG6Q2aqbAOcwrcedNmN1v1BsvKBeVwNvG-dBeQBWPOZfKYkrpLmu3Xisq5hxbDYQ1QemnX5VUPjWQBHr4atUJ1HNJr_8d3cHVj29FiOIP_EVKYHUss4N_wICeTjJTBwc6wfml-w_rqDbloCC-XHoRAWH_O6LUmirPq115WnCdiAPbgHSol0HbkuaFl9lYVCbqLb-SaQjvuBBTYaz3oeRmAdzFkhjmWnMQmnVge8AcAs0ok7TEgVwfcLyVxdJC5iCpMG9ia3YJ-Z4OxJA64bx-Y9XZbiu6DTaHOYseqdSDdcQIIAlCK4t146Tp7VkcnO_OccEAysFpI1scy2Vus22BaEZk7eCVTNA4heS6hdXxUSuhlDe-VC3haJLEOu0vmND9f7KBzab-rzrYouGPZjpeLmxle-AtmAHVJ9V_mnIhf9aJod04eadFNgnc8_dYjxOU2Xmol2O6LD9FuzQy_7mzT39AG5uAXH26AkN2mlvOtxMeFlPRM-Hj95CG8B-fD85NHhljxns8yLkunYKi3bZEq9l1p_Fw7ksTdKCAuScpxAbhlxFP7iC3R3D7F4p2fwgIQ',
       sectionUrl:'',
       documentUrl:'',
       createTagUrl:'',
@@ -644,7 +644,7 @@ export default {
       allMimeTypesUrl: '',
       tagOptions:{loaded: false, options:[{label:'tag1', value:'1-#afafaf'}, {label:'tag2', value:'1-#1a2f4d'},{label:'tag3', value:'1-#987654'}]},
       redactonBurninDateUrl: '',
-      changedCommentAnnotationId:''
+      defaultUrlBaseAddress: 'https://legalstore.poc.fileman.com.au/bundle'
     },
     //customization
   },

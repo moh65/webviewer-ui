@@ -11,20 +11,21 @@ const queryBuilder = ({ isOpen, onClose }) => {
     let [
         token,
         metadataTypeUrl,
-        allMimeTypesUrl
+        allMimeTypesUrl,
+        defaultBaseUrlAddress
     ] = useSelector(state => [
         selectors.getAuthToken(state),
         selectors.getMetadataTypeUrl(state),
-        selectors.getAllMimeTypesUrl(state)
+        selectors.getAllMimeTypesUrl(state),
+        selectors.getDefaultUrlBaseAddress(state)
     ]);
     const [metadataInfo, setMedataInfo] = useState([])
     const [mimeTypeInfo, setMimeTypeInfo] = useState([])
     const [showQueryBuilder, setShowQueryBuilder] = useState(false)
     const [loading, setLoading] = useState(false);
 
-    metadataTypeUrl = metadataTypeUrl ? metadataTypeUrl : 'http://localhost:5600/api/search/allmetadatatypes/664';
-    allMimeTypesUrl = allMimeTypesUrl ? allMimeTypesUrl : 'http://localhost:5600/api/search/allmimetypes/664';
-    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDk2MzAzMzQsImV4cCI6MTY0OTYzMzkzNCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY0OTM4MzU4MSwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.kKSHsPr6mHHVYNdGij_aA-cxx7d-52tKs5gv3_bJtJRjH2t5GfRb8dTSS_ZwRpqoU2ok20YolOo6J-01BdJLi88tGLzAx1v9QZAHWWyV5ZsD5sl_1cSZUYvgXpwjPEqQvjWwP1dT3K59VxnEhUhRVN78Ox5AaIN9Xs5ZQaV5xVtsCZU_FUPowuDnOJdsU1BiTeA0Lss2zjRXBJ-jblddWj7V0CjyLYDeKz3UT94fe4i5htaDIzVLxRL4XJv2EfdzdjXhZR-SFbNV2W2vm9IWwivfn0hmXI898nYssJffiyNMjULIgg87_9Ml2VivIuvfVVsMdYseP9ereT5F6L3rZw';
+    metadataTypeUrl = metadataTypeUrl ? metadataTypeUrl : `${defaultBaseUrlAddress}/api/search/allmetadatatypes/664`;
+    allMimeTypesUrl = allMimeTypesUrl ? allMimeTypesUrl : `${defaultBaseUrlAddress}/api/search/allmimetypes/664`;
 
     // useEffect(() => {
     //     return () => {

@@ -569,10 +569,6 @@ export const setTagOptions = (tagOptions) => ({
   payload: { tagOptions: tagOptions },
 });
 
-export const setAnnotationCommentChanged = (changedCommentAnnotationId) => ({
-  type: 'SET_ANNOTATION_COMMENT_CHANGE',
-  payload: { changedCommentAnnotationId: changedCommentAnnotationId },
-});
 
 //customization
 

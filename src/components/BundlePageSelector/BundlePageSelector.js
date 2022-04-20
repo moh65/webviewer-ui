@@ -25,7 +25,8 @@ export default ({ isModalOpen }) => {
         token,
         currentDocumentInfo,
         defaultTag,
-        annotationLinkToEdit
+        annotationLinkToEdit,
+        defaultBaseUrlAddress
     ] = useSelector(state => [
         selectors.getLoadSectionsInfo(state),
         selectors.getSectionUrl(state),
@@ -33,13 +34,14 @@ export default ({ isModalOpen }) => {
         selectors.getAuthToken(state),
         selectors.getThisDocumentInfo(state),
         selectors.getDefaultTag(state),
-        selectors.getAnnotationLinkToEdit(state)
+        selectors.getAnnotationLinkToEdit(state),
+        selectors.getDefaultUrlBaseAddress(state)
     ]);
     const [t] = useTranslation();
 
-    sectionUrl = sectionUrl ? sectionUrl : 'http://localhost:5600/api/bundle/664/items/sections';
-    documentUrl = documentUrl ? documentUrl : 'http://localhost:5600/api/bundle/sections/664/{sectionId}/documents/list';
-    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NTAzMzg4NjAsImV4cCI6MTY1MDM0MjQ2MCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY1MDMyNTA5NywiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.naiqaZ5SBYJXyUWhxQFwkZ9KDW-Iqb-K7MW7c9bi03DLH4fcjwV0TsdqUejiiZmV2e7d07Q7HfAFOL6YHz0xQrldcBnO5GjCdex7YuhaLil1FIwzGS3uOpB2_KJABRAyL5OojOuEcxsdoJoPMoJJATQQ_fLbXYwoykndASe4_jRXo8UzXOG6IcfScKPV0s7gFZoYrvWf_qBBM-Fdt31OItQwTWnFPCn2aDzs8OExM5OFN7B0T_7n0bFvOTjU83zjE9xiEL1fk8Ltsy2zrERrPIb572zzwo9mhDIOWtvbV3EiZctSKr-HWMrnYwk2PfpXdP20NmYXEzVnjeOvklQh-Q';
+    sectionUrl = sectionUrl ? sectionUrl : `${defaultBaseUrlAddress}/api/bundle/664/items/sections`;
+    documentUrl = documentUrl ? documentUrl : `${defaultBaseUrlAddress}/api/bundle/sections/664/{sectionId}/documents/list`;
+    
     currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
         id: 231423,
         title: 'Annette Wallis Atkins Costs Disclosure Signed'

@@ -303,7 +303,8 @@ export const getTagOptions = state => state.viewer.customized.tagOptions
 
 export const getRedactonBurninDateUrl = state => state.viewer.customized.redactonBurninDateUrl
 
-export const getChangedCommentAnnotationId = state => state.viewer.customized.changedCommentAnnotationId
+export const getDefaultUrlBaseAddress = state => state.viewer.customized.defaultUrlBaseAddress
+
 
 //customization
 

@@ -10,9 +10,6 @@ import { FocusTrap } from '@pdftron/webviewer-react-toolkit';
 import { hexToRgba2 } from 'helpers/color';
 import setToolStyles from 'helpers/setToolStyles';
 
-
-// to load options from external URL provided by WebViewer constructor
-
 export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, creatable, placeholder }, ref) => {
     let [
         token,
@@ -20,7 +17,8 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
         createTagUrl,
         getTagsUrl,
         tagOptionsState,
-        disabledElements
+        disabledElements,
+        defaultBaseUrlAddress
     ] = useSelector(
         state => [
             selectors.getAuthToken(state),
@@ -28,13 +26,13 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
             selectors.getCreateTagUrl(state),
             selectors.getGetTagsUrl(state),
             selectors.getTagOptions(state),
-            selectors.getDisabledElements(state)
+            selectors.getDisabledElements(state),
+            selectors.getDefaultUrlBaseAddress(state)
         ]
     );
 
-    createTagUrl = createTagUrl ? createTagUrl : 'http://localhost:5600/api/bundle/jobtag/664';
-    getTagsUrl = getTagsUrl ? getTagsUrl : 'http://localhost:5600/api/bundle/jobtag/664';
-    token = token ? token : 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QifQ.eyJuYmYiOjE2NDkzODM2MDEsImV4cCI6MTY0OTM4NzIwMSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY0OTM4MzU4MSwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.fWRAfjLxVlnMnNAk2wc1hWao-laRBgegXkXfb_c2pqlnSUI5xy6dMtm7lOk2FqP7HbuJcgtQB1FTG7SqeS5urKGaN9QabfHxP4EKsdwd_6AZ_s8TkjSHsUWMYtAlwzK8rPhPnEbppjjCh0bekntznFb1YO1LtbkYhER5uuNBcIa95Cgw6TZrUePa8O5FtpAMnIyPnBlGU1YXcat0XmiupJrKisjYMdWLbJrNitMD90MUPDtgbcMNmMSjDj9EN2WdFdLA5nsexfF7ZBOdcDthVkWbnnOu6jFOwkK6S7s2ODyxWKqwv0wuDBDcTyQj79N7wrza4nHzhOTNIUVmIdiZ1A';
+    createTagUrl = createTagUrl ? createTagUrl : `${defaultBaseUrlAddress}/api/bundle/jobtag/664`;
+    getTagsUrl = getTagsUrl ? getTagsUrl : `${defaultBaseUrlAddress}/api/bundle/jobtag/664`;
 
     const noTagOption = { value: 'no-tag', label: 'No tag' }
     const createTagOption = { value: 'create-tag', label: 'create new tag' }
@@ -115,7 +113,6 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
                 headers: { "Authorization": `Bearer ${token}` }
             }).then(res => res.json())
                 .then(json => {
-                    debugger
                     options = json.map(m => ({
                         label: m.TagName,
                         value: `${m.JobTagId}-${m.TagColour}`
@@ -185,7 +182,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
                                         'AnnotationCreateSticky'];
                                     let color = new window.Annotations.Color(option.value.split('-')[1]);
                                     toolNames.forEach(toolName => {
-                                        if (toolName === 'AnnotationCreateFreeText'){
+                                        if (toolName === 'AnnotationCreateFreeText') {
                                             setToolStyles(toolName, 'TextColor', color);
                                         } else {
                                             setToolStyles(toolName, 'StrokeColor', color);
