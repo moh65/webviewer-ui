@@ -252,10 +252,11 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
         contentStyle.color = textColor.toHexString();
       }
 
+      debugger
       return (
         <React.Fragment>
           {isEditing && isSelected ? (
-            !isReply ?
+           // !isReply ?
               <ContentArea
                 annotation={annotation}
                 noteIndex={noteIndex}
@@ -263,9 +264,9 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
                 textAreaValue={textAreaValue}
                 onTextAreaValueChange={onTextChange}
               />
-              : <div className={classNames('container', { 'reply-content': isReply })} onClick={handleContentsClicked} style={contentStyle}>
-                {renderContents(contentsToRender, richTextStyle)}
-              </div>
+              // : <div className={classNames('container', { 'reply-content': isReply })} onClick={handleContentsClicked} style={contentStyle}>
+              //   {renderContents(contentsToRender, richTextStyle)}
+              // </div>
           ) : (
             contentsToRender && (
               <div className={classNames('container', { 'reply-content': isReply })} onClick={handleContentsClicked} style={contentStyle}>
