@@ -159,7 +159,7 @@ export default store => async () => {
 
   Actions.GoTo.prototype.onTriggered = function(target, event) {
     
-    if (!selectors.isCtrlPressed(getState())){
+    if (selectors.isCtrlPressed(getState())){
       return;
     }
     onTriggeredGoto.apply(this, arguments);
@@ -169,7 +169,7 @@ export default store => async () => {
 
     if (target instanceof Annotations.Link) {
 
-      if (!selectors.isCtrlPressed(getState())){
+      if (selectors.isCtrlPressed(getState())){
         return;
       }
       
