@@ -91,8 +91,10 @@ function NoteHeader(props) {
       setCustomDate(cd)
     }
 
-    if (ct != null && ct != undefined){
-      setCustomTag(ct)
+    if (ct != null && ct != undefined && ct != '') {
+      let joinedTag = JSON.parse(ct);
+      joinedTag = joinedTag ? joinedTag.map(m => m.label).join(',') : '';
+      setCustomTag(joinedTag)
     }
   }
 

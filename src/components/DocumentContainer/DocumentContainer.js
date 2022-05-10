@@ -303,6 +303,7 @@ class DocumentContainer extends React.PureComponent {
               ref={measureRef}
             >
               <div
+                style={{backgroundColor:'gray'}}
                 className={documentContainerClassName}
                 ref={this.container}
                 data-element="documentContainer"

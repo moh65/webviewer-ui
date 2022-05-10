@@ -16,6 +16,8 @@ import { Swipeable } from 'react-swipeable';
 
 import './LinkModal.scss';
 
+import BsButton from 'react-bootstrap/Button';
+
 const LinkModal = () => {
   let [
     isDisabled,
@@ -159,7 +161,6 @@ const LinkModal = () => {
         }
 
         //customization
-
         createHighlightAnnot(
           currPageLinks,
           quads[currPageNumber],

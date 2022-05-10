@@ -38,6 +38,7 @@ import './index.scss';
 
 //customization
 import './fileman.scss';
+import 'bootstrap/dist/css/bootstrap.min.css';
 //customization
 
 
