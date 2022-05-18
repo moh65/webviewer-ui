@@ -1,145 +1,372 @@
 @import '../../constants/styles';
 @import '../../constants/modal';
-
+//customization
 .FilterAnnotModal {
-  @extend %modal;
-  font-size: 0.9em;
-
-  .container {
-    @extend %modal-shared-container-style;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 4px;
-    box-shadow: 0px 0px 3px 0px var(--document-box-shadow);
-    padding: 8px 8px;
-    background: var(--component-background);
-
-    @include mobile {
-      width: 100%;
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      min-width: 400px;
-      padding-top: 24px;
-      padding-bottom: 16px;
-      padding-left: 24px;
-      padding-right: 24px;
-      min-width: 100px;
-
-      .swipe-indicator {
-        background: var(--divider);
-        border-radius: 2px;
-        height: 4px;
-        width: 38px;
-        position: absolute;
-        top: 12px;
-        margin-left: auto;
-        margin-right: auto;
-        left: 0;
-        right: 0;
-
-        @include tablet-and-desktop {
-          display: none;
-        }
-      }
-    }
-
-    .message {
-      font-size: 14px;
-      @include mobile {
-        font-size: 16px;
-      }
-    }
-
-    .filter-modal {
-      display: flex;
-      flex-direction: column;
-
-      .filter-options {
-        display: flex;
+    @extend %modal;
+    font-size: 0.9em;
+    .container {
+        @extend %modal-shared-container-style;
+        display: grid;
+        width: 686px;
         flex-direction: column;
-
-        .filter {
-          display: flex;
-          flex-direction: column;
-
-          .heading {
-            font-size: 15px;
+        align-items: center;
+        border-radius: 10px;
+        box-shadow: 0px 0px 3px 0px var(--document-box-shadow);
+        background: var(--component-background);
+        @include mobile {
+            width: 100%;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            min-width: 400px;
+            padding-top: 24px;
+            padding-bottom: 16px;
+            padding-left: 24px;
+            padding-right: 24px;
+            min-width: 100px;
+            .swipe-indicator {
+                background: var(--divider);
+                border-radius: 2px;
+                height: 4px;
+                width: 38px;
+                position: absolute;
+                top: 12px;
+                margin-left: auto;
+                margin-right: auto;
+                left: 0;
+                right: 0;
+                @include tablet-and-desktop {
+                    display: none;
+                }
+            }
+        }
+        .message {
+            font-size: 14px;
             @include mobile {
-              font-size: 18px;
+                font-size: 16px;
             }
-          }
-
-          .buttons {
-            display: grid;
-            padding: 6px 0 6px 0;
-            grid-template-columns: 100px 100px;
-          }
-
-          .colorSelect {
+        }
+        .filter-modal {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
+            padding-bottom: 60px;
+            padding-left: 60px;
+            padding-right: 60px;
+            .filter-options {
+                display: flex;
+                flex-direction: column;
+                .filter {
+                    display: flex;
+                    flex-direction: column;
+                    margin-bottom: 15px;
+                    .heading {
+                        font-size: 15px;
+                        @include mobile {
+                            font-size: 18px;
+                        }
+                    }
+                    .buttons {
+                        display: grid;
+                        padding: 6px 0 6px 0;
+                        grid-template-columns: 100px 100px;
+                        .filterAnnotationTypesCheckBox {
+                            margin-right: 40px !important;
+                        }
+                    }
+                    .tag-buttons {
+                        display: table;
+                        padding: 6px 0 6px 0;
+                    }
+                    .date-buttons {
+                        display: table;
+                        padding: 6px 0 6px 0;
+                        .date-row {
+                            display: table-row; 
+                            .date-cell {
+                                display: table-cell;
+                                .MuiOutlinedInput-root {
+                                    height: 35px;
+                                    outline: none;
+                                    input {
+                                        border: 0px !important;
+                                        pointer-events: none; 
+                                    }
 
-            .colorCell {
-              width: 15px;
-              height: 15px;
-              border-radius: 10000000px;
-              margin: 4px;
+                                    .MuiOutlinedInput-notchedOutline {
+                                        width: auto !important;
+                                        outline: none !important;
+                                        legend {
+                                            width: auto !important;
+                                        }
+                                    }
+                                }
+                            }
+                            .date-cell-header {
+                                display: table-cell;
+                                width: 150px;
+                                vertical-align: middle;
+                                font-size: small;
+                            }
+                            .date-cell-seperator {
+                                display: table-cell;
+                                width: 45px;
+                                font-size: x-large;
+                                vertical-align: middle;
+                                padding-left: 10px;
+                                padding-right: 10px
+                            }
+                        }
+                    }
+                    .annotationTypes {
+                        display: inline-flex;
+                        padding: 6px 0 6px 0;
+                        margin-left: -10px;
+                        grid-template-columns: 100px 100px;
+                        .annotationType {
+                            margin-right: 30px !important;
+                            .MuiCheckbox-root {
+                                padding-top: 0px !important;
+                            }
+                            label {
+                                vertical-align: middle;
+                            }
+                        }
+                    }
+                    .colorSelect {
+                        display: flex;
+                        flex-direction: row;
+                        .colorCell {
+                            width: 15px;
+                            height: 15px;
+                            border-radius: 10000000px;
+                            margin: 4px;
+                        }
+                    }
+                    .author-buttons {
+                        display: table;                        
+                        .authors {
+                            display: table-row;
+                            .multi-select {
+                                display: table-cell;
+                                width: fit-content;
+                            }     
+                            .replies {
+                                display: table-cell;
+                                width: 105px;
+                                align-content: right;
+                                padding-left: 40px;
+                                vertical-align: middle;
+                            }
+                            .replies-label {
+                                display: table-cell;
+                                width: 82px;
+                                vertical-align: middle;
+                            }
+                        }
+                        label {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                    }
+                }
+            }
+            .footer {
+                display: flex;
+                width: 100%;
+                align-items: center;
+                .Button {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    color: var(--primary-button-text);
+                    padding: 6px 18px;
+                    margin-top: 8px;
+                    margin-left: 5px;
+                    width: auto;
+                    width: fit-content;
+                    background: var(--primary-button);
+                    border-radius: 4px;
+                    height: 30px;
+                    cursor: pointer;
+                    &:hover {
+                        background: var(--primary-button-hover);
+                    }
+                    &.disabled {
+                        background: var(--gray-6);
+                        border-color: var(--gray-6);
+                        cursor: not-allowed;
+                    }
+                }
+                .filter-annot-apply {
+                    align-items: center;
+                    appearance: button;
+                    background-color: rgb(85, 207, 93);
+                    border-bottom-color: rgb(85, 207, 93);
+                    border-bottom-left-radius: 4px;
+                    border-bottom-right-radius: 4px;
+                    border-bottom-style: solid;
+                    border-bottom-width: 1px;
+                    border-image-outset: 0;
+                    border-image-repeat: stretch;
+                    border-image-slice: 100%;
+                    border-image-source: none;
+                    border-image-width: 1;
+                    border-left-color: rgb(85, 207, 93);
+                    border-left-style: solid;
+                    border-left-width: 1px;
+                    border-right-color: rgb(85, 207, 93);
+                    border-right-style: solid;
+                    border-right-width: 1px;
+                    border-top-color: rgb(85, 207, 93);
+                    border-top-left-radius: 4px;
+                    border-top-right-radius: 4px;
+                    border-top-style: solid;
+                    border-top-width: 1px;
+                    box-sizing: border-box;
+                    -webkit-tap-highlight-color: rgba(0,0,0,0);
+
+                    font-size: 1rem;
+                    font-stretch: 100%;
+                    font-style: normal;
+                    font-variant-caps: normal;
+                    font-variant-east-asian: normal;
+                    font-variant-ligatures: normal;
+                    font-variant-numeric: normal;
+                    font-weight: 700;
+                    height: 60px;
+                    letter-spacing: normal;
+                    line-height: 24px;
+                    margin-bottom: 4px;
+                    margin-left: 10px;
+                    margin-right: 10px;
+                    margin-top: 4px;
+                    outline-color: rgb(255, 255, 255);
+                    outline-style: none;
+                    outline-width: 0px;
+                    overflow-x: visible;
+                    overflow-y: visible;
+                    padding-bottom: 17.008px;
+                    padding-left: 40px;
+                    padding-right: 40px;
+                    padding-top: 17.008px;
+                    pointer-events: auto;
+                    text-align: center;
+                    text-indent: 0px;
+                    text-rendering: auto;
+                    text-shadow: none;
+                    text-size-adjust: 100%;
+                    text-transform: none;
+                    transition-delay: 0s;
+                    transition-duration: 0s;
+                    transition-property: none;
+                    transition-timing-function: ease;
+                    user-select: none;
+                    vertical-align: middle;
+                    white-space: nowrap;
+                    --primary-button-hover: #38C641;
+                    
+                }
+                .filter-annot-clear {
+                    align-items: center;
+                    appearance: button;
+                    background-color: grey;
+                    border-bottom-color: grey;
+                    border-bottom-left-radius: 4px;
+                    border-bottom-right-radius: 4px;
+                    border-bottom-style: solid;
+                    border-bottom-width: 1px;
+                    border-image-outset: 0;
+                    border-image-repeat: stretch;
+                    border-image-slice: 100%;
+                    border-image-source: none;
+                    border-image-width: 1;
+                    border-left-color: grey;
+                    border-left-style: solid;
+                    border-left-width: 1px;
+                    border-right-color: grey;
+                    border-right-style: solid;
+                    border-right-width: 1px;
+                    border-top-color: grey;
+                    border-top-left-radius: 4px;
+                    border-top-right-radius: 4px;
+                    border-top-style: solid;
+                    border-top-width: 1px;
+                    box-sizing: border-box;
+
+                    font-size: 1rem;
+                    font-stretch: 100%;
+                    font-style: normal;
+                    font-variant-caps: normal;
+                    font-variant-east-asian: normal;
+                    font-variant-ligatures: normal;
+                    font-variant-numeric: normal;
+                    font-weight: 700;
+                    height: 60px;
+                    letter-spacing: normal;
+                    line-height: 24px;
+                    margin-bottom: 4px;
+                    margin-left: 10px;
+                    margin-right: 10px;
+                    margin-top: 4px;
+                    outline-color: rgb(255, 255, 255);
+                    outline-style: none;
+                    outline-width: 0px;
+                    overflow-x: visible;
+                    overflow-y: visible;
+                    padding-bottom: 17.008px;
+                    padding-left: 40px;
+                    padding-right: 40px;
+                    padding-top: 17.008px;
+                    pointer-events: auto;
+                    text-align: center;
+                    text-indent: 0px;
+                    text-rendering: auto;
+                    text-shadow: none;
+                    text-size-adjust: 100%;
+                    text-transform: none;
+                    transition-delay: 0s;
+                    transition-duration: 0s;
+                    transition-property: none;
+                    transition-timing-function: ease;
+                    user-select: none;
+                    vertical-align: middle;
+                    white-space: nowrap;
+                    -webkit-tap-highlight-color: rgba(0,0,0,0);
+                    --primary-button-hover: #6D6D6D;
+                }
+            }
+        }
+        .modal-header {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-left: 60px;
+            padding-right: 60px;
+            padding-top: 60px;
+            border-bottom: 0px !important;
+            
+            
+            h5 {
+                -webkit-text-size-adjust: 100%;
+                font-family: Helvetica;
+                color: rgb(46, 43, 41);
+                font-size: 1rem;
+                font-weight: 700;
+            }
+
+            button {
+                position: absolute;
+                right: 0px;
+                top: 0px;
+                margin-top: 25px;
+                margin-right: 25px;
+                background-color: rgb(0, 0, 0, 0);
+                border-width: 0;
+                font-size: 24px;
+                font-family: Helvetica;
             }
           }
-
-          label {
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-        }
-      }
-
-      .footer {
-        display: flex;
-        width: 100%;
-
-        .Button {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          color: var(--primary-button-text);
-          padding: 6px 18px;
-          margin-top: 8px;
-          margin-left: 5px;
-          width: auto;
-          width: fit-content;
-          background: var(--primary-button);
-          border-radius: 4px;
-          height: 30px;
-          cursor: pointer;
-
-          &:hover {
-            background: var(--primary-button-hover);
-          }
-
-          &.disabled {
-            background: var(--gray-6);
-            border-color: var(--gray-6);
-            cursor: not-allowed;
-          }
-        }
-
-        .filter-annot-apply {
-          font-weight: 600;
-        }
-
-        .filter-annot-clear {
-          color: var(--secondary-button-text);
-          background: none;
-
-          &:hover {
-            color: var(--secondary-button-hover);
-            background: none;
-          }
-        }
-      }
     }
-  }
 }
+//customization
