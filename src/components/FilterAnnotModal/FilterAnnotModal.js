@@ -716,7 +716,7 @@ const FilterAnnotModal = () => {
       <div className={modalClass} data-element="filterModal" onMouseDown={closeModal}>
         <FocusTrap locked={isOpen} focusLastOnUnlock>
           <div className="container" onMouseDown={e => e.stopPropagation()}>
-            <div className="modal-header">
+            <div className="modal4-header">
                 <h5 className="modal-title">Comment Filters</h5>
                 <button type="button" aria-label="Close" class="close" onClick={closeModal}>×</button>
             </div>
@@ -732,8 +732,8 @@ const FilterAnnotModal = () => {
                   {/* {renderQueryBuilder()} */}
                 </div>
                 <div className="footer">
-                  <Button className="filter-annot-clear" onClick={filterClear} label={t('action.clear')} />
-                  <Button className="filter-annot-apply" onClick={filterApply} label={t('action.apply')} />
+                  <Button className="btn4-secondary" onClick={filterClear} label={t('action.clear')} />
+                  <Button className="btn4-primary" onClick={filterApply} label={t('action.apply')} />
                 </div>
               </div>
             ) : (

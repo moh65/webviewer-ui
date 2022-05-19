@@ -1,5 +1,8 @@
 @import '../../constants/styles';
 @import '../../constants/modal';
+@import '../../constants/modal';
+@import '../../fileman.scss';
+
 //customization
 .FilterAnnotModal {
     @extend %modal;
@@ -47,14 +50,8 @@
             }
         }
         .filter-modal {
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 60px;
-            padding-left: 60px;
-            padding-right: 60px;
+            @include modal4-body;
             .filter-options {
-                display: flex;
-                flex-direction: column;
                 .filter {
                     display: flex;
                     flex-direction: column;
@@ -170,203 +167,8 @@
                     }
                 }
             }
-            .footer {
-                display: flex;
-                width: 100%;
-                align-items: center;
-                .Button {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    color: var(--primary-button-text);
-                    padding: 6px 18px;
-                    margin-top: 8px;
-                    margin-left: 5px;
-                    width: auto;
-                    width: fit-content;
-                    background: var(--primary-button);
-                    border-radius: 4px;
-                    height: 30px;
-                    cursor: pointer;
-                    &:hover {
-                        background: var(--primary-button-hover);
-                    }
-                    &.disabled {
-                        background: var(--gray-6);
-                        border-color: var(--gray-6);
-                        cursor: not-allowed;
-                    }
-                }
-                .filter-annot-apply {
-                    align-items: center;
-                    appearance: button;
-                    background-color: rgb(85, 207, 93);
-                    border-bottom-color: rgb(85, 207, 93);
-                    border-bottom-left-radius: 4px;
-                    border-bottom-right-radius: 4px;
-                    border-bottom-style: solid;
-                    border-bottom-width: 1px;
-                    border-image-outset: 0;
-                    border-image-repeat: stretch;
-                    border-image-slice: 100%;
-                    border-image-source: none;
-                    border-image-width: 1;
-                    border-left-color: rgb(85, 207, 93);
-                    border-left-style: solid;
-                    border-left-width: 1px;
-                    border-right-color: rgb(85, 207, 93);
-                    border-right-style: solid;
-                    border-right-width: 1px;
-                    border-top-color: rgb(85, 207, 93);
-                    border-top-left-radius: 4px;
-                    border-top-right-radius: 4px;
-                    border-top-style: solid;
-                    border-top-width: 1px;
-                    box-sizing: border-box;
-                    -webkit-tap-highlight-color: rgba(0,0,0,0);
-
-                    font-size: 1rem;
-                    font-stretch: 100%;
-                    font-style: normal;
-                    font-variant-caps: normal;
-                    font-variant-east-asian: normal;
-                    font-variant-ligatures: normal;
-                    font-variant-numeric: normal;
-                    font-weight: 700;
-                    height: 60px;
-                    letter-spacing: normal;
-                    line-height: 24px;
-                    margin-bottom: 4px;
-                    margin-left: 10px;
-                    margin-right: 10px;
-                    margin-top: 4px;
-                    outline-color: rgb(255, 255, 255);
-                    outline-style: none;
-                    outline-width: 0px;
-                    overflow-x: visible;
-                    overflow-y: visible;
-                    padding-bottom: 17.008px;
-                    padding-left: 40px;
-                    padding-right: 40px;
-                    padding-top: 17.008px;
-                    pointer-events: auto;
-                    text-align: center;
-                    text-indent: 0px;
-                    text-rendering: auto;
-                    text-shadow: none;
-                    text-size-adjust: 100%;
-                    text-transform: none;
-                    transition-delay: 0s;
-                    transition-duration: 0s;
-                    transition-property: none;
-                    transition-timing-function: ease;
-                    user-select: none;
-                    vertical-align: middle;
-                    white-space: nowrap;
-                    --primary-button-hover: #38C641;
-                    
-                }
-                .filter-annot-clear {
-                    align-items: center;
-                    appearance: button;
-                    background-color: grey;
-                    border-bottom-color: grey;
-                    border-bottom-left-radius: 4px;
-                    border-bottom-right-radius: 4px;
-                    border-bottom-style: solid;
-                    border-bottom-width: 1px;
-                    border-image-outset: 0;
-                    border-image-repeat: stretch;
-                    border-image-slice: 100%;
-                    border-image-source: none;
-                    border-image-width: 1;
-                    border-left-color: grey;
-                    border-left-style: solid;
-                    border-left-width: 1px;
-                    border-right-color: grey;
-                    border-right-style: solid;
-                    border-right-width: 1px;
-                    border-top-color: grey;
-                    border-top-left-radius: 4px;
-                    border-top-right-radius: 4px;
-                    border-top-style: solid;
-                    border-top-width: 1px;
-                    box-sizing: border-box;
-
-                    font-size: 1rem;
-                    font-stretch: 100%;
-                    font-style: normal;
-                    font-variant-caps: normal;
-                    font-variant-east-asian: normal;
-                    font-variant-ligatures: normal;
-                    font-variant-numeric: normal;
-                    font-weight: 700;
-                    height: 60px;
-                    letter-spacing: normal;
-                    line-height: 24px;
-                    margin-bottom: 4px;
-                    margin-left: 10px;
-                    margin-right: 10px;
-                    margin-top: 4px;
-                    outline-color: rgb(255, 255, 255);
-                    outline-style: none;
-                    outline-width: 0px;
-                    overflow-x: visible;
-                    overflow-y: visible;
-                    padding-bottom: 17.008px;
-                    padding-left: 40px;
-                    padding-right: 40px;
-                    padding-top: 17.008px;
-                    pointer-events: auto;
-                    text-align: center;
-                    text-indent: 0px;
-                    text-rendering: auto;
-                    text-shadow: none;
-                    text-size-adjust: 100%;
-                    text-transform: none;
-                    transition-delay: 0s;
-                    transition-duration: 0s;
-                    transition-property: none;
-                    transition-timing-function: ease;
-                    user-select: none;
-                    vertical-align: middle;
-                    white-space: nowrap;
-                    -webkit-tap-highlight-color: rgba(0,0,0,0);
-                    --primary-button-hover: #6D6D6D;
-                }
-            }
         }
-        .modal-header {
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            position: relative;
-            padding-left: 60px;
-            padding-right: 60px;
-            padding-top: 60px;
-            border-bottom: 0px !important;
-            
-            
-            h5 {
-                -webkit-text-size-adjust: 100%;
-                font-family: Helvetica;
-                color: rgb(46, 43, 41);
-                font-size: 1rem;
-                font-weight: 700;
-            }
 
-            button {
-                position: absolute;
-                right: 0px;
-                top: 0px;
-                margin-top: 25px;
-                margin-right: 25px;
-                background-color: rgb(0, 0, 0, 0);
-                border-width: 0;
-                font-size: 24px;
-                font-family: Helvetica;
-            }
-          }
     }
 }
 //customization
