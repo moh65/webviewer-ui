@@ -36,12 +36,12 @@
 
 .zoom-overlay {
   .Button {
-    color: var(--black);
+    color: var(--black) !important;
     &:hover {
       background: var(--popup-button-active) !important;
     }
     .Icon {
-      color: inherit;
+      color: inherit !important;
     }
   }
 }
