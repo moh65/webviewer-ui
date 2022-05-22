@@ -10,6 +10,8 @@ import { FocusTrap } from '@pdftron/webviewer-react-toolkit';
 import { hexToRgba2 } from 'helpers/color';
 import setToolStyles from 'helpers/setToolStyles';
 
+import './TagDropDown.scss';
+
 export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, creatable, placeholder }, ref) => {
   let [
     token,
@@ -35,7 +37,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
   getTagsUrl = getTagsUrl ? getTagsUrl : `${defaultBaseUrlAddress}/api/bundle/jobtag/664`;
 
   const noTagOption = { value: 'no-tag', label: 'No tag' };
-  const createTagOption = { value: 'create-tag', label: 'create new tag' };
+  const createTagOption = { value: 'create-tag', label: 'Create new tag...' };
 
   const dropDownRef = useRef();
 
@@ -164,86 +166,89 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
   return (
     showElement && (
       <div className="custom-select" style={{ width: '200px' }}>
-        {
-          !showTagCreateForm ? <Select
-            onChange={(option, { action }) => {
-              if (creatable) {
-                if (action === 'select-option') {
-                  if (option.value === 'create-tag') {
-                    setShowTagCreateForm(true);
-                    return;
+        <Select
+          onChange={(option, { action }) => {
+            if (creatable) {
+              if (action === 'select-option') {
+                if (option.value === 'create-tag') {
+                  setShowTagCreateForm(true);
+                  return;
+                }
+                if (option.value === 'no-tag') {
+                  dispatch(actions.setDefaultTag({}));
+                  return;
+                }
+                let toolNames = ['AnnotationCreateTextHighlight',
+                  'AnnotationCreateEllipse',
+                  'AnnotationCreateRectangle',
+                  'AnnotationCreateLine',
+                  'AnnotationCreateFreeHand',
+                  'AnnotationCreateFreeHandHighlight',
+                  'AnnotationCreatePolygon',
+                  'AnnotationCreatePolygonCloud',
+                  'AnnotationCreatePolyline',
+                  'AnnotationCreateArrow',
+                  'AnnotationCreateFreeText',
+                  'AnnotationCreateTextUnderline',
+                  'AnnotationCreateTextStrikeout',
+                  'AnnotationCreateTextSquiggly',
+                  'AnnotationCreateSticky'];
+                let color = new window.Annotations.Color(option.value.split('-')[1]);
+                toolNames.forEach(toolName => {
+                  if (toolName === 'AnnotationCreateFreeText') {
+                    setToolStyles(toolName, 'TextColor', color);
+                  } else {
+                    setToolStyles(toolName, 'StrokeColor', color);
                   }
-                  if (option.value === 'no-tag') {
-                    dispatch(actions.setDefaultTag({}));
-                    return;
-                  }
-                  let toolNames = ['AnnotationCreateTextHighlight',
-                    'AnnotationCreateEllipse',
-                    'AnnotationCreateRectangle',
-                    'AnnotationCreateLine',
-                    'AnnotationCreateFreeHand',
-                    'AnnotationCreateFreeHandHighlight',
-                    'AnnotationCreatePolygon',
-                    'AnnotationCreatePolygonCloud',
-                    'AnnotationCreatePolyline',
-                    'AnnotationCreateArrow',
-                    'AnnotationCreateFreeText',
-                    'AnnotationCreateTextUnderline',
-                    'AnnotationCreateTextStrikeout',
-                    'AnnotationCreateTextSquiggly',
-                    'AnnotationCreateSticky'];
-                  let color = new window.Annotations.Color(option.value.split('-')[1]);
-                  toolNames.forEach(toolName => {
-                    if (toolName === 'AnnotationCreateFreeText') {
-                      setToolStyles(toolName, 'TextColor', color);
-                    } else {
-                      setToolStyles(toolName, 'StrokeColor', color);
-                    }
-                  });
+                });
 
-                  dispatch(actions.setDefaultTag(option));
-                }
-              } else {
-                if (setDropDownChanged) {
-                  setDropDownChanged(true);
-                }
-                if (setSelectedTags) {
-                  setSelectedTags(option);
-                }
+                dispatch(actions.setDefaultTag(option));
+              }
+            } else {
+              if (setDropDownChanged) {
+                setDropDownChanged(true);
+              }
+              if (setSelectedTags) {
+                setSelectedTags(option);
               }
             }
-            }
-            ref={dropDownRef}
-            placeholder={placeholder}
-            defaultValue={creatable ? noTagOption : (defaultTag && defaultTag.value ? defaultTag : selectedTags)}
-            isSearchable
-            isClearable={creatable ? false : true}
-            options={tagOptions}
-            styles={customStyles}
-            closeMenuOnSelect={creatable ? true : false}
-            isMulti={creatable ? false : true}
-            noOptionsMessage={e => "no tags available"}
-          /> :
-            <Swipeable onSwipedUp={e => setShowTagCreateForm(false)} onSwipedDown={e => setShowTagCreateForm(false)} preventDefaultTouchmoveEvent>
-              <div style={{ marginTop: '380px' }}>
-
-                <label htmlFor="tagName">Tag Name:</label>
-                <input type="text" id="tagName" value={tagName} onChange={e => setTagName(e.target.value)} />
-                <br />
-                <label htmlFor="tagColor">Tag Color:</label>
-                <SketchPicker color={tagColor} onChange={colorPickerHandler} />
-                <div className="fm-container">
-                  <div className="fm-container-child">
-                    <button className="fm-save-button" onClick={saveTag}>save</button>
-                  </div>
-                  <div className="fm-container-child">
-                    <button className="fm-cancel-button" onClick={e => setShowTagCreateForm(false)}>cancel</button>
-                  </div>
-                </div>
-
+          }
+          }
+          ref={dropDownRef}
+          placeholder={placeholder}
+          defaultValue={creatable ? noTagOption : (defaultTag && defaultTag.value ? defaultTag : selectedTags)}
+          isSearchable
+          isClearable={creatable ? false : true}
+          options={tagOptions}
+          styles={customStyles}
+          closeMenuOnSelect={creatable ? true : false}
+          isMulti={creatable ? false : true}
+          noOptionsMessage={() => "no tags available"}
+        />
+        {showTagCreateForm && (
+          <Swipeable
+            onSwipedUp={() => setShowTagCreateForm(false)}
+            onSwipedDown={() => setShowTagCreateForm(false)}
+            preventDefaultTouchmoveEvent
+            className="new-tag-form"
+          >
+            <div className="new-tag-form-inner">
+              <label htmlFor="tagName">Tag Name:</label>
+              <input type="text" id="tagName" placeholder="Enter tag name" value={tagName} onChange={e => setTagName(e.target.value)} />
+              <br />
+              <label htmlFor="tagColor">Tag Color:</label>
+              <SketchPicker color={tagColor} onChange={colorPickerHandler} />
+            </div>
+            <div className="fm-container clear">
+              <div className="fm-container-child">
+                <button className="btn btn-cancel" onClick={() => setShowTagCreateForm(false)}>Cancel</button>
               </div>
-            </Swipeable>
-        }
+              <div className="fm-container-child">
+                <button className="btn btn-success" onClick={saveTag}>Done</button>
+              </div>
+            </div>
+          </Swipeable>
+        )}
       </div>
     )
   );
