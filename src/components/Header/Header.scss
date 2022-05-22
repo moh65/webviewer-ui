@@ -37,8 +37,14 @@
 
   &:not(.Tools) {
     .Button {
+      color: var(--white);
       &:hover:enabled {
+        color: var(--white);
         background: var(--view-header-button-hover);
+      }
+
+      .Icon {
+        color: var(--white);
       }
 
       &.active {
