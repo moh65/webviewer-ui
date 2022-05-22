@@ -59,10 +59,10 @@
   position: relative;
 
   &:hover {
-    background-color: var(--view-header-button-hover);
+    background-color: var(--popup-button-active);
   }
   &.active {
-    background-color: var(--view-header-button-active);
+    background-color: var(--popup-button-active);
   }
 
   // Avoids the child button chevron from overlapping the zoom text
