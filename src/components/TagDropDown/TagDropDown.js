@@ -74,6 +74,15 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
         color: state.data.value.split('-')[1]
       });
     },
+    control: provided => ({
+      ...provided,
+      height: 30,
+      minHeight: 30,
+    }),
+    dropdownIndicator: provider => ({
+      ...provider,
+      padding: 4,
+    }),
     multiValue: (provided, state) => {
       return { ...provided, backgroundColor: state.data.value.split('-')[1] };
     },
