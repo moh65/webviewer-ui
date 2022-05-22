@@ -252,7 +252,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
         contentStyle.color = textColor.toHexString();
       }
 
-      debugger
+      //debugger
       return (
         <React.Fragment>
           {isEditing && isSelected ? (

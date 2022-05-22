@@ -118,11 +118,19 @@
 
       .filterAnnotationButton {
         height: 28px;
-        width: 28px;
+        width: auto;
+        padding: 0 5px;
+        margin-right: -5px;
         cursor: pointer;
+        .Icon {
+          margin-right: 5px;
+        }
+        svg {
+          width: 22px;
+        }
 
         &:hover {
-          background: var(--blue-1)
+          background: var(--blue-2)
         }
 
         &.active {
@@ -218,6 +226,8 @@
   .normal-notes-container {
     overflow: auto;
     overflow: overlay;
+    padding-left: 16px;
+    margin-left: -16px;
   }
 
   .note-wrapper:first-child {
