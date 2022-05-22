@@ -11,11 +11,15 @@
   border-radius: 4px;
   width: 32px;
   height: 32px;
-  color: var(--text-color);
+  color: var(--white);
 
   img {
     height: 24px;
     width: 24px;
+  }
+
+  .Icon {
+    color: var(--white);
   }
 
   // color for svgs

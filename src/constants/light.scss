@@ -23,6 +23,11 @@
   --yellow-1: #FACE0080;
   --red: red;
 
+  --black: #000000;
+  --white: #FFFFFF;
+  --primary: #b42025;
+  --primary-active: #82171b;
+
   --component-background: var(--gray-0);
   --mobile-presets-background: var(--gray-1);
   --faded-component-background: var(--gray-2);
@@ -40,12 +45,12 @@
   --slider-background: var(--gray-4);
   --badge-fill: var(--gray-8);
   --badge-text-color: var(--gray-0);
-  --view-header-icon-active-fill: var(--blue-6);
+  --view-header-icon-active-fill: var(--white);
 
   --text-color: var(--gray-8);
   --faded-text: var(--gray-7);
   --placeholder-text: var(--gray-6);
-  --ribbon-active-color: var(--blue-5);
+  --ribbon-active-color: var(--primary);
 
   --no-presets-text: var(--gray-6);
   --disabled-text: var(--gray-5);
@@ -55,8 +60,8 @@
   --icon-color: var(--gray-7);
   --selected-icon-color: var(--gray-8);
 
-  --view-header-button-hover: var(--blue-1);
-  --view-header-button-active: var(--blue-2);
+  --view-header-button-hover: var(--primary-active);
+  --view-header-button-active: var(--primary-active);
 
   --popup-button-hover: var(--blue-1);
   --popup-button-active: var(--blue-2);
@@ -92,7 +97,7 @@
 
 
   --tools-header-background: var(--gray-3);
-  --view-header-background: var(--gray-1);
+  --view-header-background: var(--primary);
   --tools-overlay-background: var(--gray-0);
 
   --tools-button-hover: var(--blue-3);
