@@ -17,7 +17,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-
+    margin-top: -8px;
 
     .Icon {
       width: 24px;
@@ -44,14 +44,14 @@
     }
     border-radius: 4px;
     background: var(--component-background);
-    top: 40px;
+    top: 32px;
 
     .note-popup-option{
       @include button-reset;
     }
 
     &.options-reply {
-      top: 30px;
+      top: 20px;
     }
 
     .option {

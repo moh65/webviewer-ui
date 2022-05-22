@@ -13,6 +13,8 @@ import { NotesPanelSortStrategy } from 'constants/sortStrategies';
 import selectors from 'selectors';
 import { useDispatch, useSelector } from 'react-redux';
 import actions from 'actions';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 
 import './NoteHeader.scss';
@@ -135,12 +137,30 @@ function NoteHeader(props) {
       <div className={authorAndDateClass}>
         <div className="author-and-overflow">
           <div className="author-and-time">
-            <div className='author'>
-              {renderAuthorName(annotation)}
+            <div className="row-flex mb-1">
+              <div className="col-grow author">
+                {renderAuthorName(annotation)}
+              </div>
+              <div className="col-shrink">
+                <div className="date-and-time">
+                  {date ? dayjs(date).locale(language).format(noteDateFormat) : t('option.notesPanel.noteContent.noDate')}
+                </div>
+              </div>
             </div>
             { showHeader && (<div>
-              <div>
-                {`Visibility : ${customPrivate === 'true' ? 'private' : 'public'}`}
+              <div className="row-flex mb-1">
+                <div className="col-grow visibility">
+                  {customPrivate === 'true'
+                    ? <><FontAwesomeIcon icon={faEyeSlash} /> Private</>
+                    : <><FontAwesomeIcon icon={faEye} /> Public</>
+                  }
+                </div>
+                {numberOfReplies > 0 &&
+                  <div className="col-shrink num-replies-container">
+                    <Icon className="num-reply-icon" glyph={"icon-chat-bubble"} />
+                    <div className="num-replies">{numberOfReplies}</div>
+                  </div>
+                }
               </div>
               <div>
                 {`Date : ${customDate === '' ? 'not set' : customDate}`}
@@ -152,16 +172,6 @@ function NoteHeader(props) {
                 {customTag !== '[]' ? customTag : ''}
               </div>
             </div>)}
-            <div className="date-and-num-replies">
-              <div className="date-and-time">
-                {date ? dayjs(date).locale(language).format(noteDateFormat) : t('option.notesPanel.noteContent.noDate')}
-              </div>
-              {numberOfReplies > 0 && !isSelected &&
-                <div className="num-replies-container">
-                  <Icon className="num-reply-icon" glyph={"icon-chat-bubble"} />
-                  <div className="num-replies">{numberOfReplies}</div>
-                </div>}
-            </div>
           </div>
           <div className="state-and-overflow">
             <NoteUnpostedCommentIndicator annotationId={annotation.Id} />
