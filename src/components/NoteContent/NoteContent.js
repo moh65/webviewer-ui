@@ -500,7 +500,7 @@ const ContentArea = ({
 
               window.documentViewer.getAnnotationManager().enableRedaction();
               let isEnabled = core.isCreateRedactionEnabled();
-              applyRedactionFromCommentBox(annotation, dispatch, redactionBurninDateUrl);
+              applyRedactionFromCommentBox(annotation, dispatch, redactionBurninDateUrl, token);
             }}
           >
             {t('action.apply')}

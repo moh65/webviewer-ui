@@ -569,6 +569,11 @@ export const setTagOptions = (tagOptions) => ({
   payload: { tagOptions: tagOptions },
 });
 
+export const setdefaultUrlBaseAddress = (defaultUrlBaseAddress) => ({
+  type: 'SET_DEFAULT_URL_BASE_ADDRESS',
+  payload: { defaultUrlBaseAddress: defaultUrlBaseAddress },
+});
+
 
 //customization
 
