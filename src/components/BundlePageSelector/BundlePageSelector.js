@@ -39,8 +39,8 @@ export default ({ isModalOpen }) => {
     ]);
     const [t] = useTranslation();
 
-    sectionUrl = sectionUrl ? sectionUrl : `${defaultBaseUrlAddress}/api/bundle/664/items/sections`;
-    documentUrl = documentUrl ? documentUrl : `${defaultBaseUrlAddress}/api/bundle/sections/664/{sectionId}/documents/list`;
+    sectionUrl = sectionUrl ? sectionUrl : `${defaultBaseUrlAddress}/api/bundle/683/items/sections`;
+    documentUrl = documentUrl ? documentUrl : `${defaultBaseUrlAddress}/api/bundle/sections/683/{sectionId}/documents/list`;
     
     currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
         id: 231423,

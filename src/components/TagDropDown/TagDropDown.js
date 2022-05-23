@@ -10,7 +10,7 @@ import { FocusTrap } from '@pdftron/webviewer-react-toolkit';
 import { hexToRgba2 } from 'helpers/color';
 import setToolStyles from 'helpers/setToolStyles';
 
-export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, creatable, placeholder }, ref) => {
+export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, creatable, placeholder, controlWidth }, ref) => {
     let [
         token,
         defaultTag,
@@ -151,7 +151,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
 
     return (
         showElement && (
-            <div style={{ width: '200px' }}>
+            <div style={{ width: controlWidth ? controlWidth : '200px' }}>
                 {
                     !showTagCreateForm ? <Select
                         onChange={(option, { action }) => {

@@ -17,15 +17,28 @@ import Button from 'components/Button';
 import { Swipeable } from 'react-swipeable';
 import { FocusTrap } from '@pdftron/webviewer-react-toolkit';
 
+
 import './FilterAnnotModal.scss';
 import { bool } from 'prop-types';
+import ActionButton from 'components/ActionButton';
 
 //customization
-
+import { Checkbox } from '@mui/material';
+import { green } from '@mui/material/colors';
+import { Radio } from '@mui/material';
+import { RadioGroup } from '@mui/material';
+import { FormControlLabel } from '@mui/material';
+import { FormControl } from '@mui/material';
+import { FormLabel } from '@mui/material';
+import { TextField } from '@mui/material';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Select from 'react-select';
+import Switch from 'components/Switch';
 import { getAnnotationClass, getAnnotationClassForFilterModal } from 'helpers/getAnnotationClass';
 import TagDropDown from 'components/TagDropDown';
 import QueryBuilder from 'components/QueryBuilder';
-import DatePicker from '../DatePicker';
 
 //customization
 const hidden = [];
@@ -55,12 +68,24 @@ const FilterAnnotModal = () => {
   //customization
 
   const [privateFilter, setPrivateFilter] = useState(false);
-  const [toDateRange, setToDateRange] = useState('yyyy-mm-dd');
-  const [fromDateRange, setFromDateRange] = useState('yyyy-mm-dd');
-  const [isFromDatePickerShown, setIsFromDatePickerShown] = useState(false);
-  const [isToDatePickerShown, setIsToDatePickerShown] = useState(false);
+  const [toCommentDateRange, setToCommentDateRange] = useState('yyyy-mm-dd');
+  const [fromCommentDateRange, setFromCommentDateRange] = useState('yyyy-mm-dd');
+  const [fromCommentDate, setFromCommentDate] = useState(null);
+  const [toCommentDate, setToCommentDate] = useState(null);
+  const [isFromCommentDatePickerShown, setIsFromCommentDatePickerShown] = useState(false);
+  const [isToCommentDatePickerShown, setIsToCommentDatePickerShown] = useState(false);
+
+  const [toAttributeDateRange, setToAttributeDateRange] = useState('yyyy-mm-dd');
+  const [fromAttributeDateRange, setFromAttributeDateRange] = useState('yyyy-mm-dd');
+  const [fromAttributeDate, setFromAttributeDate] = useState(null);
+  const [toAttributeDate, setToAttributeDate] = useState(null);
+  const [isFromAttributeDatePickerShown, setIsFromAttributeDatePickerShown] = useState(false);
+  const [isToAttributeDatePickerShown, setIsToAttributeDatePickerShown] = useState(false);
+
+
   const [filteredTags, setFilteredTags] = useState([]);
   const [openQueryBuilder, setOpenQueryBuilder] = useState(false);
+  const [visibility, setVisiblity] = useState('All');
 
   //customization
 
@@ -140,42 +165,80 @@ const FilterAnnotModal = () => {
         }
 
         //customization
-        let fromDateApply = false;
-        let toDateApply = false;
-        let annotDate = annot.getCustomData('custom-date');
+        let fromCommentDateApply = false;
+        let toCommentDateApply = false;
+        
+        let annotCommentDate = annot['wN'];
 
-        if (annotDate !== "") {
+        if (annotCommentDate !== "") {
           debugger
         }
 
-        if (fromDateRange !== '' && fromDateRange !== "yyyy-mm-dd") {
-          if (annotDate !== "" && annotDate != null) {
-            fromDateApply = annotDate < fromDateRange;
-          } else
-            fromDateApply = true;
+        if (isFromCommentDatePickerShown && fromCommentDate !== '' && fromCommentDate !== "yyyy-mm-dd") {
+          if (annotCommentDate !== "" && annotCommentDate != null) {
+            fromCommentDateApply = annotCommentDate < fromCommentDate;
+          } else {
+            fromCommentDateApply = true;
+          }
         }
 
-        if (toDateRange !== '' && toDateRange !== "yyyy-mm-dd") {
-          if (annotDate !== "" && annotDate != null) {
-            toDateApply = annotDate > toDateRange;
-          } else
-            toDateApply = true;
+        if (isToCommentDatePickerShown && toCommentDateRange !== '' && toCommentDateRange !== "yyyy-mm-dd") {
+          if (annotCommentDate !== "" && annotCommentDate != null) {
+            toCommentDateApply = annotCommentDate > toCommentDateRange;
+          } else {
+            toCommentDateApply = true;
+          }
         }
 
+        let fromAttributeDateApply = false;
+        let toAttributeDateApply = false;
+        
+        let annotAttributeDate = annot.getCustomData('custom-date');
+
+        if (annotAttributeDate !== "") {
+          debugger
+        }
+
+        if (isFromAttributeDatePickerShown && fromAttributeDate !== '' && fromAttributeDate !== "yyyy-mm-dd") {
+          if (annotAttributeDate !== "" && annotAttributeDate != null) {
+            fromAttributeDateApply = annotAttributeDate < fromAttributeDate;
+          } else {
+            fromAttributeDateApply = true;
+          }
+        }
+
+        if (isToAttributeDatePickerShown && toAttributeDateRange !== '' && toAttributeDateRange !== "yyyy-mm-dd") {
+          if (annotAttributeDate !== "" && annotAttributeDate != null) {
+            toAttributeDateApply = annotAttributeDate > toAttributeDateRange;
+          } else {
+            toAttributeDateApply = true;
+          }
+        }
         //customization
 
         //customization
+  
         let isPrivate = annot.getCustomData("custom-private");
-        if (isPrivate.toLocaleLowerCase() === "true") {
-          isPrivate = true;
-        } else if (isPrivate.toLocaleLowerCase() === "false") {
-          isPrivate = false;
-        } else
-          isPrivate = (isPrivate == null || isPrivate == undefined || isPrivate === "" ? false : isPrivate);
+        let privatePublicShow = true;
 
-
-        let privatePublicShow = privateFilter ? (isPrivate ? true : false) : true;//    (isPrivate && privateFilter) || (!isPrivate && !privateFilter);
-
+        switch(visibility) { 
+          case 'Private': { 
+             if (isPrivate.toLocaleLowerCase() !== "true") {
+              privatePublicShow = false;
+             } 
+             break; 
+          } 
+          case 'Public': { 
+            if (isPrivate.toLocaleLowerCase() === "true") {
+              privatePublicShow = false;
+            }
+            break; 
+          } 
+          default: { 
+            privatePublicShow = true;
+            break; 
+          } 
+        } 
         //customization
 
         //customization
@@ -193,7 +256,7 @@ const FilterAnnotModal = () => {
         //customization
 
 
-        let showComment = !filteredTagShouldApply && type && author && privatePublicShow && !fromDateApply && !toDateApply;
+        let showComment = !filteredTagShouldApply && type && author && privatePublicShow && !fromCommentDateApply && !toCommentDateApply && !fromAttributeDateApply && !toAttributeDateApply;
 
         if (!showComment) {
           hidden.push(annot);
@@ -240,13 +303,26 @@ const FilterAnnotModal = () => {
     //customization
 
     setPrivateFilter(false);
-    setToDateRange('yyyy-mm-dd');
-    setFromDateRange('yyyy-mm-dd');
+    setVisiblity('All');
+
+    setToCommentDateRange('yyyy-mm-dd');
+    setFromCommentDateRange('yyyy-mm-dd');
+    setFromCommentDate(null);
+    setToCommentDate(null);
+    setIsFromCommentDatePickerShown(false);
+    setIsToCommentDatePickerShown(false);
+
+    setToAttributeDateRange('yyyy-mm-dd');
+    setFromAttributeDateRange('yyyy-mm-dd');
+    setFromAttributeDate(null);
+    setToAttributeDate(null);
+    setIsFromAttributeDatePickerShown(false);
+    setIsToAttributeDatePickerShown(false);
+
     hidden.splice(0, hidden.length);
     showAnnot();
     setFilteredTags([]);
     dropRef.current.clearSelect();
-    setIsFromDatePickerShown(false);
 
     //customization
 
@@ -271,15 +347,22 @@ const FilterAnnotModal = () => {
     const annots = core.getAnnotationsList();
     // set is a great way to remove any duplicate additions and ensure the unique items are present
     // the only gotcha that it should not be used by state since not always it will trigger a rerender
-    const authorsToBeAdded = new Set();
+
+    //customization
+    const authorsToBeAdded = [];
+    //customization
     const annotTypesToBeAdded = new Set();
     const annotColorsToBeAdded = new Set();
     const annotStatusesToBeAdded = new Set();
     annots.forEach(annot => {
       const displayAuthor = core.getDisplayAuthor(annot['Author']);
-      if (displayAuthor && displayAuthor !== '') {
-        authorsToBeAdded.add(displayAuthor);
+      
+      //customization
+      if (displayAuthor && displayAuthor !== '' && !authorsToBeAdded.find(i => i.value === displayAuthor)) {
+        authorsToBeAdded.push( { value: displayAuthor, label: displayAuthor });
       }
+      //customization
+
       // We don't show it in the filter for WidgetAnnotation or StickyAnnotation or LinkAnnotation from the comments
       if (
         annot instanceof Annotations.WidgetAnnotation ||
@@ -306,9 +389,11 @@ const FilterAnnotModal = () => {
       }
     });
 
-
     hideAnnot();
-    setAuthors([...authorsToBeAdded]);
+    //customization
+    setAuthors(authorsToBeAdded);   
+    //customization
+
     setAnnotTypes([...annotTypesToBeAdded]);
     setColorTypes([...annotColorsToBeAdded]);
     setStatusTypes([...annotStatusesToBeAdded]);
@@ -319,73 +404,20 @@ const FilterAnnotModal = () => {
     };
   }, [isOpen]);
 
-
-
-
   const renderAuthors = () => {
     return (
       <div className="filter">
-        <div className="heading">{t('option.filterAnnotModal.commentBy')}</div>
-        <div className="buttons">
-          {[...authors].map((val, index) => {
-            return (
-              <Choice
-                type="checkbox"
-                key={index}
-                label={val}
-                checked={authorFilter.includes(val)}
-                id={val}
-                onChange={e => {
-                  if (authorFilter.indexOf(e.target.getAttribute('id')) === -1) {
-                    setAuthorFilter([...authorFilter, e.target.getAttribute('id')]);
-                  } else {
-                    setAuthorFilter(authorFilter.filter(author => author !== e.target.getAttribute('id')));
-                  }
-                }}
-              />
-            );
-          })}
-        </div>
-        <div className="buttons">
-          <Choice
-            type="checkbox"
-            label={t('option.filterAnnotModal.includeReplies')}
-            checked={checkRepliesForAuthorFilter}
-            onChange={
-              e => setCheckRepliesForAuthorFilter(e.target.checked)
-            }
-            id="filter-annot-modal-include-replies"
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const renderAnnotTypes = () => {
-    return (
-      <div className="filter">
-        <div className="heading">{t('option.filterAnnotModal.types')}</div>
-        <div className="buttons">
-          {[...annotTypes]
-            .sort((type1, type2) => (t(`annotation.${type1}`) <= t(`annotation.${type2}`) ? -1 : 1))
-            .map((val, index) => {
-              return (
-                <Choice
-                  type="checkbox"
-                  key={index}
-                  label={t(`annotation.${val}`)}
-                  checked={typesFilter.includes(val)}
-                  id={val}
-                  onChange={e => {
-                    if (typesFilter.indexOf(e.target.getAttribute('id')) === -1) {
-                      setTypesFilter([...typesFilter, e.target.getAttribute('id')]);
-                    } else {
-                      setTypesFilter(typesFilter.filter(type => type !== e.target.getAttribute('id')));
-                    }
-                  }}
-                />
-              );
-            })}
+        <div className="heading"><h6>Comment Author</h6></div>
+        <div className="author-buttons">
+          <div className='authors'>
+            <Select options={authors} isSearchable="true" isMulti className="multi-select"
+              defaultValue={authors}
+            />
+            <div className="replies">
+              <Switch onChange={setCheckRepliesForAuthorFilter} checked={checkRepliesForAuthorFilter} />   
+            </div>            
+            <div className='replies-label'>Include Replies</div>
+          </div>
         </div>
       </div>
     );
@@ -425,6 +457,45 @@ const FilterAnnotModal = () => {
     );
   };
 
+  //customization
+  const renderAnnotTypes = () => {
+    return (
+      <div className="filter">
+        <div className="heading"><h6>{t('option.filterAnnotModal.types')}</h6></div>
+        <div className="annotationTypes">
+          {[...annotTypes]
+            .sort((type1, type2) => (t(`annotation.${type1}`) <= t(`annotation.${type2}`) ? -1 : 1))
+            .map((val, index) => {
+              return (  
+                <div className="annotationType">  
+                  <Checkbox 
+                    checked={typesFilter.includes(val)} 
+                    id={val}
+
+                    sx={{ 
+                      '& .MuiSvgIcon-root': { fontSize: 28 },
+                      color: green[300],
+                      '&.Mui-checked': {
+                        color: green[400],
+                      },
+                    }}
+                    onChange={(e, status) => {
+                      if (typesFilter.indexOf(e.currentTarget.getAttribute('id')) === -1) {
+                        setTypesFilter([...typesFilter, e.currentTarget.getAttribute('id')]);
+                      } else {
+                        setTypesFilter(typesFilter.filter(type => type !== e.currentTarget.getAttribute('id')));
+                      }
+                    }}/>
+                  
+                  <label>{t(`annotation.${val}`)}</label>
+                </div>
+              );
+            })}
+        </div>
+      </div>
+    );
+  };
+
   const renderStatusTypes = () => {
     // Hide status filter if there is only on status type
     if (statuses.length === 1) {
@@ -458,15 +529,14 @@ const FilterAnnotModal = () => {
     );
   };
 
-  //customization
-
   const renderTags = () => {
 
     return (
       <div className="filter">
         <div className="heading">{t('annotation.tag')}</div>
-        <div className="buttons">
-          <TagDropDown ref={dropRef} creatable={false} setSelectedTags={setFilteredTags} />
+        <div className="tag-buttons">
+          <TagDropDown ref={dropRef} creatable={false} setSelectedTags={setFilteredTags} controlWidth="100%"/>
+
         </div>
       </div>
     );
@@ -476,20 +546,46 @@ const FilterAnnotModal = () => {
 
     return (
       <div className="filter">
-        <div className="heading">{t('annotation.visibility')}</div>
-        <div className="buttons">
-          <Choice
-            type="checkbox"
+        <div className="heading"><h6>Visibility</h6></div>
+        <FormControl>
+        <RadioGroup
+          aria-labelledby="demo-controlled-radio-buttons-group"
+          name="controlled-radio-buttons-group"
+          row
+          value={visibility}                    
+          onChange={(e, value) => {
+            setPrivateFilter(value === 'Private');
+            setVisiblity(value);
+          }}
+        >
+        <FormControlLabel value="All" control={<Radio        
+            sx={{ 
+            '& .MuiSvgIcon-root': { fontSize: 20 },
+            color: green[300],
+            '&.Mui-checked': {
+              color: green[400],
+            },
+          }} />} label="All" />
+          <FormControlLabel value="Private" control={<Radio         sx={{ 
+            '& .MuiSvgIcon-root': { fontSize: 20 },
+            color: green[300],
+            '&.Mui-checked': {
+              color: green[400],
+            },
+          }}
+          />} label="Private only" />
+          <FormControlLabel value="Public" control={<Radio         sx={{ 
+            '& .MuiSvgIcon-root': { fontSize: 20 },
+            color: green[300],
+            '&.Mui-checked': {
+              color: green[400],
+            },
+          }}
+          />} label="Public only" />
+        </RadioGroup>
+      </FormControl>
+    </div>
 
-            checked={privateFilter}
-            label={t('annotation.private')}
-
-            onChange={e => {
-              setPrivateFilter(e.target.checked);
-            }}
-          />
-        </div>
-      </div>
     );
   };
 
@@ -516,49 +612,85 @@ const FilterAnnotModal = () => {
 
     return (
       <div className="filter">
-        <div className="heading">Date Range Filter</div>
-        <div className="buttons">
-          <div>
-            <label htmlFor="fromDateRange">From Date: {fromDateRange} </label>
-            {
-              isFromDatePickerShown && (
+        <div className="heading"><h6>Date Range Filter</h6></div>
+        <div className="date-buttons">
+          <div className='date-row'>
+            <div className='date-cell-header'>
+              <p>Comment date</p>
+            </div>
+            <div className='date-cell'>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
-                  dateFormat='YYYY-MM-DD'
-                  onClick={(selectedDate) => {
-                    setFromDateRange(selectedDate);
-                    setIsFromDatePickerShown(false);
+                  inputFormat="yyyy-MM-dd"
+                  value={fromCommentDate}  
+                  maxDate={toCommentDate}
+                  onChange={(newValue) => {
+                    setFromCommentDate(newValue);  
+                    setFromCommentDateRange(newValue);
+                    setIsFromCommentDatePickerShown(true);
                   }}
-                  onDatePickerShow={() => { }}
+                  renderInput={(params) => <TextField {...params} helperText={null} />}
                 />
-              )
-            }
+              </LocalizationProvider>
+            </div>
+            <div className='date-cell-seperator'>
+              <p>➞</p>
+            </div>
+            <div className='date-cell'>
 
-            <button onClick={(e) => {
-              e.stopPropagation();
-              setIsFromDatePickerShown(true);
-            }}>...</button>
-
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DatePicker
+                    value={toCommentDate}  
+                    minDate={fromCommentDate}
+                    inputFormat="yyyy-MM-dd"
+                    onChange={(newValue) => {
+                      setToCommentDate(newValue);    
+                      setToCommentDateRange(newValue);                    
+                      setIsToCommentDatePickerShown(true);
+                    }}
+                    renderInput={(params) => <TextField {...params} helperText={null} />}
+                  />
+                </LocalizationProvider>
+            </div>
           </div>
-          <br />
-          <div>
-            <label htmlFor="toDateRange">To Date: {toDateRange} </label>
-            {
-              isToDatePickerShown && (
+          <div className='date-row'>
+            <div className='date-cell-header'>
+              <p>Attibuted date</p>
+            </div>
+            <div className='date-cell'>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
-                  dateFormat='YYYY-MM-DD'
-                  onClick={(selectedDate) => {
-                    setToDateRange(selectedDate);
-                    setIsToDatePickerShown(false);
+                  value={fromAttributeDate}  
+                  maxDate={toAttributeDate}
+                  inputFormat="yyyy-MM-dd"
+                  onChange={(newValue) => {
+                    setFromAttributeDate(newValue);  
+                    setFromAttributeDateRange(newValue);                    
+                    setIsFromAttributeDatePickerShown(true);  
                   }}
-                  onDatePickerShow={() => { }}
+                  renderInput={(params) => <TextField {...params} helperText={null} />}
                 />
-              )
-            }
+              </LocalizationProvider>
+            </div>
+            <div className='date-cell-seperator'>
+              <p>➞</p>
+            </div>
+            <div className='date-cell'>
 
-            <button onClick={(e) => {
-              e.stopPropagation();
-              setIsToDatePickerShown(true);
-            }}>...</button>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DatePicker
+                    value={toAttributeDate}  
+                    minDate={fromAttributeDate}
+                    inputFormat="yyyy-MM-dd"
+                    onChange={(newValue) => {
+                      setToAttributeDate(newValue);   
+                      setToAttributeDateRange(newValue);                    
+                      setIsToAttributeDatePickerShown(true); 
+                    }}
+                    renderInput={(params) => <TextField {...params} helperText={null} />}
+                  />
+                </LocalizationProvider>
+            </div>
           </div>
         </div>
       </div>
@@ -584,6 +716,10 @@ const FilterAnnotModal = () => {
       <div className={modalClass} data-element="filterModal" onMouseDown={closeModal}>
         <FocusTrap locked={isOpen} focusLastOnUnlock>
           <div className="container" onMouseDown={e => e.stopPropagation()}>
+            <div className="modal4-header">
+                <h5 className="modal-title">Comment Filters</h5>
+                <button type="button" aria-label="Close" class="close" onClick={closeModal}>×</button>
+            </div>
             {core.getAnnotationsList().length > 0 ? (
               <div className="filter-modal">
                 <div className="swipe-indicator" />
@@ -596,8 +732,8 @@ const FilterAnnotModal = () => {
                   {/* {renderQueryBuilder()} */}
                 </div>
                 <div className="footer">
-                  <Button className="filter-annot-clear" onClick={filterClear} label={t('action.clear')} />
-                  <Button className="filter-annot-apply" onClick={filterApply} label={t('action.apply')} />
+                  <Button className="btn4-secondary" onClick={filterClear} label={t('action.clear')} />
+                  <Button className="btn4-primary" onClick={filterApply} label={t('action.apply')} />
                 </div>
               </div>
             ) : (

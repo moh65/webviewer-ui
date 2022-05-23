@@ -26,7 +26,7 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
 
     generateThumbnailUrl = generateThumbnailUrl ? generateThumbnailUrl : `${defaultBaseUrlAddress}/api/bundleitem/${logicalItemInfo.id}/generate/thumbnails`;
     pageThumbnailUrl = pageThumbnailUrl ? pageThumbnailUrl : `${defaultBaseUrlAddress}/api/bundleitem/{itemId}/page/{pageId}/thumbnail?w=200&h=250&access_token={token}`;
-    documentPagesUrl = documentPagesUrl ? documentPagesUrl : `${defaultBaseUrlAddress}/api/bundle/664/{itemId}/pages`;
+    documentPagesUrl = documentPagesUrl ? documentPagesUrl : `${defaultBaseUrlAddress}/api/bundle/683/{itemId}/pages`;
 
     const [thumbnailLoading, setThumbnailLoading] = useState(false);
     const [showGallery, setShowGallery] = useState(false);

@@ -138,7 +138,7 @@
     "private":"private",
     "public":"public",
     "visibility": "Visibility",
-    "tag":"Tags filter"
+    "tag":"Tags"
   },
   "rubberStamp": {
     "Approved": "Approved",
