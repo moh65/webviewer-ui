@@ -78,11 +78,15 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     },
     control: provided => ({
       ...provided,
-      height: 30,
+      height: 'auto',
       minHeight: 30,
       lineHeight: 1,
     }),
     dropdownIndicator: provider => ({
+      ...provider,
+      padding: 4,
+    }),
+    clearIndicator: provider => ({
       ...provider,
       padding: 4,
     }),

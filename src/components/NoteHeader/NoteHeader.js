@@ -78,27 +78,24 @@ function NoteHeader(props) {
     let cd = annotation.getCustomData('custom-date');
     let ct = annotation.getCustomData('custom-tag-options');
 
-    if (cl != null && cl != undefined)
-    {
-      setCustomLink(cl)
+    if (cl != null && cl != undefined) {
+      setCustomLink(cl);
     }
 
-    if (cp != null && cp != undefined)
-    {
-      setCustomPrivate(cp)
+    if (cp != null && cp != undefined) {
+      setCustomPrivate(cp);
     }
 
-    if (cd != null && cd != undefined)
-    {
-      setCustomDate(cd)
+    if (cd != null && cd != undefined) {
+      setCustomDate(cd);
     }
 
-    if (ct != null && ct != undefined && ct != '') {
+    if (ct !== null && ct !== undefined && ct !== '') {
       let joinedTag = JSON.parse(ct);
       joinedTag = joinedTag ? joinedTag.map(m => m.label).join(',') : '';
-      setCustomTag(joinedTag)
+      setCustomTag(joinedTag);
     }
-  }
+  };
 
   // useEffect(() => {
   //   console.log(`for annotation ${annotation.Id} noteIndex = ${noteIndex} isEditing = ${isEditing}`)
@@ -107,22 +104,22 @@ function NoteHeader(props) {
 
   useEffect(() => {
     setCustomData();
-  }, [])
+  }, []);
 
-  useEffect(()=>{
-    if (annotation.Subject === 'Redact'){
-      debugger
+  useEffect(() => {
+    if (annotation.Subject === 'Redact') {
+      debugger;
     }
-    if (isEditing === true && isSelected === true){
-      setShowHeader(false)
+    if (isEditing === true && isSelected === true) {
+      setShowHeader(false);
     } else {
       setCustomData();
-      setShowHeader(true)
+      setShowHeader(true);
     }
-  }, [isEditing, isSelected])
+  }, [isEditing, isSelected]);
 
   const authorAndDateClass = classNames('author-and-date', { isReply });
-  const noteHeaderClass = classNames('NoteHeader', { parent: !isReply })
+  const noteHeaderClass = classNames('NoteHeader', { parent: !isReply });
 
   return (
     <div className={noteHeaderClass}>
@@ -147,7 +144,7 @@ function NoteHeader(props) {
                 </div>
               </div>
             </div>
-            { showHeader && (<div>
+            { showHeader && !isReply && (
               <div className="row-flex mb-1">
                 <div className="col-grow visibility">
                   {customPrivate === 'true'
@@ -162,16 +159,26 @@ function NoteHeader(props) {
                   </div>
                 }
               </div>
+            )}
+            { showHeader && (
               <div>
-                {`Date : ${customDate === '' ? 'not set' : customDate}`}
+                {customDate !== '' && (
+                  <div className="note-detail">
+                    <strong>Date:</strong> {customDate}
+                  </div>
+                )}
+                {customLink !== '' && (
+                  <div className="note-detail">
+                    <strong>URL:</strong> {customLink}
+                  </div>
+                )}
+                {customTag && (
+                  <div className="note-detail">
+                    <strong>Tags:</strong> {customTag}
+                  </div>
+                )}
               </div>
-              <div>
-                {customLink != '' ? `URL : ${customLink}` : ''}
-              </div>
-              <div>
-                {customTag !== '[]' ? customTag : ''}
-              </div>
-            </div>)}
+            )}
           </div>
           <div className="state-and-overflow">
             <NoteUnpostedCommentIndicator annotationId={annotation.Id} />
@@ -192,8 +199,8 @@ function NoteHeader(props) {
         </div>
       </div>
     </div>
-  )
-};
+  );
+}
 
 NoteHeader.propTypes = propTypes;
 

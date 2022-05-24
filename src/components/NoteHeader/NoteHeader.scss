@@ -20,6 +20,11 @@
     display: flex;
     flex: 1;
     justify-content: flex-end;
+    flex-direction: column-reverse;
+    [data-element="unpostedCommentIndicator"] {
+      margin-left: 8px;
+      margin-top: 8px;
+    }
   }
 
   .author-and-time {
@@ -39,6 +44,10 @@
     svg {
       margin-right: 2px;
     }
+  }
+
+  .note-detail {
+    font-size: 12px;
   }
 
   .num-replies-container {
@@ -106,8 +115,8 @@
 
   .type-icon-container {
     position: absolute;
-    left: 12px;
-    top: 12px;
+    left: 6px;
+    top: 10px;
     width: 28px;
     height: 28px;
   }
@@ -139,5 +148,5 @@
 }
 
 .parent {
-  padding-left: 52px;
+  padding-left: 40px;
 }

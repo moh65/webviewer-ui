@@ -450,6 +450,7 @@ const ContentArea = ({
         <div>
           <input type="date"
             value={noteDate}
+            placeholder="Add Date (yyyy-mm-dd)"
             onChange={e => {
               e.stopPropagation();
               setCustomDataChanged(true);

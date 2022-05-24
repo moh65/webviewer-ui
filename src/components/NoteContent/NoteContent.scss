@@ -35,13 +35,13 @@
   }
 
   .container {
-    margin-top: 8px;
+    margin-top: 4px;
     overflow: hidden;
     white-space: pre-wrap;
     word-wrap: break-word;
     user-select: text;
     cursor: text;
-    padding-left: 52px;
+    padding-left: 40px;
     padding-right: 12px;
   }
 
@@ -67,7 +67,7 @@
       flex: none;
     }
 
-    textarea {
+    textarea, [type=date] {
       width: 100%;
       padding-left: 8px;
       border: 1px solid var(--border);
@@ -78,6 +78,7 @@
       resize: none;
       overflow: hidden;
       box-sizing: border-box;
+      margin-bottom: 10px;
 
       &:focus {
         outline: none;

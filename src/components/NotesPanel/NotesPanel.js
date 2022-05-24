@@ -365,7 +365,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
 
   let style = {};
   if ((isInDesktopOnlyMode || !isMobile)) {
-    style = { width: `${currentWidth}px`, minWidth: `${currentWidth}px` };
+    style = { width: `${currentWidth}px`, minWidth: '370px' };
   }
 
   return ((isDisabled || !isOpen) ? null : (
