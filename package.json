@@ -29,6 +29,7 @@
     "@mui/icons-material": "^5.5.1",
     "@mui/lab": "^5.0.0-alpha.73",
     "@mui/material": "^5.5.0",
+    "@mui/x-date-pickers": "^5.0.0-alpha.4",
     "@pdftron/webviewer": "^8.4.1",
     "@pdftron/webviewer-react-toolkit": "^0.7.1",
     "autolinker": "^3.11.1",
