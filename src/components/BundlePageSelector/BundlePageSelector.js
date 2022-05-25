@@ -9,11 +9,14 @@ import core from 'core';
 import actions from 'actions';
 import './BundlePageSelector.scss'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import Button from 'components/Button';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import Button from '@mui/material/Button';
 import { useTranslation } from 'react-i18next';
 import Loading from 'components/loading';
 import { hexToRgba2 } from 'helpers/color';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import ReactTooltip from 'react-tooltip';
+import { element, number } from 'prop-types';
 
 
 
@@ -39,17 +42,108 @@ export default ({ isModalOpen }) => {
     ]);
     const [t] = useTranslation();
 
-    sectionUrl = sectionUrl ? sectionUrl : `${defaultBaseUrlAddress}/api/bundle/683/items/sections`;
-    documentUrl = documentUrl ? documentUrl : `${defaultBaseUrlAddress}/api/bundle/sections/683/{sectionId}/documents/list`;
+    sectionUrl = sectionUrl ? sectionUrl : `${defaultBaseUrlAddress}/api/bundle/686/items/sections`;
+    documentUrl = documentUrl ? documentUrl : `${defaultBaseUrlAddress}/api/bundle/sections/686/{sectionId}/documents/list`;
     
     currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
         id: 231423,
         title: 'Annette Wallis Atkins Costs Disclosure Signed'
     };
 
-    const [data, setData] = useState([]);
-    const [docs, setDocs] = useState([]);
+    const toolTipStyles = {
+        display: 'table-cell',
+        height: '60px',
+        width: '80px',
+        textAlign: 'center',
+        background: '#f6f6f6',
+        verticalAlign: 'middle',
+        border: '5px solid white',
+      };
 
+    const topElement = useRef(null);
+    const botElement = useRef(null);
+    const documentElement = useRef(null);
+
+    const elementHeight = 40;
+    const sectionSize = 50;
+
+    const setScrollDefaults = (json) => {
+        documentScroll.sections.clear();
+
+        for (let i = 0; i < json.length; i++) {
+            const index = Math.floor(i / sectionSize);
+            if (!documentScroll.sections.has(index)) {
+                documentScroll.sections.set(index, []);
+            }
+
+            const section = documentScroll.sections.get(index);
+            section.push(json[i]);
+        }
+
+        const sectionDocs = json.slice(0, sectionSize * 3);
+        setDocs(sectionDocs);
+        documentScroll.currentIndex = 0;
+        setTopHeight(0);
+        setBotHeight((json.length - (sectionSize * 3)) * elementHeight);
+        documentElement.current.scrollTop = 0;
+        documentScroll.lock = false;
+    };
+
+    const setScrollIndex = (index) => {
+        documentScroll.currentIndex = index;
+
+        if (index < 1) {
+            index = 1;
+        }
+
+        let startRow = (index - 1) * sectionSize;
+
+        let sectionDocs = [];
+        if (documentScroll.sections.has(index - 1)) {
+            sectionDocs = sectionDocs.concat(...documentScroll.sections.get(index - 1));
+        }
+        if (documentScroll.sections.has(index)) {
+            sectionDocs = sectionDocs.concat(...documentScroll.sections.get(index));
+        }
+        
+        if (documentScroll.sections.has(index + 1)) {
+            sectionDocs = sectionDocs.concat(...documentScroll.sections.get(index + 1));
+        }
+
+        setDocs(sectionDocs);
+        const topHeight = startRow * elementHeight;
+        const botHeight = (allDocs.length - sectionDocs.length - startRow) * elementHeight;
+        setTopHeight(topHeight);
+        setBotHeight(botHeight);
+    };
+    
+    const setBotHeight = (height) => {
+        botElement.current.style.height = height + "px";
+    };
+
+    const setTopHeight = (height) => {
+        topElement.current.style.height = height + "px";
+    };
+
+    const onDocumentScroll = (event) => {
+        //documentElement.current.style.scrol
+        const scrolledIndex = Math.floor(documentElement.current.scrollTop / elementHeight / sectionSize);
+        if (!documentScroll.lock && documentScroll.currentIndex !== scrolledIndex) {
+            documentScroll.lock = true;
+            console.log('Setting scrolled index: ' + scrolledIndex)
+            setScrollIndex(scrolledIndex);
+            documentScroll.lock = false;
+        }
+    }        
+
+    const [docs, setDocs] = useState([]);
+    const [data, setData] = useState([]);
+    const [documentScroll, setDocumentScroll] = useState({
+        currentIndex: 0,
+        lock: false,
+        sections: new Map(),
+    });
+    const [allDocs, setAllDocs] = useState([]);
     const [isThumbnailSelectorOpen, setIsThumbnailSelectorOpen] = useState(false);
     const [loadingDocument, setLoadingDocument] = useState(false);
     const [thisDocumentInfo, setThisDocumentInfo] = useState({});
@@ -61,7 +155,51 @@ export default ({ isModalOpen }) => {
         if (jsonData.Children && jsonData.Children.length > 0) {
             children = jsonData.Children.map(m => renderSections(m));
         }
-        return { text: jsonData.Name, id: jsonData.SectionId, children: children }
+        return { text:  jsonData.DocumentNumber + jsonData.Name, id: jsonData.SectionId, children: children }
+    }
+
+    const closeModal = () => {
+        //customization
+        if (isOpenForUrl) {
+          dispatch(actions.closeElement('linkModalUrl'));
+        }
+        if (isOpen) {
+          dispatch(actions.closeElement('linkModal'));
+        }
+        dispatch(actions.setAnnotationLinkToEdit(null))
+        //customization
+        setURL('');
+        core.setToolMode(defaultTool);
+      };
+
+    const getDocumentItem = (data) => {  
+        switch (data?.fileExtension) {
+            case 'docx':
+            case 'doc':
+            return 'file-word'
+            case 'pdf':
+            return 'file-pdf' 
+            case 'xls':
+            case 'xlsx':
+            return 'file-excel' 
+            case 'ppt':
+            case 'pptx':
+            return 'file-powerpoint'
+            case 'csv':
+            return 'file-csv'
+            case 'msg':
+            case 'eml':
+            return 'envelope'
+            case 'png':
+            case 'jpg':
+            case 'bmp':
+            return 'image'
+            case 'zip':
+            case 'rar':
+            return 'archive'
+            default:
+            return 'file-alt'
+        }
     }
 
     useEffect(() => {
@@ -87,15 +225,15 @@ export default ({ isModalOpen }) => {
             headers: { "Authorization": `Bearer ${token}` }
         }).then(res => res.json())
             .then(json => {
-
                 let sectionData = json.map(j => {
-                    if (j.ItemType === 'Section')
+                    if (j.ItemType === 'Section') {
                         return renderSections(j)
+                    }
+
                 }
                 )
 
                 sectionData = sectionData.filter(f => f)
-
                 setData(sectionData);
             });
     }, [needToLoadSections]);
@@ -103,7 +241,7 @@ export default ({ isModalOpen }) => {
     const renderTree = (nodes) => {
         return (
 
-            <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.text}>
+            <TreeItem key={nodes.id} nodeId={nodes.id.toString()} label={nodes.text}>
                 {Array.isArray(nodes.children)
                     ? nodes.children.map((node) => renderTree(node))
                     : null}
@@ -113,12 +251,38 @@ export default ({ isModalOpen }) => {
 
     const renderTree1 = (nodes) => {
         return (
-
-            <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.text}>
-                {Array.isArray(nodes.children)
-                    ? nodes.children.map((node) => renderTree(node))
-                    : null}
+            nodes && (
+            <TreeItem key={nodes.id} nodeId={nodes.id.toString()} label={
+                <div className='float-child-document-tree-item'>
+                    <div className='float-child-document-tree-icon'><FontAwesomeIcon icon={getDocumentItem(nodes)} /></div>
+                    <div className='float-child-document-tree-label' 
+                        data-for={nodes.id.toString()}
+                        data-tip={nodes.documentNumber + ' ' + nodes.text}
+                        data-iscapture="true"     
+                    >
+                        <div className='float-child-document-tree-label-name'>
+                            {nodes.documentNumber + ' ' + nodes.text}
+                        </div> 
+                        <ReactTooltip
+                            id={nodes.id.toString()}
+                            type="light"
+                            effect="solid"
+                            border={true}
+                            borderColor="black"
+                            multiline={false}
+                        />         
+                        <div className='float-child-document-tree-label-page'>{ ' - ' + nodes.pageCount + ' page' + (nodes.pageCount !== 1 ? 's' : '')}</div>
+                    </div> 
+                </div>
+                                    
+            }>
+            {
+                Array.isArray(nodes.children)
+                    ? nodes.children.map((node) => renderTree1(node))
+                    : null
+            }
             </TreeItem>
+            )
         );
     }
 
@@ -309,7 +473,7 @@ export default ({ isModalOpen }) => {
     const findNodeInDocs = (nodes, id) => {
         let foundDoc;
         for (const doc of nodes) {
-            if (doc.id === id) {
+            if (doc.id.toString() === id) {
                 return doc;
             }
             if (doc.children && doc.children.length > 0) {
@@ -331,88 +495,111 @@ export default ({ isModalOpen }) => {
     }
 
     return (
-        <div>
-            {
-                isThumbnailSelectorOpen &&
-                <ThumbnailSelector logicalItemInfo={selectedDocumentInfo} setIsOpen={changeDocument} isOpen={isThumbnailSelectorOpen} onSelectThumbnail={onSelectThumbnailHandler} />
-            }
-            {
-                !isThumbnailSelectorOpen &&
-                <div class="float-container">
-                    <div>
-                        <div class="float-child-section">
-                            <h2>Sections</h2>
-                            <TreeView
-                                aria-label="rich object"
-                                sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-                                defaultCollapseIcon={<ExpandMoreIcon />}
-                                defaultExpandIcon={<ChevronRightIcon />}
-                                onNodeSelect={(e, n) => {
-                                    setLoadingDocument(true)
-                                    fetch(documentUrl.replace('{sectionId}', n), {
-                                        method: "GET",
-                                        headers: { "Authorization": `Bearer ${token}` }
-                                    }).then(res => res.json())
-                                        .then(json => {
-
-                                            setDocs(json)
-                                            setLoadingDocument(false)
-                                        });
-                                }}
-                            >
-                                {data.map(m => renderTree(m))}
-                            </TreeView>
-                        </div>
-                        <div class="float-child-document">
-                            <h2>Documents</h2>
-                            {
-                                loadingDocument && <div style={{ height: '100%' }}><Loading /></div>
-                            }
-                            {
-                                !loadingDocument &&
-                                <TreeView
-                                    style={{ width: '300px', height: '350px', display: 'block' }}
-                                    aria-label="rich object 2"
-                                    sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-                                    defaultCollapseIcon={<ExpandMoreIcon />}
-                                    defaultExpandIcon={<ChevronRightIcon />}
-                                    onNodeSelect={(e, n) => {
-
-                                        let selectedDoc = findNodeInDocs(docs, n);
-                                        // if (selectedDoc.children && selectedDoc.children.length > 0) {
-                                        //     return;
-                                        // }
-
-                                        setSelectedDocumentInfo({ id: n, title: selectedDoc.text })
-
-                                    }}
-                                >
-                                    {docs.map(m => renderTree1(m))}
-                                </TreeView>
-                            }
-                        </div>
-                    </div>
-                    <div class="button-container">
-                        <span class="button-action">
-                            <Button
-                                dataElement="linkSubmitButton"
-                                label={t('action.cancel')}
-                                onClick={() => { dispatch(actions.closeElement('linkModal')); }}
-                            />
-                        </span>
-                        <span class="button-action">
-                            <Button
-                                dataElement="linkSubmitButton"
-                                label={t('action.showPages')}
-                                onClick={() => { setIsThumbnailSelectorOpen(true); }}
-                            />
-                        </span>
-
-                    </div>
-                </div>
-            }
-
-
+        <div className={'container container-page'} onMouseDown={e => e.stopPropagation()}>
+        <div className="bundle-header">
+            <h5 className="modal-title">{isThumbnailSelectorOpen ? 'Link to page' : 'Change Document'}</h5>
+            <button type="button" aria-label="Close" className="close" onClick={closeModal}>×</button>
         </div>
+        <div className="link-modal">
+          <div className="swipe-indicator" />    
+        <div className='page-table'>
+            <div>
+                {
+                    isThumbnailSelectorOpen &&
+                    <ThumbnailSelector logicalItemInfo={selectedDocumentInfo} setIsOpen={changeDocument} isOpen={isThumbnailSelectorOpen} onSelectThumbnail={onSelectThumbnailHandler} />
+                }
+                {
+                    !isThumbnailSelectorOpen && (
+                    <div>
+                        <div className="float-container">
+                            <div className="float-container-row">
+                                <div className="float-child-section">
+                                    <h5>Sections</h5>
+                                    <div className="float-child-section-tree">
+                                    <TreeView
+                                        aria-label="rich object"
+                                        sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+                                        defaultCollapseIcon={<ExpandLessIcon />}
+                                        defaultExpandIcon={<ExpandMoreIcon />}                                    
+                                        onNodeSelect={(e, n) => {
+                                            setLoadingDocument(true)
+                                            fetch(documentUrl.replace('{sectionId}', n), {
+                                                method: "GET",
+                                                headers: { "Authorization": `Bearer ${token}` }
+                                            }).then(res => res.json())
+                                                .then(json => {
+                                                    setAllDocs(json);
+                                                    setScrollDefaults(json);
+                                                    //setTopHeight("'0px';");
+                                                    //setBotHeight("'" + ((json.length - 100) * 40) + "px';");
+                                                    setLoadingDocument(false)
+                                                });
+                                        }}
+                                    >
+                                        {data.map(m => renderTree(m))}
+                                    </TreeView>
+                                    </div>
+                                </div>
+                                <div className="float-child-document">
+                                    <h5>Documents</h5>
+                                    <div className="float-child-document-tree" onScroll={onDocumentScroll} ref={documentElement}>
+                                        <div ref={topElement}></div>   
+                                        {
+                                            loadingDocument && <div style={{ height: '100%' }}><Loading /></div>
+                                        }
+                              
+                                        <TreeView
+                                            style={{ width: 'auto', height: 'auto', display:  loadingDocument ? 'hidden' :'block' }}
+                                            aria-label="rich object 2"
+                                            sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+                                            defaultCollapseIcon={<ExpandLessIcon />}
+                                            defaultExpandIcon={<ExpandMoreIcon />}
+                                            onNodeSelect={(e, n) => {
+
+                                                let selectedDoc = findNodeInDocs(docs, n);
+                                                // if (selectedDoc.children && selectedDoc.children.length > 0) {
+                                                //     return;
+                                                // }
+
+                                                setSelectedDocumentInfo({ id: n, title: selectedDoc.text, documentNumber: selectedDoc.documentNumber, type: selectedDoc.documentType })
+
+                                            }}
+                                        >
+                                            {docs.map( m => renderTree1(m))}
+                                        </TreeView>   
+                                        <div ref={botElement}></div>   
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="footer">
+                                <span class="button-action">
+                                    <Button 
+                                        class="btn4-secondary" 
+                                        onClick={() => { dispatch(actions.closeElement('linkModal')); }}
+                                        startIcon={<FontAwesomeIcon icon="ban" />}>
+                                        {t('action.cancel')}
+                                    </Button>
+                                </span>
+                                <span class="button-action">
+                                    <Button 
+                                        class="btn4-primary"
+                                        onClick={() => { setIsThumbnailSelectorOpen(true); }} 
+                                        startIcon={<FontAwesomeIcon icon="check" />}>
+                                        Select Document
+                                    </Button>
+                                </span>
+
+                            </div>
+                    </div>)
+                }
+
+
+            </div>
+        
+        </div>
+        </div>
+    </div>
     );
 }

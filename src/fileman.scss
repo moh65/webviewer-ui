@@ -150,7 +150,14 @@
   --primary-button-hover: #6D6D6D;
 }  
 
-.modal4-header {
+.btn4-change {
+  @include btn4;
+  --primary-button-text: #fff;
+  --primary-button-color: #5591cf;
+  --primary-button-hover: #5586cf;
+}  
+
+@mixin modal4-header {
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -185,6 +192,10 @@
   }
 }
 
+.modal4-header {
+  @include modal4-header;
+}
+
 @mixin modal4-body {
   display: flex;
   flex-direction: column;
@@ -202,4 +213,8 @@
       width: 100%;
       align-items: center;
   }
+}
+
+.modal4-body {
+  @include modal4-body;
 }

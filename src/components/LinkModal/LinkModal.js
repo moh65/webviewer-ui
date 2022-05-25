@@ -7,14 +7,20 @@ import { hexToRgba2 } from 'helpers/color';
 import defaultTool from 'constants/defaultTool';
 import core from 'core';
 import { Tabs, Tab, TabPanel } from 'components/Tabs';
-import Button from 'components/Button';
+import Button from '@mui/material/Button';
 import BundlePageSelector from 'components/BundlePageSelector';
 import actions from 'actions';
 import selectors from 'selectors';
 
 import { Swipeable } from 'react-swipeable';
+import CheckIcon from '@mui/icons-material/Check';
+import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';import PublicSharpIcon from '@mui/icons-material/PublicSharp';
+import { faCheck, faEarthAmericas } from '@fortawesome/free-solid-svg-icons'
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import './LinkModal.scss';
+
 
 import BsButton from 'react-bootstrap/Button';
 
@@ -306,7 +312,7 @@ const LinkModal = () => {
 
   useEffect(() => {
     if (tabSelected === 'PageNumberPanelButton' && !isOpenForUrl) {
-      pageLabelInput.current.focus();
+      
     } else if (tabSelected === 'URLPanelButton' && isOpenForUrl) {
       urlInput.current.focus();
     }
@@ -347,61 +353,41 @@ const LinkModal = () => {
         data-element="linkModal"
         onMouseDown={closeModal}
       >
-        <div className="container" onMouseDown={e => e.stopPropagation()}>
-          <div className="swipe-indicator" />
-          <Tabs id="linkModal">
-            <div className="tab-list">
-              {
-                isOpenForUrl &&
-                <Tab dataElement="URLPanelButton">
-                  <div className="tab-options-button" ref={urlTab}>{t('link.url')}</div>
-                </Tab>
-              }
-
-              {
-                //customization
-                !isOpenForUrl &&
-                <Tab dataElement="PageNumberPanelButton">
-                  <div className="tab-options-button" ref={pageTab}>{t('link.page')}</div>
-                </Tab>
-                //customization
-
-              }
-
-            </div>
-            {isOpenForUrl &&
-              <TabPanel dataElement="URLPanel">
-                <form onSubmit={addURLLink}>
-                  <div>{t('link.enterurl')}</div>
-                  <div className="linkInput">
-                    <input
-                      className="urlInput"
-                      type="url"
-                      ref={urlInput}
-                      value={url}
-                      onChange={e => setURL(e.target.value)}
-                    />
-                    <Button
-                      dataElement="linkSubmitButton"
-                      label={t('action.link')}
-                      onClick={addURLLink}
-                    />
+              {isOpenForUrl &&
+                <div className={isOpenForUrl ? 'container container-link' : 'container container-page'} onMouseDown={e => e.stopPropagation()}>
+                  <div className="link-header">
+                      <h5 className="modal-title">{isOpenForUrl ? 'Add Hyperlink' : 'Link to page'}</h5>
+                      <button type="button" aria-label="Close" className="close" onClick={closeModal}>×</button>
                   </div>
-                </form>
-              </TabPanel>
-            }
-            {
-              !isOpenForUrl &&
-              //customization
-              <TabPanel dataElement="PageNumberPanel">
-                <div ref={pageLabelInput}>
-                  <BundlePageSelector isModalOpen={isOpen} />
+                  <div className="link-modal">
+                    <div className="swipe-indicator" />
+                    <form className='link-table' onSubmit={addURLLink}>
+                      <div>{t('link.enterurl')}</div>
+                      <div className="linkInput">
+                        <input
+                          className="urlInput"
+                          placeholder="https://www.example.com"
+                          type="url"
+                          ref={urlInput}
+                          value={url}
+                          onChange={e => setURL(e.target.value)}
+                        />
+                        <Button class="btn4-primary" onClick={addURLLink} startIcon={<FontAwesomeIcon icon="check" />}>
+                          {t('action.link')}
+                        </Button>
+                        <Button class="btn4-secondary" onClick={closeModal} startIcon={<FontAwesomeIcon icon="ban" />}>
+                          {t('action.cancel')}
+                        </Button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
-              </TabPanel>
-              //customization
-            }
-          </Tabs>
-        </div>
+              }
+              {
+                !isOpenForUrl &&
+                //customization
+                    <BundlePageSelector isModalOpen={isOpen} ref={pageLabelInput} />
+              }
       </div>
     </Swipeable>
   );
