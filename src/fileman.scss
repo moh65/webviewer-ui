@@ -47,10 +47,6 @@
     justify-content: center;
     cursor: pointer;
     margin-right: 2px;
-
-    &:hover {
-      color: var(--secondary-button-hover);
-    }
 }              
 
 @mixin btn4 {                    
@@ -218,3 +214,20 @@
 .modal4-body {
   @include modal4-body;
 }
+
+.Header { 
+  height: 50px;
+  background-color: #B22126 !important;
+  --icon-color: white;
+}
+
+.HeaderItems {
+  background-color: #B22126 !important;
+}
+/*
+.HeaderItems > div > div > div > div {
+  min-height: 25px;
+    div {
+      height: 25px;
+    }
+}*/
