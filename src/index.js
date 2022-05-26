@@ -37,8 +37,12 @@ import defineWebViewerInstanceUIAPIs from 'src/apis';
 import './index.scss';
 
 //customization
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faCheck, faBan, faArrowsRotate, faEnvelope, faFileWord, faFilePdf, faFileExcel, faFilePowerpoint, faFileCsv, faImage, faArchive, faFileAlt } from '@fortawesome/free-solid-svg-icons'
 import './fileman.scss';
-// import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+library.add(faCheck, faBan, faArrowsRotate, faEnvelope, faFileWord, faFilePdf, faFileExcel, faFilePowerpoint, faFileCsv, faImage, faArchive, faFileAlt)
 //customization
 
 

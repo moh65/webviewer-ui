@@ -1,27 +1,37 @@
+@import "../../fileman.scss";
+
 .float-container {
     border: 3px solid #fff;
-    padding: 20px;
-    height: 500px;
+    height: 420px;
+    width: 100%;
+    display: table;
+    margin-top: -50px !important;
+}
+
+.float-container-row {
+    display: table-row;
 }
 
 .float-child-section {
-    width: 300px;
+    width: 40%;
     float: left;
     padding: 20px;
     height: 400px;
+    display: table-cell;
 }  
 
 ul[role="tree"]{
     display: block !important;
-    width: 300px !important;
-    height: 300px !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .float-child-document {
-    width: 300px;
+    width: 60%;
     float: left;
     padding: 20px;
     height: 400px;
+    display: table-cell;
 }  
 
 .page-container {
@@ -30,19 +40,227 @@ ul[role="tree"]{
 }
 
 .page-number {
-    position: absolute;
-    bottom: 10px;
-    right: 0;
-    left: 50%;
-    margin: auto;
+    //position: absolute;
+    //bottom: 10px;
+    //right: 0;
+    //left: 50%;
+    //margin: auto;
+    margin-top: 3px;
 }
 
 
 .button-container {
     text-align:center;
     height: 100px;
+    padding: 30px;
 }  
 
 .button-action{
     display: inline-block;
+}
+
+
+.image-item {
+    border: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: lightgray;
+    position: unset !important;
+    left: unset !important;
+    top: unset !important;
+    margin: 10px; 
+    display: grid !important;
+    justify-items: center;
+    float: left;
+    div {
+        width: 210px;
+        border-radius: 5px;
+        align-content: center;
+        justify-items: center;
+        justify-content: center;
+        justify-self: center;
+        display: flex;
+        /* padding: 5px; */
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        img {
+            width: auto;
+            height: auto;
+        }
+    }
+}
+
+.gallery-view {
+    display: inline-flex;
+    height: fit-content !important;
+}
+
+.gallery-outline {
+    border: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: lightgray;
+    padding: 10px;
+    overflow-x: hidden;
+}
+
+.not-selected:hover {
+    outline: 0px solid #5586cf !important;
+}
+
+.image-item:hover {
+    outline: 1px solid #5586cf !important;
+}
+
+.react-photo-gallery--gallery {
+    width: 100% !important;
+    div {
+        display: inline-flow;
+        height: fit-content !important;
+    }
+}
+
+.image-item-selected {
+    outline: 1px solid #5586cf !important;
+    span {
+        color: #5586cf !important;
+    }
+    div {
+        display: grid;
+        div {
+            bottom: -225px!important;
+            right: -80px!important;
+            left: unset !important;
+            top: unset !important;
+            position: relative !important;
+        }
+    }
+}
+
+.float-child-section-tree {
+    height: 100%;
+    border-color: #F0F0F0;
+    border-style: solid;
+    border-width: 1px;
+    overflow-y: overlay;
+    border-radius: 5px;
+}
+
+.float-child-document-tree > .MuiTreeView-root {
+    max-width: unset !important;   
+    padding: 3px !important;
+}
+
+.float-child-section-tree * .Mui-selected {
+    background-color: #DAE6F2 !important;
+    border-color: #5586cf !important;  
+    border-radius: 5px !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+}
+
+.float-child-section-tree * .MuiTreeItem-content {
+    border-color: #F0F0F0;
+    border-style: solid;
+    border-width: 1px;
+    overflow-y: scroll;
+    max-width: unset !important;
+    min-height: 39px !important;
+    margin: 2px !important;
+    border-radius: 5px;
+    width: 99%;
+    background-color: #F0F0F0;
+}
+
+.float-child-section-tree * .MuiTreeItem-label {
+    min-height: 39px !important;
+    padding-top: 8px;
+}
+
+.float-child-document-tree * .MuiTreeItem-label {
+    height: 45px !important;
+    padding-top: 5px;
+    display: table;
+}
+
+.float-child-document-tree {
+    height: 100%;
+    border-color: #F0F0F0;
+    border-style: solid;
+    border-width: 1px;
+    overflow-y: overlay;
+    border-radius: 5px;
+}
+
+ul[role=tree] {
+    max-width: unset !important;
+    min-height: 100% !important;
+    height: unset !important;
+    padding: 5px;
+}
+
+.float-child-document-tree * li:nth-child(odd) {
+    background-color: white;
+}
+  
+.float-child-document-tree * li:nth-child(even) {
+    background-color: #fcfcfc;
+}
+
+.MuiTreeItem-content {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.float-child-document-tree-label {
+    display: flex;   
+    vertical-align: middle;
+    float: left;
+    padding-top: 7px;
+}
+
+.float-child-document-tree-icon {
+    display: table-cell;
+    padding-left: 8px;
+    width: 50px;
+    svg {
+        height: 25px;
+        padding-top: 6px;
+    }
+}
+
+.float-child-document-tree-item {
+    display: table-row;
+}
+
+.float-child-document-tree-label-name {
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    white-space: nowrap;
+    max-width: 485px;
+}
+
+.float-child-document-tree-label-page {
+    width: 100px;
+    padding-left: 5px;
+}
+
+.__react_component_tooltip.show {
+    opacity: 1 !important;
+}
+
+.footer {
+    padding-right: 15px;
+}    
+
+.bundle-header {
+    @include modal4-header;
+    padding-top: 10px;
+    
+    button {
+    margin-top: 0px;
+    margin-right: 0px;
+    right: 25px;
+    }
 }

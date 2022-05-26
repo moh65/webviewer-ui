@@ -10,6 +10,8 @@ import { FocusTrap } from '@pdftron/webviewer-react-toolkit';
 import { hexToRgba2 } from 'helpers/color';
 import setToolStyles from 'helpers/setToolStyles';
 
+import './TagDropDown.scss';
+
 export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, creatable, placeholder, controlWidth }, ref) => {
     let [
         token,
@@ -151,7 +153,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
 
     return (
         showElement && (
-            <div style={{ width: controlWidth ? controlWidth : '200px' }}>
+            <div className='tag-dropdown' style={{ width: controlWidth ? controlWidth : '200px' }}>
                 {
                     !showTagCreateForm ? <Select
                         onChange={(option, { action }) => {
@@ -211,19 +213,20 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
                         noOptionsMessage={e => "no tags available"}
                     /> :
                         <Swipeable onSwipedUp={e => setShowTagCreateForm(false)} onSwipedDown={e => setShowTagCreateForm(false)} preventDefaultTouchmoveEvent>
-                            <div style={{ marginTop: '380px' }}>
+                            <div className='tag-creation'>
 
                                 <label htmlFor='tagName'>Tag Name:</label>
-                                <input type='text' id='tagName' value={tagName} onChange={e => setTagName(e.target.value)} />
+                                <br />
+                                <input type='text' id='tagName' value={tagName} onChange={e => setTagName(e.target.value)} placeholder="Enter tag Name" />
                                 <br />
                                 <label htmlFor='tagColor'>Tag Color:</label>
                                 <SketchPicker color={tagColor} onChange={colorPickerHandler} />
                                 <div className='fm-container'>
                                     <div className='fm-container-child'>
-                                        <button className='fm-save-button' onClick={saveTag}>save</button>
+                                        <button className="fm-cancel-button" onClick={e => setShowTagCreateForm(false)}>Cancel</button>
                                     </div>
                                     <div className='fm-container-child'>
-                                        <button className="fm-cancel-button" onClick={e => setShowTagCreateForm(false)}>cancel</button>
+                                        <button className='fm-save-button' onClick={saveTag}>Save</button>
                                     </div>
                                 </div>
 

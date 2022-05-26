@@ -16,7 +16,7 @@ const Checkmark = ({ selected }) => (
       <circle cx="12.5" cy="12.2" r="8.292" />
     </svg>
     <svg
-      style={{ fill: "#06befa", position: "absolute" }}
+      style={{ fill: "#5586cf", position: "absolute" }}
       width="24px"
       height="24px"
     >

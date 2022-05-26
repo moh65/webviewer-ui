@@ -71,6 +71,18 @@ export default {
           render: () => <Ribbons />,
           className: 'custom-ribbons-container',
         },
+        { type: 'toggleElementButton', dataElement: 'menuButton', element: 'menuOverlay', img: 'icon-header-settings-line', title: 'component.menuOverlay', hidden: ['small-mobile'] },
+        {
+          type: 'actionButton',
+          dataElement: 'moreButton',
+          title: 'action.more',
+          img: 'icon-tools-more',
+          onClick: dispatch => {
+            dispatch(actions.setActiveHeaderGroup('small-mobile-more-buttons'));
+            core.setToolMode(defaultTool);
+          },
+          hidden: ['mobile', 'tablet', 'desktop'],
+        },
         { type: 'toggleElementButton', dataElement: 'searchButton', element: 'searchPanel', img: 'icon-header-search', title: 'component.searchPanel', hidden: ['small-mobile'] },
         {
           type: 'toggleElementButton',
@@ -85,23 +97,11 @@ export default {
           },
           hidden: ['small-mobile']
         },
-        { type: 'toggleElementButton', dataElement: 'menuButton', element: 'menuOverlay', img: 'icon-header-settings-line', title: 'component.menuOverlay', hidden: ['small-mobile'] },
-        {
-          type: 'actionButton',
-          dataElement: 'moreButton',
-          title: 'action.more',
-          img: 'icon-tools-more',
-          onClick: dispatch => {
-            dispatch(actions.setActiveHeaderGroup('small-mobile-more-buttons'));
-            core.setToolMode(defaultTool);
-          },
-          hidden: ['mobile', 'tablet', 'desktop'],
-        },
       ],
       'small-mobile-more-buttons': [
+        { type: 'toggleElementButton', dataElement: 'menuButton', element: 'menuOverlay', img: 'icon-header-settings-line', title: 'component.menuOverlay' },
         { type: 'toggleElementButton', dataElement: 'searchButton', element: 'searchPanel', img: 'icon-header-search', title: 'component.searchPanel' },
         { type: 'toggleElementButton', dataElement: 'toggleNotesButton', element: 'notesPanel', img: 'icon-header-chat-line', title: 'component.notesPanel' },
-        { type: 'toggleElementButton', dataElement: 'menuButton', element: 'menuOverlay', img: 'icon-header-settings-line', title: 'component.menuOverlay' },
         { type: 'spacer' },
         {
           type: 'actionButton',
@@ -626,7 +626,7 @@ export default {
     //customization
     customized:{
       loadSectionsInfo: false,
-      authToken: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IkI5QjBCMDY5MDg5MUY2QUJCQTFGRkJEQTAzOEZCNzU3Q0ZBQzg0QkMiLCJ0eXAiOiJhdCtqd3QiLCJ4NXQiOiJ1YkN3YVFpUjlxdTZIX3ZhQTQtM1Y4LXNoTHcifQ.eyJuYmYiOjE2NTI4NDk0MjgsImV4cCI6MTY1Mjg1MzAyOCwiaXNzIjoiaHR0cHM6Ly9sZWdhbHN0b3JlLnBvYy5maWxlbWFuLmNvbS5hdS9hdXRoIiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiIyZDA5ZjM1YjcwODc0OTVkOGRhMDRiODk3NWJmZmFiMSIsImF1dGhfdGltZSI6MTY1Mjc0Mjg0NSwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.X3QtSMajDyaMNtC_ynlnLyUy6o4rP5yIl-ugW-HjY4N_rzkjCm5m1heWU7iSpcdr_pEGy6O1bdWpVvuD_T6DdECqPILlCxaYap2jwyImua90v1jL0nc2JNBkrUgq4JOT6nVvpT5UZX0OcmWR8tB_2PxWeBt6itzQESDVS4SOOxBDldcDNaL7Vab2X652KWNbnwucFxOVzNA8VDf_T1tsygT_DcUMTWEqPdhSXatez9s0t4CwZmAzCSt0AaKHg_OXTsJPVWUPCOHgIjaNQMESZNCUAmU7z3pU81VkSE7oPz5GMmwO9XHStquIrN0UblAH0zoIR9RSSbPUefVhj6nzlKw1F46Zih3U0CuvM1TNKbhnrsxi3jE415G0xFj2iU6ceselC1lWmp_2Fi95GR_KiT4MoXo8u0gqpna4UGnhXglNfbvcKGZY5YBTKFl7uvq5_uf5_qpy6AXaz5H7hZchN00BVvDRp9AXAO1VBHL93eAgHoU097xH6VBYgz1p8wxTB47_IOjlOJmJEKjDH-WB1anf5e86NTrfcIVW8l2FX7bXZSHu-ci0TrANSTlfeCigNfwG7cWrTtSS36exMUC4SV-JKPBONX8bITijVcxd99QoSWyrnBQrGzg37OIhx5TwPVhiSOyUQs8qE9brYxify2WxkrCQhWPgWD-RytE0DIw',
+      authToken: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IkI5QjBCMDY5MDg5MUY2QUJCQTFGRkJEQTAzOEZCNzU3Q0ZBQzg0QkMiLCJ0eXAiOiJhdCtqd3QiLCJ4NXQiOiJ1YkN3YVFpUjlxdTZIX3ZhQTQtM1Y4LXNoTHcifQ.eyJuYmYiOjE2NTM1MTgwMjgsImV4cCI6MTY1MzUyMTYyOCwiaXNzIjoiaHR0cHM6Ly9sZWdhbHN0b3JlLnBvYy5maWxlbWFuLmNvbS5hdS9hdXRoIiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiIwMWM0Yzc0NjAxOTg0ODc4YWUwY2NkYTEwMDg4YzU4ZiIsImF1dGhfdGltZSI6MTY1MjMxMTUxMCwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.gs61ve80l1rHpchEL22tGcBIUJ1vqfzF8xUQRhslAlM4rob8x2rCgtLToUkWWaLUh-z_ilmJ6deXAlANn0uPttEFH5PyQKJl-agIsRQJVSy-5mXgDU4S6NsZZwvTQORFZvrlmuF3IdxBuWrjUKPkZvUX3Mi0EYhYzm-4EO_x3Z97-z6QJsjTrR6VQkyrPmx-iohU1_Cf3uBkX6KWeyNZnfsiCH01tnG8sNc-sGGSWpZyeWA0ZwQXu2Qom4hYnIFJzkILqErhYRpDSWkE9YVqKCy95NNDOMatPeJp6t_gMAKaBbOHUcn7Q3mdDCpDlbZeYbagbaqepoOaAsuulOzqN8RnFyDAVWtKP1GD77ZlFBZLyJlUwRPnZr2u7juenesHJfA-J0cj8e5cSSjmwzVENbHhLU23ZS8jLwvyCesCy_MJAzIMC4TAt5x7ZEaoMvyZaxe8NV4yJi8VnncgswHi8_yN8adAAhk14sJsHsUVzvsDFbR6-gx6oNtFDIwfutr7VTn2rIL7GvCvR7l1ZgR02Cqja-ASHsF_mmRBR7MNEQjckJcIj7lPNxSLYWuejb3I18B7p1hJm5z8rSdBfSZ8N4OUzNNvwvD1Lz1jOLlOJKCFIAM-lXETAMHY6csm7ZH68KaL7dI8gCm_n-HbUjhwgRuPYZPmLCcBrYbiPLv4SgU',
       sectionUrl:'',
       documentUrl:'',
       createTagUrl:'',
