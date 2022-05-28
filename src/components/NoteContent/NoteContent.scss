@@ -60,7 +60,7 @@
     flex-direction: column;
     position: relative;
     flex: 1;
-    padding-left: 52px;
+    padding-left: 40px;
     padding-right: 12px;
 
     @include ie11 {
@@ -90,55 +90,88 @@
       }
     }
 
-    .edit-buttons {
+    .ui__base {
+      margin-right: 0;
+    }
+
+    .ui__choice__label {
+      font-size: 12px;
+      padding-left: 5px !important;
+    }
+
+    .ui__choice__input__check--checked {
+      background-color: var(--success) !important;
+      border-color: var(--success) !important;
+    }
+
+  }
+
+  .edit-buttons {
+    display: flex;
+    flex-direction: row;
+    margin-top: 4px;
+    margin-bottom: -12px;
+
+    > div {
+      margin-right: 4px;
+    }
+
+    button {
+      flex: 1;
+      @include button-reset;
+      cursor: pointer;
       display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-      margin-top: 4px;
-
-      > div {
-        margin-right: 4px;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      height: 40px;
+      padding: 0 8px;
+      font-weight: 600;
+      svg {
+        margin-top: -0.125em;
+        margin-right: 6px;
+        font-size: 14px;
       }
-
-      .save-button {
-        @include button-reset;
-        cursor: pointer;
-        flex-shrink: 0;
-        background: var(--primary-button);
-        border-radius: 4px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        color: var(--primary-button-text);
-        padding: 0 13px;
-
-        &:hover {
-          background: var(--primary-button-hover);
-          color: var(--primary-button-text);
-        }
-
-        &.disabled {
-          background: var(--gray-6);
-          border-color: var(--gray-6);
-          cursor: not-allowed;
-        }
+      &.disabled {
+        background: var(--gray-6);
+        border-color: var(--gray-6);
+        cursor: not-allowed;
       }
+    }
 
-      .cancel-button {
-        @include button-reset;
-        color: var(--secondary-button-text);
-        padding: 0 10px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        margin-right: 2px;
+    .save-button {
+      background: var(--success);
+      color: var(--white);
+      &:hover {
+        background: var(--success-active);
+        color: var(--white);
+      }
+    }
+    .cancel-button {
+      background-color: var(--gray-2);
+      color: var(--text-color);
+      &:hover {
+        background-color: var(--gray-4);
+        color: var(--text-color);
+      }
+    }
+    .delete-button {
+      background: var(--primary);
+      color: var(--white);
+      &:hover {
+        background: var(--primary-active);
+        color: var(--white);
+      }
+    }
+  }
 
-        &:hover {
-          color: var(--secondary-button-hover);
+  &.isReply {
+    .edit-buttons {
+      button {
+        font-size: 12px;
+        height: 36px;
+        svg {
+          font-size: 12px;
         }
       }
     }

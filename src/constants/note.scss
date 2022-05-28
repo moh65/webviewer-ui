@@ -36,3 +36,28 @@
     }
   }
 }
+
+.mb-1 {
+  margin-bottom: 4px
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.row-flex {
+  display: flex;
+  flex-direction: row;
+}
+
+.col-grow {
+  flex-grow: 1;
+}
+
+.col-shrink {
+  flex-shrink: 1;
+}
+
+.align-items-center {
+  align-items: center;
+}
