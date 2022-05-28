@@ -30,7 +30,10 @@ import TagDropDown from 'components/TagDropDown';
 import LinkEdition from '../LinkEdition';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan, faCheck, faBan } from '@fortawesome/free-solid-svg-icons';
+import { faTrashCan, faCheck, faBan, faCalendarDays } from '@fortawesome/free-solid-svg-icons';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 
 //customization
 
@@ -424,7 +427,8 @@ const ContentArea = ({
 
   const [isPrivate, setIsPrivate] = useState(isAnnotPrivate === 'true' ? true : false);
   const [noteDate, setNoteDate] = useState(annotNoteDate ? annotNoteDate : null);
-  const [showDate, setShowDate] = useState(false);
+  const [showDateField, setShowDateField] = useState(false);
+  const [dateFieldValue, setDateFieldValue] = useState(null);
   const [customDataChanged, setCustomDataChanged] = useState(false);
   const [commentTextChanged, setCommentTextChanged] = useState(false);
   const [selectedTags, setSelectedTags] = useState(annotTags != null && annotTags != undefined && annotTags != '' ? JSON.parse(annotTags) : []);
@@ -468,7 +472,6 @@ const ContentArea = ({
                   type="checkbox"
                   label="Private"
                   checked={isPrivate}
-
                   onChange={e => {
                     e.stopPropagation();
                     setCustomDataChanged(true);
@@ -485,21 +488,24 @@ const ContentArea = ({
               type="checkbox"
               label="Add Date"
               className="mb-10"
-              checked={showDate}
-              onChange={() => setShowDate(!showDate)}
+              checked={showDateField || noteDate !== null}
+              onChange={() => setShowDateField(!showDateField)}
             />
-            {showDate && (
-              <input
-                type="date"
-                value={noteDate}
-                placeholder="Add Date (yyyy-mm-dd)"
-                onChange={e => {
-                  e.stopPropagation();
-                  setCustomDataChanged(true);
-                  let date = e.target.value;
-                  setNoteDate(date);
-                }}
-              />
+            {(showDateField || noteDate !== null) && (
+              <div className="date-field">
+                <DatePicker
+                  placeholderText="Add Date (dd/mm/yyyy)"
+                  dateFormat="dd/MM/yyyy"
+                  selected={dateFieldValue}
+                  onChange={date => {
+                    setCustomDataChanged(true);
+                    setDateFieldValue(date);
+                    const newNoteDate = format(date, 'dd/MM/yyyy');
+                    setNoteDate(newNoteDate);
+                  }}
+                />
+                <FontAwesomeIcon icon={faCalendarDays} />
+              </div>
             )}
             {
               linkAnnotation && <LinkEdition annotation={linkAnnotation} />

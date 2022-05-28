@@ -67,7 +67,7 @@
       flex: none;
     }
 
-    textarea, [type=date] {
+    textarea, [type=date], .date-field input {
       width: 100%;
       padding-left: 8px;
       border: 1px solid var(--border);
@@ -90,8 +90,17 @@
       }
     }
 
-    [type=date] {
-      padding-right: 6px;
+    .date-field {
+      position: relative;
+      input {
+        padding-right: 25px;
+      }
+      > svg {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        pointer-events: none;
+      }
     }
 
     .ui__base {
@@ -113,7 +122,7 @@
   .edit-buttons {
     display: flex;
     flex-direction: row;
-    margin-top: 4px;
+    margin-top: 10px;
     margin-bottom: -12px;
 
     > div {
