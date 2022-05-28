@@ -423,7 +423,7 @@ const ContentArea = ({
   let annotTags = annotation.getCustomData("custom-tag-options");
 
   const [isPrivate, setIsPrivate] = useState(isAnnotPrivate === 'true' ? true : false);
-  const [noteDate, setNoteDate] = useState(annotNoteDate ? annotNoteDate : new Date().toISOString().split('T')[0]);
+  const [noteDate, setNoteDate] = useState(annotNoteDate ? annotNoteDate : null);
   const [showDate, setShowDate] = useState(false);
   const [customDataChanged, setCustomDataChanged] = useState(false);
   const [commentTextChanged, setCommentTextChanged] = useState(false);
@@ -438,7 +438,7 @@ const ContentArea = ({
 
 
   return (
-    <>
+    <div>
       <div className={contentClassName}>
         <NoteTextarea
           ref={el => {
@@ -484,12 +484,13 @@ const ContentArea = ({
             <Choice
               type="checkbox"
               label="Add Date"
+              className="mb-10"
               checked={showDate}
-
-              onChange={setShowDate(!showDate)}
+              onChange={() => setShowDate(!showDate)}
             />
             {showDate && (
-              <input type="date"
+              <input
+                type="date"
                 value={noteDate}
                 placeholder="Add Date (yyyy-mm-dd)"
                 onChange={e => {
@@ -499,14 +500,13 @@ const ContentArea = ({
                   setNoteDate(date);
                 }}
               />
-            )}}
+            )}
             {
               linkAnnotation && <LinkEdition annotation={linkAnnotation} />
             }
           </div>
           //customization
-        )
-        }
+        )}
       </div>
       <div className="edit-buttons">
         {
@@ -567,7 +567,7 @@ const ContentArea = ({
           {t('action.save')}
         </button>
       </div>
-    </>
+    </div>
     //customization
   );
 };
