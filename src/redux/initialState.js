@@ -37,7 +37,7 @@ export default {
     panelWidths: {
       leftPanel: 264,
       searchPanel: 293,
-      notesPanel: 293,
+      notesPanel: 370,
     },
     documentContainerWidth: null,
     documentContainerHeight: null,
@@ -642,7 +642,7 @@ export default {
       isCtrlPressed:false,
       metadataTypeUrl: '',
       allMimeTypesUrl: '',
-      tagOptions:{loaded: false, options:[{label:'tag1', value:'1-#afafaf'}, {label:'tag2', value:'1-#1a2f4d'},{label:'tag3', value:'1-#987654'}]},
+      tagOptions:{ loaded: false, options:[{ label:'tag1', value:'1-#afafaf' }, { label:'tag2', value:'1-#1a2f4d' },{ label:'tag3', value:'1-#987654' }] },
       redactonBurninDateUrl: '',
       defaultUrlBaseAddress: 'https://legalstore.poc.fileman.com.au/bundle'
     },
