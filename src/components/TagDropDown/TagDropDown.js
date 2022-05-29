@@ -69,6 +69,23 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
 
   }));
 
+  // Helper function to get the text color of the tag
+  const pickTextColorFromBgColor = bgColor => {
+    var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
+    var r = parseInt(color.substring(0, 2), 16); // hexToR
+    var g = parseInt(color.substring(2, 4), 16); // hexToG
+    var b = parseInt(color.substring(4, 6), 16); // hexToB
+    return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 150) ? '#000000' : '#FFFFFF';
+  };
+
+  const labelStyles = {
+    padding: '4px 8px',
+    borderRadius: 4,
+    fontWeight: 600,
+    fontSize: 12,
+    whiteSpace: 'nowrap',
+  };
+
   const customStyles = {
     option: (provided, state) => {
       return ({
@@ -82,6 +99,14 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
       minHeight: 30,
       lineHeight: 1,
     }),
+    valueContainer: provided => ({
+      ...provided,
+      paddingLeft: 4,
+    }),
+    placeholder: provided => ({
+      ...provided,
+      marginLeft: 4,
+    }),
     dropdownIndicator: provider => ({
       ...provider,
       padding: 4,
@@ -91,22 +116,52 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
       padding: 4,
     }),
     multiValue: (provided, state) => {
-      return { ...provided, backgroundColor: state.data.value.split('-')[1] };
+      const bgColor = state.data.value.split('-')[1];
+      return {
+        ...provided,
+        borderRadius: 4,
+        alignItems: 'center',
+        backgroundColor: bgColor,
+        color: pickTextColorFromBgColor(bgColor)
+      };
     },
     multiValueLabel: (provided, state) => {
-      return { ...provided, backgroundColor: state.data.value.split('-')[1] };
+      const bgColor = state.data.value.split('-')[1];
+      return {
+        ...labelStyles,
+        backgroundColor: bgColor,
+        paddingRight: 0,
+        color: pickTextColorFromBgColor(bgColor)
+      };
     },
+    multiValueRemove: provided => ({
+      ...provided,
+      paddingLeft: 0,
+      paddingRight: 0,
+      margin: 4,
+      height: 12,
+      width: 12,
+    }),
     singleValue: (provided, state) => {
+      const bgColor = state.data.value.split('-')[1];
       if (state.data.value === 'no-tag') {
         return { ...provided };
       }
-      return { ...provided, backgroundColor: state.data.value.split('-')[1] };
+      return {
+        ...labelStyles,
+        backgroundColor: bgColor, color: pickTextColorFromBgColor(bgColor)
+      };
     },
     singleValueLabel: (provided, state) => {
       if (state.data.value === 'no-tag') {
         return { ...provided };
       }
-      return { ...provided, backgroundColor: state.data.value.split('-')[1] };
+      const bgColor = state.data.value.split('-')[1];
+      return {
+        ...labelStyles,
+        backgroundColor: bgColor,
+        color: pickTextColorFromBgColor(bgColor)
+      };
     }
   };
 
@@ -134,7 +189,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
         .then(json => {
           options = json.map(m => ({
             label: m.TagName,
-            value: `${m.JobTagId}-${m.TagColour}`
+            value: `${m.JobTagId}-${m.TagColour}`,
           }));
           dispatch(actions.setTagOptions({ loaded: true, options }));
         });
@@ -145,7 +200,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     setAndCheckCreatableDropDown(tagOptionsState.options);
   }, [tagOptionsState.options]);
 
-
+  
   const saveTag = () => {
     let body = { TagName: tagName, TagColour: tagColor, JobId: 0, JobTagId: 0 };
     fetch(getTagsUrl, {
@@ -159,7 +214,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
         let newTagOptionState = {
           loaded: tagOptionsState.loaded, options: [...tagOptionsState.options, {
             label: tagName,
-            value: `${id}-${tagColor}`
+            value: `${id}-${tagColor}`,
           }]
         };
 
