@@ -177,6 +177,7 @@
   .edit-buttons {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     margin-top: 10px;
     margin-bottom: -12px;
 
@@ -207,6 +208,19 @@
       }
     }
 
+    .apply-button {
+      background: var(--blue-5);
+      color: var(--white);
+      width: 100%;
+      flex: 1 1 100%;
+      margin-left: 40px;
+      margin-bottom: 14px;
+      margin-right: 12px;
+      &:hover {
+        background: var(--blue-6);
+        color: var(--white);
+      }
+    }
     .save-button {
       background: var(--success);
       color: var(--white);

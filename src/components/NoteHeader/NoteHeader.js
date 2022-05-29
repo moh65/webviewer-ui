@@ -108,9 +108,6 @@ function NoteHeader(props) {
   }, []);
 
   useEffect(() => {
-    if (annotation.Subject === 'Redact') {
-      debugger;
-    }
     if (isEditing === true && isSelected === true) {
       setShowHeader(false);
     } else {

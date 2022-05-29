@@ -30,10 +30,10 @@ import TagDropDown from 'components/TagDropDown';
 import LinkEdition from '../LinkEdition';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan, faCheck, faBan, faCalendarDays } from '@fortawesome/free-solid-svg-icons';
+import { faTrashCan, faCheck, faBan, faCalendarDays, faStrikethrough } from '@fortawesome/free-solid-svg-icons';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format, lightFormat } from 'date-fns';
+import { format } from 'date-fns';
 
 //customization
 
@@ -522,7 +522,7 @@ const ContentArea = ({
         {
           (annotation.Subject === "Redact") &&
           <button
-            className="cancel-button"
+            className="apply-button"
             onClick={async e => {
               e.stopPropagation();
 
@@ -531,7 +531,8 @@ const ContentArea = ({
               applyRedactionFromCommentBox(annotation, dispatch, redactionBurninDateUrl);
             }}
           >
-            {t('action.apply')}
+            <FontAwesomeIcon icon={faStrikethrough} />
+            {t('Apply Redaction')}
           </button>
         }
         {/*customization*/}
