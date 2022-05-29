@@ -78,12 +78,17 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 150) ? '#000000' : '#FFFFFF';
   };
 
-  const labelStyles = {
-    padding: '4px 8px',
+  const valueStyles = {
+    padding: '5px 8px',
     borderRadius: 4,
+  };
+
+  const labelStyles = {
     fontWeight: 600,
-    fontSize: 12,
+    fontSize: 11,
     whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   };
 
   const customStyles = {
@@ -119,7 +124,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
       const bgColor = state.data.value.split('-')[1];
       return {
         ...provided,
-        borderRadius: 4,
+        ...valueStyles,
         alignItems: 'center',
         backgroundColor: bgColor,
         color: pickTextColorFromBgColor(bgColor)
@@ -138,7 +143,8 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
       ...provided,
       paddingLeft: 0,
       paddingRight: 0,
-      margin: 4,
+      marginLeft: 4,
+      marginRight: -4,
       height: 12,
       width: 12,
     }),
@@ -148,17 +154,9 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
         return { ...provided };
       }
       return {
+        ...valueStyles,
         ...labelStyles,
-        backgroundColor: bgColor, color: pickTextColorFromBgColor(bgColor)
-      };
-    },
-    singleValueLabel: (provided, state) => {
-      if (state.data.value === 'no-tag') {
-        return { ...provided };
-      }
-      const bgColor = state.data.value.split('-')[1];
-      return {
-        ...labelStyles,
+        maxWidth: '95%',
         backgroundColor: bgColor,
         color: pickTextColorFromBgColor(bgColor)
       };

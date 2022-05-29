@@ -48,6 +48,11 @@
 
   .note-detail {
     font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .custom-tag-container {
+    margin: -3px;
   }
 
   .num-replies-container {
@@ -91,11 +96,6 @@
 
   .col-shrink {
     flex-shrink: 1;
-  }
-
-  .custom-tag-container {
-    margin: -4px;
-    padding-bottom: 10px;
   }
 
   .author-and-date {
