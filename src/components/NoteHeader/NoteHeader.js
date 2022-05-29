@@ -92,12 +92,7 @@ function NoteHeader(props) {
     }
 
     if (ct !== null && ct !== undefined && ct !== '') {
-      // let joinedTag = JSON.parse(ct);
-      // joinedTag = joinedTag ? joinedTag.map(m => m.label).join(',') : '';
-      // setCustomTag(joinedTag);
-      let tags = JSON.parse(ct);
-      //console.log(tags);
-      //tags = tags ? tags.map(m => m) : '';
+      const tags = JSON.parse(ct);
       setCustomTag([...tags]);
     }
   };
@@ -177,7 +172,7 @@ function NoteHeader(props) {
                     )}
                   </div>
                 )}
-                {customDate && (
+                {customDate && customDate !== 'null' && (
                   <div className="note-detail">
                     <strong>Date:</strong> {customDate}
                   </div>

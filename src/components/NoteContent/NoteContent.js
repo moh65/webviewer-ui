@@ -33,7 +33,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan, faCheck, faBan, faCalendarDays } from '@fortawesome/free-solid-svg-icons';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format } from 'date-fns';
+import { format, lightFormat } from 'date-fns';
 
 //customization
 
@@ -428,12 +428,17 @@ const ContentArea = ({
   const [isPrivate, setIsPrivate] = useState(isAnnotPrivate === 'true' ? true : false);
   const [noteDate, setNoteDate] = useState(annotNoteDate ? annotNoteDate : null);
   const [showDateField, setShowDateField] = useState(false);
-  const [dateFieldValue, setDateFieldValue] = useState(null);
   const [customDataChanged, setCustomDataChanged] = useState(false);
   const [commentTextChanged, setCommentTextChanged] = useState(false);
   const [selectedTags, setSelectedTags] = useState(annotTags != null && annotTags != undefined && annotTags != '' ? JSON.parse(annotTags) : []);
   const allAnnotations = core.getAnnotationsList();
   const linkAnnotation = allAnnotations.find(s => s.Subject === 'Link' && s.InReplyTo === annotation.Id);
+
+  useEffect(() => {
+    if (noteDate !== null) {
+      setShowDateField(true);
+    }
+  }, [noteDate]);
 
   //customization
 
@@ -488,19 +493,18 @@ const ContentArea = ({
               type="checkbox"
               label="Add Date"
               className="mb-10"
-              checked={showDateField || noteDate !== null}
+              checked={showDateField}
               onChange={() => setShowDateField(!showDateField)}
             />
-            {(showDateField || noteDate !== null) && (
+            {showDateField && (
               <div className="date-field">
                 <DatePicker
                   placeholderText="Add Date (dd/mm/yyyy)"
                   dateFormat="dd/MM/yyyy"
-                  selected={dateFieldValue}
-                  onChange={date => {
+                  selected={Date.parse(noteDate)}
+                  onChange={newDate => {
                     setCustomDataChanged(true);
-                    setDateFieldValue(date);
-                    const newNoteDate = format(date, 'dd/MM/yyyy');
+                    const newNoteDate = format(newDate, 'yyyy/MM/dd');
                     setNoteDate(newNoteDate);
                   }}
                 />
