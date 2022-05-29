@@ -74,8 +74,6 @@
 
   .date-and-num-replies{
     display: flex;
-
-    
   }
 
   .mb-1 {
@@ -93,6 +91,11 @@
 
   .col-shrink {
     flex-shrink: 1;
+  }
+
+  .custom-tag-container {
+    margin: -4px;
+    padding-bottom: 10px;
   }
 
   .author-and-date {

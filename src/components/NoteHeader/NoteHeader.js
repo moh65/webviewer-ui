@@ -15,9 +15,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import actions from 'actions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-
+import Tag from 'components/Tag';
 
 import './NoteHeader.scss';
+import { typeOf } from 'react-is';
 
 
 
@@ -91,11 +92,16 @@ function NoteHeader(props) {
     }
 
     if (ct !== null && ct !== undefined && ct !== '') {
-      let joinedTag = JSON.parse(ct);
-      joinedTag = joinedTag ? joinedTag.map(m => m.label).join(',') : '';
-      setCustomTag(joinedTag);
+      // let joinedTag = JSON.parse(ct);
+      // joinedTag = joinedTag ? joinedTag.map(m => m.label).join(',') : '';
+      // setCustomTag(joinedTag);
+      let tags = JSON.parse(ct);
+      //console.log(tags);
+      //tags = tags ? tags.map(m => m) : '';
+      setCustomTag([...tags]);
     }
   };
+
 
   // useEffect(() => {
   //   console.log(`for annotation ${annotation.Id} noteIndex = ${noteIndex} isEditing = ${isEditing}`)
@@ -162,7 +168,16 @@ function NoteHeader(props) {
             )}
             { showHeader && (
               <div>
-                {customDate !== '' && (
+                {customTag && (
+                  <div className="note-detail custom-tag-container">
+                    {customTag.map(
+                      ({ label, value }) => (
+                        <Tag key={label} label={label} value={value} />
+                      )
+                    )}
+                  </div>
+                )}
+                {customDate && (
                   <div className="note-detail">
                     <strong>Date:</strong> {customDate}
                   </div>
@@ -170,11 +185,6 @@ function NoteHeader(props) {
                 {customLink !== '' && (
                   <div className="note-detail">
                     <strong>URL:</strong> {customLink}
-                  </div>
-                )}
-                {customTag && (
-                  <div className="note-detail">
-                    <strong>Tags:</strong> {customTag}
                   </div>
                 )}
               </div>
