@@ -39,14 +39,16 @@ import Switch from 'components/Switch';
 import { getAnnotationClass, getAnnotationClassForFilterModal } from 'helpers/getAnnotationClass';
 import TagDropDown from 'components/TagDropDown';
 import QueryBuilder from 'components/QueryBuilder';
+import { ConstructionOutlined } from '@mui/icons-material';
 
 //customization
 const hidden = [];
 
 const FilterAnnotModal = () => {
-  const [isDisabled, isOpen] = useSelector(state => [
+  const [isDisabled, isOpen, tagOptionsState] = useSelector(state => [
     selectors.isElementDisabled(state, 'filterModal'),
-    selectors.isElementOpen(state, 'filterModal')
+    selectors.isElementOpen(state, 'filterModal'),
+    selectors.getTagOptions(state),
 
   ]);
   const [t] = useTranslation();
@@ -54,6 +56,7 @@ const FilterAnnotModal = () => {
 
   const dropRef = useRef();
 
+  const [applied, setApplied] = useState(false);
   const [authors, setAuthors] = useState([]);
   const [annotTypes, setAnnotTypes] = useState([]);
   const [colors, setColorTypes] = useState([]);
@@ -62,7 +65,7 @@ const FilterAnnotModal = () => {
   const [authorFilter, setAuthorFilter] = useState([]);
   const [typesFilter, setTypesFilter] = useState([]);
   const [colorFilter, setColorFilter] = useState([]);
-  const [checkRepliesForAuthorFilter, setCheckRepliesForAuthorFilter] = useState(true);
+  const [checkRepliesForAuthorFilter, setCheckRepliesForAuthorFilter] = useState(false);
   const [statusFilter, setStatusFilter] = useState([]);
 
   //customization
@@ -124,24 +127,25 @@ const FilterAnnotModal = () => {
 
         if (typesFilter.length > 0) {
           //customization
-
-          type = annots.some(s => s.Subject === 'Link' && s.InReplyTo === annot.Id);
-          if (!type) {
             let annotType = getAnnotationClassForFilterModal(annot);
             type = typesFilter.includes(annotType);
-          }
+            
+          //}
 
           //customization
         }
 
-        if (authorFilter.length > 0) {
-          author = authorFilter.includes(core.getDisplayAuthor(annot['Author']));
+        if (authorFilter && authorFilter.length > 0) {
+          const annotAuthor = core.getDisplayAuthor(annot['Author']);
+          author = authorFilter.find(i => i.value === annotAuthor)
           if (!author && checkRepliesForAuthorFilter) {
             const allReplies = annot.getReplies();
             for (const reply of allReplies) {
               // Short-circuit the search if at least one reply is created by
               // one of the desired authors
-              if (authorFilter.includes(core.getDisplayAuthor(reply['Author']))) {
+              const replyAuthor = core.getDisplayAuthor(reply['Author']);
+              const authorReply = authorFilter.find(i => i.value === replyAuthor)
+              if (authorReply) {
                 author = true;
                 break;
               }
@@ -255,7 +259,6 @@ const FilterAnnotModal = () => {
 
         //customization
 
-
         let showComment = !filteredTagShouldApply && type && author && privatePublicShow && !fromCommentDateApply && !toCommentDateApply && !fromAttributeDateApply && !toAttributeDateApply;
 
         if (!showComment) {
@@ -282,6 +285,8 @@ const FilterAnnotModal = () => {
         checkRepliesForAuthorFilter
       }
     );
+
+    setApplied(true);
     closeModal();
   };
 
@@ -295,14 +300,15 @@ const FilterAnnotModal = () => {
       }),
     );
     setCheckRepliesForAuthorFilter(false);
-    setAuthorFilter([]);
-    setTypesFilter([]);
+
+    setAuthorFilter([...authors]);
+    setTypesFilter([...annotTypes]);
     setColorFilter([]);
-    setStatusFilter([]);
+    setStatusFilter([...statuses]);
 
     //customization
 
-    setPrivateFilter(false);
+    setPrivateFilter(true);
     setVisiblity('All');
 
     setToCommentDateRange('yyyy-mm-dd');
@@ -350,16 +356,20 @@ const FilterAnnotModal = () => {
 
     //customization
     const authorsToBeAdded = [];
+    const authorsToBeSet = [];
+    const annotTypesToBeSet = new Set();
     //customization
     const annotTypesToBeAdded = new Set();
     const annotColorsToBeAdded = new Set();
     const annotStatusesToBeAdded = new Set();
-    annots.forEach(annot => {
-      const displayAuthor = core.getDisplayAuthor(annot['Author']);
-      
+    annots.forEach(annot => {    
       //customization
+      const isHidden = annot.Hidden;
+
+      const displayAuthor = core.getDisplayAuthor(annot['Author']);
       if (displayAuthor && displayAuthor !== '' && !authorsToBeAdded.find(i => i.value === displayAuthor)) {
-        authorsToBeAdded.push( { value: displayAuthor, label: displayAuthor });
+        const author = { value: displayAuthor, label: displayAuthor };
+        authorsToBeAdded.push(author);
       }
       //customization
 
@@ -375,7 +385,9 @@ const FilterAnnotModal = () => {
         return;
       }
 
-      annotTypesToBeAdded.add(getAnnotationClassForFilterModal(annot));
+      const annotType = getAnnotationClassForFilterModal(annot);
+      annotTypesToBeAdded.add(annotType);
+
       if (annot.Color && !similarColorExist([...annotColorsToBeAdded], annot.Color)) {
         annotColorsToBeAdded.add(rgbaToHex(annot.Color.R, annot.Color.G, annot.Color.B, annot.Color.A));
       } else {
@@ -387,16 +399,25 @@ const FilterAnnotModal = () => {
       } else {
         annotStatusesToBeAdded.add('None');
       }
+
     });
 
     hideAnnot();
+
     //customization
-    setAuthors(authorsToBeAdded);   
+    setAuthors(authorsToBeAdded); 
+    
+    if (!applied) {
+      setTypesFilter([...annotTypesToBeAdded]);
+      setAuthorFilter([...authorsToBeAdded]);  
+      setStatusFilter([...annotStatusesToBeAdded]);
+    }
     //customization
 
     setAnnotTypes([...annotTypesToBeAdded]);
     setColorTypes([...annotColorsToBeAdded]);
     setStatusTypes([...annotStatusesToBeAdded]);
+    
 
     core.addEventListener('documentUnloaded', closeModal);
     return () => {
@@ -404,14 +425,19 @@ const FilterAnnotModal = () => {
     };
   }, [isOpen]);
 
+  const handleAuthorChange = selectedOption => {
+    setAuthorFilter(selectedOption);
+  };
+
   const renderAuthors = () => {
     return (
       <div className="filter">
         <div className="heading"><h6>Comment Author</h6></div>
         <div className="author-buttons">
           <div className='authors'>
-            <Select options={authors} isSearchable="true" isMulti className="multi-select"
-              defaultValue={authors}
+            <Select options={authors} isSearchable="true" isMulti className="multi-select" closeMenuOnSelect={false}
+            onChange={handleAuthorChange}
+              value={authorFilter}
             />
             <div className="replies">
               <Switch onChange={setCheckRepliesForAuthorFilter} checked={checkRepliesForAuthorFilter} />   
@@ -536,7 +562,6 @@ const FilterAnnotModal = () => {
         <div className="heading">{t('annotation.tag')}</div>
         <div className="tag-buttons">
           <TagDropDown ref={dropRef} creatable={false} setSelectedTags={setFilteredTags} controlWidth="100%"/>
-
         </div>
       </div>
     );
