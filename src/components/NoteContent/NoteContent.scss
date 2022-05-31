@@ -35,13 +35,13 @@
   }
 
   .container {
-    margin-top: 8px;
+    margin-top: 4px;
     overflow: hidden;
     white-space: pre-wrap;
     word-wrap: break-word;
     user-select: text;
     cursor: text;
-    padding-left: 52px;
+    padding-left: 40px;
     padding-right: 12px;
   }
 
@@ -60,14 +60,14 @@
     flex-direction: column;
     position: relative;
     flex: 1;
-    padding-left: 52px;
+    padding-left: 40px;
     padding-right: 12px;
 
     @include ie11 {
       flex: none;
     }
 
-    textarea {
+    textarea, [type=date], .date-field input {
       width: 100%;
       padding-left: 8px;
       border: 1px solid var(--border);
@@ -78,6 +78,7 @@
       resize: none;
       overflow: hidden;
       box-sizing: border-box;
+      margin-bottom: 10px;
 
       &:focus {
         outline: none;
@@ -89,55 +90,170 @@
       }
     }
 
-    .edit-buttons {
+    .date-field {
+      position: relative;
+      margin-bottom: 10px;
+      input {
+        padding-right: 25px;
+        margin-bottom: 0;
+      }
+      > svg {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        pointer-events: none;
+      }
+
+      .react-datepicker {
+        box-shadow: 0 0 3px 0 rgb(0 0 0 / 20%);
+        border: none;
+      }
+
+      .react-datepicker-popper[data-placement^=bottom] .react-datepicker__triangle::before, .react-datepicker-popper[data-placement^=bottom] .react-datepicker__triangle::after {
+        border-bottom-color: var(--primary);
+      }
+
+      .react-datepicker__header {
+        background-color: var(--primary);
+        border: none;
+      }
+      .react-datepicker__current-month, .react-datepicker-time__header, .react-datepicker-year-header {
+        color: #FFF;
+        padding-bottom: 8px;
+      }
+      .react-datepicker__year-read-view--down-arrow, .react-datepicker__month-read-view--down-arrow,
+      .react-datepicker__month-year-read-view--down-arrow, .react-datepicker__navigation-icon::before {
+        border-color: #FFF;
+        top: 12px;
+      }
+
+      .react-datepicker__day-names {
+        background-color: #e0e0e0;
+      }
+
+      .react-datepicker__day:hover {
+        border-radius: 100%;
+        background-color: #dae6f2;
+      }
+
+
+      .react-datepicker__day--today {
+        background-color: #dae6f2;
+      }
+
+      .react-datepicker__day {
+        border-radius: 100%;
+      }
+
+      .react-datepicker__day:hover,
+      .react-datepicker__day--keyboard-selected,
+      .react-datepicker__day--selected,
+      .react-datepicker__day--in-selecting-range,
+      .react-datepicker__day--in-range
+      {
+        border-radius: 100%;
+        background-color: var(--primary);
+        color: #FFF;
+      }
+
+    }
+
+    .ui__base {
+      margin-right: 0;
+    }
+
+    .ui__choice__label {
+      font-size: 12px;
+      padding-left: 5px !important;
+    }
+
+    .ui__choice__input__check--checked {
+      background-color: var(--success) !important;
+      border-color: var(--success) !important;
+    }
+
+  }
+
+  .edit-buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    margin-bottom: -12px;
+
+    > div {
+      margin-right: 4px;
+    }
+
+    button {
+      flex: 1;
+      @include button-reset;
+      cursor: pointer;
       display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-      margin-top: 4px;
-
-      > div {
-        margin-right: 4px;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      height: 40px;
+      padding: 0 8px;
+      font-weight: 600;
+      svg {
+        margin-top: -0.125em;
+        margin-right: 6px;
+        font-size: 14px;
       }
-
-      .save-button {
-        @include button-reset;
-        cursor: pointer;
-        flex-shrink: 0;
-        background: var(--primary-button);
-        border-radius: 4px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        color: var(--primary-button-text);
-        padding: 0 13px;
-
-        &:hover {
-          background: var(--primary-button-hover);
-          color: var(--primary-button-text);
-        }
-
-        &.disabled {
-          background: var(--gray-6);
-          border-color: var(--gray-6);
-          cursor: not-allowed;
-        }
+      &.disabled {
+        background: var(--gray-6);
+        border-color: var(--gray-6);
+        cursor: not-allowed;
       }
+    }
 
-      .cancel-button {
-        @include button-reset;
-        color: var(--secondary-button-text);
-        padding: 0 10px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        margin-right: 2px;
+    .apply-button {
+      background: var(--blue-5);
+      color: var(--white);
+      width: 100%;
+      flex: 1 1 100%;
+      margin-left: 40px;
+      margin-bottom: 14px;
+      margin-right: 12px;
+      &:hover {
+        background: var(--blue-6);
+        color: var(--white);
+      }
+    }
+    .save-button {
+      background: var(--success);
+      color: var(--white);
+      &:hover {
+        background: var(--success-active);
+        color: var(--white);
+      }
+    }
+    .cancel-button {
+      background-color: var(--gray-2);
+      color: var(--text-color);
+      &:hover {
+        background-color: var(--gray-4);
+        color: var(--text-color);
+      }
+    }
+    .delete-button {
+      background: var(--primary);
+      color: var(--white);
+      &:hover {
+        background: var(--primary-active);
+        color: var(--white);
+      }
+    }
+  }
 
-        &:hover {
-          color: var(--secondary-button-hover);
+  &.isReply {
+    .edit-buttons {
+      button {
+        font-size: 12px;
+        height: 36px;
+        svg {
+          font-size: 12px;
         }
       }
     }

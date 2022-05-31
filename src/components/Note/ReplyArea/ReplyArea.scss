@@ -4,26 +4,43 @@
 .reply-area-container {
   border-top: 1px solid var(--divider);
   display: flex;
+  background-color: var(--panel-background);
 
   .reply-button-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     flex-direction: column;
   }
 
   .reply-button {
-    width: 28px;
-    height: 28px;
+    width: 80px;
+    height: 40px;
     @include button-reset;
-    // for IE only
-    @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-      width: 80px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-right: 5px;
+    margin-left: -6px;
+    background:  var(--blue-5) !important;
+    border: 1px solid var(--blue-5) !important;
+    color: $white !important;
+    font-weight: bold;
+    box-sizing: border-box;
+    opacity: 1;
+    transition: opacity 300ms ease;
+    &.disabled {
+      opacity: 0.5;
+      span {
+        color: $white !important;
+      }
     }
-    right: 10px;
-    bottom: 12px;
+    .Icon {
+      color: $white;
+      margin-right: 6px;
+      width: 20px;
+    }
     
     &:hover {
-      background: var(--blue-1)
+      background: var(--blue-6)
     }
 
     &.disabled {
@@ -36,26 +53,30 @@
   display: flex;
   position: relative;
   flex: 1;
-  margin: 13px 17px 12px 12px;
+  margin: 5px;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 4px 0 0 4px;
   align-items: center;
+  box-sizing: border-box;
   &.unread {
     background: rgba($color:$pdftron-blue, $alpha: 0.08);
   }
   &:focus-within{
     border: 1px solid var(--focus-border);
   }
-
+  
   textarea {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    box-sizing: border-box;
     width: 100%;
     padding-left: 8px;
     border: none;
+    height: 38px !important;
     color: var(--text-color);
-    padding: 4px 4px 4px 4px;
+    padding: 10px 14px;
     resize: none;
     overflow: hidden;
-    height: 24px;
     box-sizing: border-box;
     &:focus {
       outline: none;

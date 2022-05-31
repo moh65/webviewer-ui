@@ -365,7 +365,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
 
   let style = {};
   if ((isInDesktopOnlyMode || !isMobile)) {
-    style = { width: `${currentWidth}px`, minWidth: `${currentWidth}px` };
+    style = { width: `${currentWidth}px`, minWidth: '370px' };
   }
 
   return ((isDisabled || !isOpen) ? null : (
@@ -433,6 +433,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
               img="icon-comments-filter"
               onClick={() => { dispatch(actions.openElement('filterModal')); }}
               title={t('component.filter')}
+              label="Filter"
             />
           </div>
         </div>

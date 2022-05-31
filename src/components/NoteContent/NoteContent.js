@@ -26,8 +26,14 @@ import isString from 'lodash/isString';
 //customization
 import Choice from 'components/Choice';
 import { applyRedactionFromCommentBox } from 'helpers/applyRedactions';
-import TagDropDown from 'components/TagDropDown'
+import TagDropDown from 'components/TagDropDown';
 import LinkEdition from '../LinkEdition';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashCan, faCheck, faBan, faCalendarDays, faStrikethrough } from '@fortawesome/free-solid-svg-icons';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 
 //customization
 
@@ -252,7 +258,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
         contentStyle.color = textColor.toHexString();
       }
 
-      debugger
+      //debugger
       return (
         <React.Fragment>
           {isEditing && isSelected ? (
@@ -420,12 +426,19 @@ const ContentArea = ({
   let annotTags = annotation.getCustomData("custom-tag-options");
 
   const [isPrivate, setIsPrivate] = useState(isAnnotPrivate === 'true' ? true : false);
-  const [noteDate, setNoteDate] = useState(annotNoteDate ? annotNoteDate : new Date().toISOString().split('T')[0]);
+  const [noteDate, setNoteDate] = useState(annotNoteDate ? annotNoteDate : null);
+  const [showDateField, setShowDateField] = useState(false);
   const [customDataChanged, setCustomDataChanged] = useState(false);
   const [commentTextChanged, setCommentTextChanged] = useState(false);
   const [selectedTags, setSelectedTags] = useState(annotTags != null && annotTags != undefined && annotTags != '' ? JSON.parse(annotTags) : []);
   const allAnnotations = core.getAnnotationsList();
   const linkAnnotation = allAnnotations.find(s => s.Subject === 'Link' && s.InReplyTo === annotation.Id);
+
+  useEffect(() => {
+    if (noteDate !== null) {
+      setShowDateField(true);
+    }
+  }, [noteDate]);
 
   //customization
 
@@ -434,67 +447,82 @@ const ContentArea = ({
 
 
   return (
-    <div className={contentClassName}>
-      <NoteTextarea
-        ref={el => {
-          textareaRef.current = el;
-        }}
-        value={textAreaValue}
-        onChange={value => { setCommentTextChanged(true); onTextAreaValueChange(value, annotation.Id) }}
-        onSubmit={setContents}
-        placeholder={`${t('action.comment')}...`}
-        aria-label={`${t('action.comment')}...`}
-      />
-      {!isReply && (
-        //customization
-        <div>
-          <input type="date"
-            value={noteDate}
-            onChange={e => {
-              e.stopPropagation();
-              setCustomDataChanged(true);
-              let date = e.target.value;
-              setNoteDate(date);
-            }}
-          />
-
-          <TagDropDown
-            setDropDownChanged={setCustomDataChanged}
-            setSelectedTags={setSelectedTags}
-            selectedTags={selectedTags}
-            creatable={false}
-            placeholder={"No tag ..."}
-          />
-
-          <Choice
-            type="checkbox"
-            label="Private"
-            checked={isPrivate}
-
-            onChange={e => {
-              e.stopPropagation();
-              setCustomDataChanged(true);
-              if (e.target.checked) {
-                setIsPrivate(true);
-              } else {
-                setIsPrivate(false);
-              }
-            }}
-          />
-
-          {
-            linkAnnotation && <LinkEdition annotation={linkAnnotation} />
-          }
-        </div>
-        //customization
-
-      )
-      }
+    <div>
+      <div className={contentClassName}>
+        <NoteTextarea
+          ref={el => {
+            textareaRef.current = el;
+          }}
+          value={textAreaValue}
+          onChange={value => { setCommentTextChanged(true); onTextAreaValueChange(value, annotation.Id) }}
+          onSubmit={setContents}
+          placeholder={`${t('action.comment')}...`}
+          aria-label={`${t('action.comment')}...`}
+        />
+        {!isReply && (
+          //customization
+          <div>
+            <div className="row-flex align-items-center mb-10">
+              <div className="col-grow">
+                <TagDropDown
+                  setDropDownChanged={setCustomDataChanged}
+                  setSelectedTags={setSelectedTags}
+                  selectedTags={selectedTags}
+                  creatable={false}
+                  placeholder={"No tag ..."}
+                />
+              </div>
+              <div className="col-shrink">
+                <Choice
+                  type="checkbox"
+                  label="Private"
+                  checked={isPrivate}
+                  onChange={e => {
+                    e.stopPropagation();
+                    setCustomDataChanged(true);
+                    if (e.target.checked) {
+                      setIsPrivate(true);
+                    } else {
+                      setIsPrivate(false);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+            <Choice
+              type="checkbox"
+              label="Add Date"
+              className="mb-10"
+              checked={showDateField}
+              onChange={() => setShowDateField(!showDateField)}
+            />
+            {showDateField && (
+              <div className="date-field">
+                <DatePicker
+                  placeholderText="Add Date (dd/mm/yyyy)"
+                  dateFormat="dd/MM/yyyy"
+                  selected={Date.parse(noteDate)}
+                  onChange={newDate => {
+                    setCustomDataChanged(true);
+                    const newNoteDate = format(newDate, 'yyyy/MM/dd');
+                    setNoteDate(newNoteDate);
+                  }}
+                />
+                <FontAwesomeIcon icon={faCalendarDays} />
+              </div>
+            )}
+            {
+              linkAnnotation && <LinkEdition annotation={linkAnnotation} />
+            }
+          </div>
+          //customization
+        )}
+      </div>
       <div className="edit-buttons">
         {
           (annotation.Subject === "Redact") &&
           <button
-            className="cancel-button"
+            className="apply-button"
             onClick={async e => {
               e.stopPropagation();
 
@@ -503,17 +531,19 @@ const ContentArea = ({
               applyRedactionFromCommentBox(annotation, dispatch, redactionBurninDateUrl);
             }}
           >
-            {t('action.apply')}
+            <FontAwesomeIcon icon={faStrikethrough} />
+            {t('Apply Redaction')}
           </button>
         }
         {/*customization*/}
         <button
-          className="cancel-button"
+          className="delete-button"
           onClick={e => {
             e.stopPropagation();
             core.deleteAnnotations([annotation, ...annotation.getGroupedChildren()]);
           }}
         >
+          <FontAwesomeIcon icon={faTrashCan} />
           {t('action.delete')}
         </button>
         {/*customization*/}
@@ -527,6 +557,7 @@ const ContentArea = ({
 
           }}
         >
+          <FontAwesomeIcon icon={faBan} />
           {t('action.cancel')}
         </button>
         <button
@@ -543,6 +574,7 @@ const ContentArea = ({
             //customization
           }}
         >
+          <FontAwesomeIcon icon={faCheck} />
           {t('action.save')}
         </button>
       </div>

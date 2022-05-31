@@ -75,7 +75,7 @@ class HeaderItems extends React.PureComponent {
     });
 
     return (
-      <div className="HeaderItems" style={{backgroundColor:'red'}}>
+      <div className="HeaderItems">
         { headers }
       </div>
     );
