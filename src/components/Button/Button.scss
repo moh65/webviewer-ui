@@ -18,6 +18,10 @@
     width: 24px;
   }
 
+  .Icon {
+    color: var(--text-color);
+  }
+
   // color for svgs
   &.active {
     path[fill=default] {

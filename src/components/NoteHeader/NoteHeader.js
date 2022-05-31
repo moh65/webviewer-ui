@@ -13,9 +13,12 @@ import { NotesPanelSortStrategy } from 'constants/sortStrategies';
 import selectors from 'selectors';
 import { useDispatch, useSelector } from 'react-redux';
 import actions from 'actions';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import Tag from 'components/Tag';
 
 import './NoteHeader.scss';
+import { typeOf } from 'react-is';
 
 
 
@@ -76,27 +79,24 @@ function NoteHeader(props) {
     let cd = annotation.getCustomData('custom-date');
     let ct = annotation.getCustomData('custom-tag-options');
 
-    if (cl != null && cl != undefined)
-    {
-      setCustomLink(cl)
+    if (cl != null && cl != undefined) {
+      setCustomLink(cl);
     }
 
-    if (cp != null && cp != undefined)
-    {
-      setCustomPrivate(cp)
+    if (cp != null && cp != undefined) {
+      setCustomPrivate(cp);
     }
 
-    if (cd != null && cd != undefined)
-    {
-      setCustomDate(cd)
+    if (cd != null && cd != undefined) {
+      setCustomDate(cd);
     }
 
-    if (ct != null && ct != undefined && ct != '') {
-      let joinedTag = JSON.parse(ct);
-      joinedTag = joinedTag ? joinedTag.map(m => m.label).join(',') : '';
-      setCustomTag(joinedTag)
+    if (ct !== null && ct !== undefined && ct !== '') {
+      const tags = JSON.parse(ct);
+      setCustomTag([...tags]);
     }
-  }
+  };
+
 
   // useEffect(() => {
   //   console.log(`for annotation ${annotation.Id} noteIndex = ${noteIndex} isEditing = ${isEditing}`)
@@ -105,22 +105,19 @@ function NoteHeader(props) {
 
   useEffect(() => {
     setCustomData();
-  }, [])
+  }, []);
 
-  useEffect(()=>{
-    if (annotation.Subject === 'Redact'){
-      debugger
-    }
-    if (isEditing === true && isSelected === true){
-      setShowHeader(false)
+  useEffect(() => {
+    if (isEditing === true && isSelected === true) {
+      setShowHeader(false);
     } else {
       setCustomData();
-      setShowHeader(true)
+      setShowHeader(true);
     }
-  }, [isEditing, isSelected])
+  }, [isEditing, isSelected]);
 
   const authorAndDateClass = classNames('author-and-date', { isReply });
-  const noteHeaderClass = classNames('NoteHeader', { parent: !isReply })
+  const noteHeaderClass = classNames('NoteHeader', { parent: !isReply });
 
   return (
     <div className={noteHeaderClass}>
@@ -135,33 +132,55 @@ function NoteHeader(props) {
       <div className={authorAndDateClass}>
         <div className="author-and-overflow">
           <div className="author-and-time">
-            <div className='author'>
-              {renderAuthorName(annotation)}
+            <div className="row-flex mb-1">
+              <div className="col-grow author">
+                {renderAuthorName(annotation)}
+              </div>
+              <div className="col-shrink">
+                <div className="date-and-time">
+                  {date ? dayjs(date).locale(language).format(noteDateFormat) : t('option.notesPanel.noteContent.noDate')}
+                </div>
+              </div>
             </div>
-            { showHeader && (<div>
+            { showHeader && !isReply && (
+              <div className="row-flex mb-1">
+                <div className="col-grow visibility">
+                  {customPrivate === 'true'
+                    ? <><FontAwesomeIcon icon={faEyeSlash} /> Private</>
+                    : <><FontAwesomeIcon icon={faEye} /> Public</>
+                  }
+                </div>
+                {numberOfReplies > 0 &&
+                  <div className="col-shrink num-replies-container">
+                    <Icon className="num-reply-icon" glyph={"icon-chat-bubble"} />
+                    <div className="num-replies">{numberOfReplies}</div>
+                  </div>
+                }
+              </div>
+            )}
+            { showHeader && (
               <div>
-                {`Visibility : ${customPrivate === 'true' ? 'private' : 'public'}`}
+                {customTag && (
+                  <div className="note-detail custom-tag-container">
+                    {customTag.map(
+                      ({ label, value }) => (
+                        <Tag key={label} label={label} value={value} />
+                      )
+                    )}
+                  </div>
+                )}
+                {customDate && customDate !== 'null' && (
+                  <div className="note-detail">
+                    <strong>Date:</strong> {customDate}
+                  </div>
+                )}
+                {customLink !== '' && (
+                  <div className="note-detail">
+                    <strong>URL:</strong> {customLink}
+                  </div>
+                )}
               </div>
-              <div>
-                {`Date : ${customDate === '' ? 'not set' : customDate}`}
-              </div>
-              <div>
-                {customLink != '' ? `URL : ${customLink}` : ''}
-              </div>
-              <div>
-                {customTag !== '[]' ? customTag : ''}
-              </div>
-            </div>)}
-            <div className="date-and-num-replies">
-              <div className="date-and-time">
-                {date ? dayjs(date).locale(language).format(noteDateFormat) : t('option.notesPanel.noteContent.noDate')}
-              </div>
-              {numberOfReplies > 0 && !isSelected &&
-                <div className="num-replies-container">
-                  <Icon className="num-reply-icon" glyph={"icon-chat-bubble"} />
-                  <div className="num-replies">{numberOfReplies}</div>
-                </div>}
-            </div>
+            )}
           </div>
           <div className="state-and-overflow">
             <NoteUnpostedCommentIndicator annotationId={annotation.Id} />
@@ -182,8 +201,8 @@ function NoteHeader(props) {
         </div>
       </div>
     </div>
-  )
-};
+  );
+}
 
 NoteHeader.propTypes = propTypes;
 

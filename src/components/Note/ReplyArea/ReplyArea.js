@@ -156,6 +156,7 @@ const ReplyArea = ({ annotation, isUnread, onPendingReplyChange }) => {
           img="icon-post-reply"
           className={`reply-button${!pendingReplyMap[annotation.Id] ? ' disabled' : ''}`}
           onMouseUp={e => postReply(e)}
+          label="Reply"
         />
       </div>
     </div>

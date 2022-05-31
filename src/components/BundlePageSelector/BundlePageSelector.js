@@ -17,6 +17,7 @@ import { hexToRgba2 } from 'helpers/color';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import ReactTooltip from 'react-tooltip';
 import { element, number } from 'prop-types';
+import Split from 'react-split'
 
 
 
@@ -130,7 +131,6 @@ export default ({ isModalOpen }) => {
         const scrolledIndex = Math.floor(documentElement.current.scrollTop / elementHeight / sectionSize);
         if (!documentScroll.lock && documentScroll.currentIndex !== scrolledIndex) {
             documentScroll.lock = true;
-            console.log('Setting scrolled index: ' + scrolledIndex)
             setScrollIndex(scrolledIndex);
             documentScroll.lock = false;
         }
@@ -160,13 +160,7 @@ export default ({ isModalOpen }) => {
 
     const closeModal = () => {
         //customization
-        if (isOpenForUrl) {
-          dispatch(actions.closeElement('linkModalUrl'));
-        }
-        if (isOpen) {
           dispatch(actions.closeElement('linkModal'));
-        }
-        dispatch(actions.setAnnotationLinkToEdit(null))
         //customization
         setURL('');
         core.setToolMode(defaultTool);
@@ -261,7 +255,7 @@ export default ({ isModalOpen }) => {
                         data-iscapture="true"     
                     >
                         <div className='float-child-document-tree-label-name'>
-                            {nodes.documentNumber + ' ' + nodes.text}
+                            <b>{nodes.documentNumber}</b>{' ' + nodes.text}
                         </div> 
                         <ReactTooltip
                             id={nodes.id.toString()}
@@ -270,12 +264,12 @@ export default ({ isModalOpen }) => {
                             border={true}
                             borderColor="black"
                             multiline={false}
-                        />         
-                        <div className='float-child-document-tree-label-page'>{ ' - ' + nodes.pageCount + ' page' + (nodes.pageCount !== 1 ? 's' : '')}</div>
+                        />
                     </div> 
-                </div>
-                                    
-            }>
+                </div>    
+                }
+                disabled={(nodes.documentType === 5 ||nodes.documentType === 6 || nodes.documentType === 7)}
+            >
             {
                 Array.isArray(nodes.children)
                     ? nodes.children.map((node) => renderTree1(node))
@@ -496,7 +490,7 @@ export default ({ isModalOpen }) => {
 
     return (
         <div className={'container container-page'} onMouseDown={e => e.stopPropagation()}>
-        <div className="bundle-header">
+        <div className={isThumbnailSelectorOpen ? 'bundle-thumbnail-header' : 'bundle-change-header'}>
             <h5 className="modal-title">{isThumbnailSelectorOpen ? 'Link to page' : 'Change Document'}</h5>
             <button type="button" aria-label="Close" className="close" onClick={closeModal}>×</button>
         </div>
@@ -513,6 +507,7 @@ export default ({ isModalOpen }) => {
                     <div>
                         <div className="float-container">
                             <div className="float-container-row">
+                                <Split className="split">
                                 <div className="float-child-section">
                                     <h5>Sections</h5>
                                     <div className="float-child-section-tree">
@@ -549,7 +544,7 @@ export default ({ isModalOpen }) => {
                                         }
                               
                                         <TreeView
-                                            style={{ width: 'auto', height: 'auto', display:  loadingDocument ? 'hidden' :'block' }}
+                                            style={{ width: '100%', height: 'auto', display:  loadingDocument ? 'hidden' :'block' }}
                                             aria-label="rich object 2"
                                             sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                                             defaultCollapseIcon={<ExpandLessIcon />}
@@ -570,6 +565,7 @@ export default ({ isModalOpen }) => {
                                         <div ref={botElement}></div>   
                                     </div> 
                                 </div>
+                                </Split>
                             </div>
                         </div>
 

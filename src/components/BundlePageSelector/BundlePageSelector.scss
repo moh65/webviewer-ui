@@ -8,6 +8,10 @@
     margin-top: -50px !important;
 }
 
+.container-page {
+    display: unset !important; 
+}
+
 .float-container-row {
     display: table-row;
 }
@@ -15,9 +19,17 @@
 .float-child-section {
     width: 40%;
     float: left;
-    padding: 20px;
-    height: 400px;
+    height: 430px;
     display: table-cell;
+    margin-bottom: 20px; 
+    margin-top: 25px;
+    padding-right: 5px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+        
+    h5 {
+        font-size: .875rem;
+    }
 }  
 
 ul[role="tree"]{
@@ -29,9 +41,16 @@ ul[role="tree"]{
 .float-child-document {
     width: 60%;
     float: left;
-    padding: 20px;
-    height: 400px;
+    padding-left: 5px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    height: 430px;
     display: table-cell;
+    margin-top: 25px;
+        
+    h5 {
+        font-size: .875rem;
+    }
 }  
 
 .page-container {
@@ -103,6 +122,7 @@ ul[role="tree"]{
     border-color: lightgray;
     padding: 10px;
     overflow-x: hidden;
+    height: 400px !important;
 }
 
 .not-selected:hover {
@@ -145,6 +165,7 @@ ul[role="tree"]{
     border-width: 1px;
     overflow-y: overlay;
     border-radius: 5px;
+    background-color: #f7f7f7;
 }
 
 .float-child-document-tree > .MuiTreeView-root {
@@ -160,7 +181,15 @@ ul[role="tree"]{
     border-width: 1px !important;
 }
 
-.float-child-section-tree * .MuiTreeItem-content {
+.float-child-document-tree * .Mui-selected {
+    background-color: #DAE6F2 !important;
+    border-color: #5586cf !important;  
+    border-radius: 5px !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+}
+
+.float-child-document-tree * .MuiTreeItem-content {
     border-color: #F0F0F0;
     border-style: solid;
     border-width: 1px;
@@ -170,7 +199,11 @@ ul[role="tree"]{
     margin: 2px !important;
     border-radius: 5px;
     width: 99%;
-    background-color: #F0F0F0;
+    background-color: #f7f7f7 !important;
+}
+
+.Mui-disabled {
+    opacity: 0.7 !important;
 }
 
 .float-child-section-tree * .MuiTreeItem-label {
@@ -186,7 +219,7 @@ ul[role="tree"]{
 
 .float-child-document-tree {
     height: 100%;
-    border-color: #F0F0F0;
+    border-color: hsla(0,0%,89.8%,.5);
     border-style: solid;
     border-width: 1px;
     overflow-y: overlay;
@@ -200,21 +233,13 @@ ul[role=tree] {
     padding: 5px;
 }
 
-.float-child-document-tree * li:nth-child(odd) {
-    background-color: white;
-}
-  
-.float-child-document-tree * li:nth-child(even) {
-    background-color: #fcfcfc;
-}
-
 .MuiTreeItem-content {
     display: flex;
     flex-direction: row-reverse;
 }
 
 .float-child-document-tree-label {
-    display: flex;   
+    display: grid;   
     vertical-align: middle;
     float: left;
     padding-top: 7px;
@@ -225,8 +250,8 @@ ul[role=tree] {
     padding-left: 8px;
     width: 50px;
     svg {
-        height: 25px;
-        padding-top: 6px;
+        height: 23px;
+        padding-bottom: 3px;
     }
 }
 
@@ -238,7 +263,7 @@ ul[role=tree] {
     text-overflow: ellipsis;
     overflow-x: hidden;
     white-space: nowrap;
-    max-width: 485px;
+    width: 100%;
 }
 
 .float-child-document-tree-label-page {
@@ -254,13 +279,56 @@ ul[role=tree] {
     padding-right: 15px;
 }    
 
-.bundle-header {
+.bundle-thumbnail-header {
     @include modal4-header;
     padding-top: 10px;
+    padding-left: 10px;
+
+    h5 {
+        font-size: .875rem;
+    }
     
     button {
-    margin-top: 0px;
-    margin-right: 0px;
-    right: 25px;
+        margin-top: 0px;
+        margin-right: 0px;
+        right: 25px;
     }
+} 
+
+.bundle-change-header{
+    @include modal4-header;
+    padding-top: 10px;
+    padding-left: 10px;
+        
+    h5 {
+        font-size: .875rem;
+    }
+    
+    button {
+        margin-top: 0px;
+        margin-right: 0px;
+        right: 25px;
+    }
+}
+
+.split {
+    display: flex;
+    flex-direction: row;
+    height: 430px;
+    margin-bottom: 40px;
+}
+
+.gutter {
+    background-color: #eee;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    height: 430px;
+    margin-top: 30px;
+}
+
+.gutter.gutter-horizontal {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+    cursor: col-resize;
+    height: 388px;
+    margin-top: 70px;
 }
