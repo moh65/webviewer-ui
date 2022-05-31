@@ -92,6 +92,10 @@ module.exports = {
         use: ['svg-inline-loader'],
       },
       {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
         test: /\.woff(2)?$/,
         use: [
           {
