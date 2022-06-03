@@ -27,7 +27,7 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
 
     generateThumbnailUrl = generateThumbnailUrl ? generateThumbnailUrl : `${defaultBaseUrlAddress}/api/bundleitem/${logicalItemInfo.id}/generate/thumbnails`;
     pageThumbnailUrl = pageThumbnailUrl ? pageThumbnailUrl : `${defaultBaseUrlAddress}/api/bundleitem/{itemId}/page/{pageId}/thumbnail?w=200&h=250&access_token={token}`;
-    documentPagesUrl = documentPagesUrl ? documentPagesUrl : `${defaultBaseUrlAddress}/api/bundle/686/{itemId}/pages`;
+    documentPagesUrl = documentPagesUrl ? documentPagesUrl : `${defaultBaseUrlAddress}/api/bundle/4/{itemId}/pages`;
 
     const [thumbnailLoading, setThumbnailLoading] = useState(false);
     const [showGallery, setShowGallery] = useState(false);
@@ -141,7 +141,7 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
                             )
                         }
                     </div>
-                    <div className='gallery-outline' style={{overflowY:'scroll', height: '350px', width:'auto'}}>
+                    <div className='gallery-outline'>
                         <Gallery direction='column' renderImage={imageRenderer} columns={3} photos={pageThumbnailData} className="gallery-view" />
                     </div>
                     <div className="button-container">
