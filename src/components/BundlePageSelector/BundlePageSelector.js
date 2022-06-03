@@ -10,6 +10,8 @@ import actions from 'actions';
 import './BundlePageSelector.scss'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
+import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 import Button from '@mui/material/Button';
 import { useTranslation } from 'react-i18next';
 import Loading from 'components/loading';
@@ -18,7 +20,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import ReactTooltip from 'react-tooltip';
 import { element, number } from 'prop-types';
 import Split from 'react-split'
-
+import IconButton from '@mui/material/IconButton';
 
 
 export default ({ isModalOpen }) => {
@@ -43,11 +45,11 @@ export default ({ isModalOpen }) => {
     ]);
     const [t] = useTranslation();
 
-    sectionUrl = sectionUrl ? sectionUrl : `${defaultBaseUrlAddress}/api/bundle/686/items/sections`;
-    documentUrl = documentUrl ? documentUrl : `${defaultBaseUrlAddress}/api/bundle/sections/686/{sectionId}/documents/list`;
+    sectionUrl = sectionUrl ? sectionUrl : `${defaultBaseUrlAddress}/api/bundle/4/items/sections`;
+    documentUrl = documentUrl ? documentUrl : `${defaultBaseUrlAddress}/api/bundle/sections/4/{sectionId}/documents/list`;
     
     currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
-        id: 231423,
+        id: 4043,
         title: 'Annette Wallis Atkins Costs Disclosure Signed'
     };
 
@@ -65,89 +67,295 @@ export default ({ isModalOpen }) => {
     const botElement = useRef(null);
     const documentElement = useRef(null);
 
-    const elementHeight = 40;
-    const sectionSize = 50;
+    const elementHeight = 49.4;
+    const sectionSize = 10;
 
     const setScrollDefaults = (json) => {
-        documentScroll.sections.clear();
+        documentScroll.sectionMap.clear();
+        
+        SetSectionMap(json);
 
-        for (let i = 0; i < json.length; i++) {
-            const index = Math.floor(i / sectionSize);
-            if (!documentScroll.sections.has(index)) {
-                documentScroll.sections.set(index, []);
-            }
-
-            const section = documentScroll.sections.get(index);
-            section.push(json[i]);
-        }
+        documentScroll.expanded = 0;
+        documentScroll.expandedList = [];
+        setExpanded([]);
+        documentScroll.json = json;
+        let maxIndex = 0;
 
         const sectionDocs = json.slice(0, sectionSize * 3);
         setDocs(sectionDocs);
         documentScroll.currentIndex = 0;
-        setTopHeight(0);
-        setBotHeight((json.length - (sectionSize * 3)) * elementHeight);
+        documentScroll.maxIndex = maxIndex;
+
+        setTopHeight("0px"); 
+
         documentElement.current.scrollTop = 0;
+        let containerHeight = json.length * elementHeight;
+        
+        if (containerHeight < 0 ) {
+            setBotHeight("100%");
+        } else {
+            setBotHeight(containerHeight + "px");
+        }
+
         documentScroll.lock = false;
     };
+    
+
+    
+    const SetSectionMap = (json) => {   
+        documentScroll.sections.clear();
+        documentScroll.sectionGroupChildOffset.clear();
+        
+        let group = 1;
+        let count = 1;
+        let row = 1;
+        
+        let childOffset = 0
+
+        if (!json.length) {
+            return;
+        }
+
+
+        for (let i = 0; i < json.length; i++) {
+            const item = json[i];
+
+            item['row'] = row++;
+            item['count'] = count++;
+            item['group'] = group;
+        
+            if (!documentScroll.sections.has(group)) {
+                documentScroll.sections.set(group, [])
+            }
+        
+            const sectionGroup = documentScroll.sections.get(group) || []
+            sectionGroup.push(item);
+      
+            const descendants = SetSectionMapRecursive(item);
+            item['descendants'] = descendants;
+            item['expanded'] = 0;
+            documentScroll.sectionMap.set(item.id.toString(), item)
+
+            childOffset += item.descendants;
+            documentScroll.sectionGroupChildOffset.set(group, childOffset);
+        
+            if ((count - 1) % sectionSize === 0) {
+                row = 1;
+                group++;
+                childOffset = 0;
+            }
+        }
+
+        const expandable = [];
+        let keys = [...documentScroll.sectionMap.keys()]
+
+        for (let key of keys) {
+            const item = documentScroll.sectionMap.get(key);
+
+            if (item.children && item.children.length > 0) {
+                expandable.push(item.id.toString());
+            }
+        }
+
+        setExpandableNodes(expandable);
+    }
+
+    const SetSectionMapRecursive = (item) => {      
+        item['expanded'] = 0;  
+        documentScroll.sectionMap.set(item.id.toString(), item)
+        if (item.children && item.children.length > 0) {
+            let descendants = 0;
+            for (let i = 0; i < item.children.length; i++) {
+                const child = item.children[i];
+            
+                child['group'] = item.group;
+                child['parentBundleItem'] = item;
+            
+                descendants += SetSectionMapRecursive(child);
+            }
+            item['descendants'] = descendants + 1;
+        
+            return descendants + 1;
+        }
+        
+        item['descendants'] = 1;
+        
+        return 1;
+    }
 
     const setScrollIndex = (index) => {
         documentScroll.currentIndex = index;
-
-        if (index < 1) {
-            index = 1;
-        }
-
-        let startRow = (index - 1) * sectionSize;
-
+        let addedsec = [];
+        let min = index;
         let sectionDocs = [];
+
         if (documentScroll.sections.has(index - 1)) {
-            sectionDocs = sectionDocs.concat(...documentScroll.sections.get(index - 1));
+            sectionDocs = sectionDocs.concat(documentScroll.sections.get(index - 1));
+            min = index - 1;
+            addedsec.push(index - 1);
         }
+
         if (documentScroll.sections.has(index)) {
-            sectionDocs = sectionDocs.concat(...documentScroll.sections.get(index));
+            sectionDocs = sectionDocs.concat(documentScroll.sections.get(index));
+            addedsec.push(index);
         }
         
         if (documentScroll.sections.has(index + 1)) {
-            sectionDocs = sectionDocs.concat(...documentScroll.sections.get(index + 1));
+            sectionDocs = sectionDocs.concat(documentScroll.sections.get(index + 1));
+            addedsec.push(index + 1);
         }
 
         setDocs(sectionDocs);
-        const topHeight = startRow * elementHeight;
-        const botHeight = (allDocs.length - sectionDocs.length - startRow) * elementHeight;
-        setTopHeight(topHeight);
-        setBotHeight(botHeight);
     };
-    
-    const setBotHeight = (height) => {
-        botElement.current.style.height = height + "px";
+
+    const collaspe = (event, nodeIds) => {
+        setExpanded(nodeIds)
+
+       let difference = documentScroll.expandedList
+                 .filter(x => !nodeIds.includes(x))
+                 .concat(nodeIds.filter(x => !documentScroll.expandedList.includes(x)));
+        documentScroll.expandedList = nodeIds;
+
+        const item = documentScroll.sectionMap.get(difference[0]);
+        const element = document.getElementById(item.id);
+        const isExpanded = nodeIds.includes(item.id.toString()); 
+        let currentOffset = documentScroll.sectionGroupChildOffset.get(item.group);
+        
+        if (isExpanded) {
+            if (item.expanded == 0) {
+                item.expanded = item.children.length
+            }
+
+            documentScroll.expanded += item.expanded;
+            currentOffset += item.expanded;
+        } else {
+            const collapsed = element.querySelectorAll(".MuiTreeItem-root");
+            item.expanded = collapsed.length;
+            documentScroll.expanded -= item.expanded;
+            currentOffset -= item.expanded;
+        }
+
+        documentScroll.sectionGroupChildOffset.set(item.group, currentOffset);
+
+        let containerHeight = (documentScroll.json.length + documentScroll.expanded) * elementHeight;
+        
+        if (containerHeight < 0 ) {
+            setBotHeight("100%");
+        } else {
+            setBotHeight(containerHeight + "px");
+        }
+    }
+
+    const expandAllDocument = () => {
+        setExpanded(expandableNodes);
+        
+        documentScroll.expanded = documentScroll.sectionMap.size - documentScroll.json.length;
+        documentScroll.expandedList = [];
+
+        let containerHeight = (documentScroll.sectionMap.size) * elementHeight;
+
+        if (containerHeight < 0 ) {
+            setBotHeight("100%");
+        } else {
+            setBotHeight(containerHeight + "px");
+        }
+    };
+
+    const collaspeAllDocument = () => {
+        setExpanded([])
+        documentScroll.expanded = 0;
+        documentScroll.expandedList = [];
+
+        let containerHeight = (documentScroll.json.length) * elementHeight;
+
+        if (containerHeight < 0 ) {
+            setBotHeight("100%");
+        } else {
+            setBotHeight(containerHeight + "px");
+        }
+    };
+
+    const expandAllFolder = () => {
+        setExpandedFolder(expandableFolders);
+    };
+
+    const collaspeAllFolder = () => {
+        setExpandedFolder([]);
     };
 
     const setTopHeight = (height) => {
-        topElement.current.style.height = height + "px";
+        topElement.current.style.top = height; 
+    };
+
+    const setBotHeight = (height) => {
+        botElement.current.style.height = height; 
     };
 
     const onDocumentScroll = (event) => {
-        //documentElement.current.style.scrol
-        const scrolledIndex = Math.floor(documentElement.current.scrollTop / elementHeight / sectionSize);
-        if (!documentScroll.lock && documentScroll.currentIndex !== scrolledIndex) {
-            documentScroll.lock = true;
-            setScrollIndex(scrolledIndex);
-            documentScroll.lock = false;
+        if (documentScroll.lock) {
+            return;
         }
+            
+        documentScroll.lock = true;
+        const scrollPosition = documentElement.current.scrollTop + documentElement.current.clientHeight
+
+        let currentScrollGroupLocation = 1
+        let scrollGroupLocationCount = 0
+        let prevScrollGroupLocationCount = 0
+        let prevPrevScrollGroupLocationCount = 0
+        let keys = [...documentScroll.sectionGroupChildOffset.keys()]
+
+        for (let key of keys) {
+            prevPrevScrollGroupLocationCount = prevScrollGroupLocationCount;
+            prevScrollGroupLocationCount = scrollGroupLocationCount;
+            scrollGroupLocationCount += documentScroll.sectionGroupChildOffset.get(key);
+            currentScrollGroupLocation = key;
+
+            if (scrollGroupLocationCount && ((scrollGroupLocationCount) * elementHeight) > scrollPosition) {
+                break;
+            }
+        }
+
+        if (currentScrollGroupLocation === null || documentScroll.currentIndex === currentScrollGroupLocation) {
+            documentScroll.lock = false;
+            return;
+        }
+
+        console.log('Updating to section:' + currentScrollGroupLocation + '; from:' + documentScroll.currentIndex + '; scrollPosition:' + scrollPosition);
+        documentScroll.currentIndex = currentScrollGroupLocation;
+
+        setScrollIndex(documentScroll.currentIndex);
+
+        let firstSection = documentScroll.currentIndex >= documentScroll.maxIndex ? prevPrevScrollGroupLocationCount : prevPrevScrollGroupLocationCount;
+        const topHeight = Math.floor((firstSection == null ? 0 : firstSection) * elementHeight) + 'px'
+
+        setTopHeight(topHeight);
+        
+        documentScroll.lock = false;
     }        
 
     const [docs, setDocs] = useState([]);
     const [data, setData] = useState([]);
+    const [expandableFolders, setExpandablefolders] = useState([]);
+    const [expandableNodes, setExpandableNodes] = useState([]);
     const [documentScroll, setDocumentScroll] = useState({
         currentIndex: 0,
         lock: false,
+        maxIndex: 0,
         sections: new Map(),
+        sectionGroupChildOffset: new Map(),
+        sectionMap: new Map(),
+        expanded: 0,
+        expandedList: [],
+        json: [],
     });
     const [allDocs, setAllDocs] = useState([]);
     const [isThumbnailSelectorOpen, setIsThumbnailSelectorOpen] = useState(false);
     const [loadingDocument, setLoadingDocument] = useState(false);
     const [thisDocumentInfo, setThisDocumentInfo] = useState({});
     const [selectedDocumentInfo, setSelectedDocumentInfo] = useState({});
+    const [expanded, setExpanded] = useState([]);
+    const [expandedFolder, setExpandedFolder] = useState([]);
     const dispatch = useDispatch();
 
     const renderSections = (jsonData) => {
@@ -226,11 +434,38 @@ export default ({ isModalOpen }) => {
 
                 }
                 )
-
+                
                 sectionData = sectionData.filter(f => f)
+                GetSectionInfo(sectionData);
                 setData(sectionData);
             });
     }, [needToLoadSections]);
+
+    const GetSectionInfo = (sectionData) => {  
+        const expandableFoldersIds = [];
+
+        for (let i = 0; i < sectionData.length; i++) {
+            const child = sectionData[i];
+
+            if (child.children && child.children > 0) {
+                expandableFoldersIds.push(child.id);
+                GetSectionInfoRecursive(sectionData[i], expandableFoldersIds);
+            }
+        }
+
+        setExpandablefolders(expandableFoldersIds);
+    }
+    
+    const GetSectionInfoRecursive = (item, expandableFoldersIds) => {
+        for (let i = 0; i < item.children.length; i++) {
+            const child = item.children[i];
+
+            if (child.children && child.children > 0) {
+                expandableFoldersIds.push(child.id);
+                GetSectionInfoRecursive(child, expandableFoldersIds);
+            }
+        }
+    }
 
     const renderTree = (nodes) => {
         return (
@@ -246,11 +481,11 @@ export default ({ isModalOpen }) => {
     const renderTree1 = (nodes) => {
         return (
             nodes && (
-            <TreeItem key={nodes.id} nodeId={nodes.id.toString()} label={
+            <TreeItem id={nodes.id} key={nodes.id} nodeId={nodes.id?.toString()} label={
                 <div className='float-child-document-tree-item'>
                     <div className='float-child-document-tree-icon'><FontAwesomeIcon icon={getDocumentItem(nodes)} /></div>
                     <div className='float-child-document-tree-label' 
-                        data-for={nodes.id.toString()}
+                        data-for={nodes.id?.toString()}
                         data-tip={nodes.documentNumber + ' ' + nodes.text}
                         data-iscapture="true"     
                     >
@@ -258,7 +493,7 @@ export default ({ isModalOpen }) => {
                             <b>{nodes.documentNumber}</b>{' ' + nodes.text}
                         </div> 
                         <ReactTooltip
-                            id={nodes.id.toString()}
+                            id={nodes.id?.toString()}
                             type="light"
                             effect="solid"
                             border={true}
@@ -508,63 +743,91 @@ export default ({ isModalOpen }) => {
                         <div className="float-container">
                             <div className="float-container-row">
                                 <Split className="split">
-                                <div className="float-child-section">
-                                    <h5>Sections</h5>
-                                    <div className="float-child-section-tree">
-                                    <TreeView
-                                        aria-label="rich object"
-                                        sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-                                        defaultCollapseIcon={<ExpandLessIcon />}
-                                        defaultExpandIcon={<ExpandMoreIcon />}                                    
-                                        onNodeSelect={(e, n) => {
-                                            setLoadingDocument(true)
-                                            fetch(documentUrl.replace('{sectionId}', n), {
-                                                method: "GET",
-                                                headers: { "Authorization": `Bearer ${token}` }
-                                            }).then(res => res.json())
-                                                .then(json => {
-                                                    setAllDocs(json);
-                                                    setScrollDefaults(json);
-                                                    //setTopHeight("'0px';");
-                                                    //setBotHeight("'" + ((json.length - 100) * 40) + "px';");
-                                                    setLoadingDocument(false)
-                                                });
-                                        }}
-                                    >
-                                        {data.map(m => renderTree(m))}
-                                    </TreeView>
+                                    <div className="float-child-section">
+                                        <div className="float-child-header">
+                                            <div className="float-child-header-row">
+                                                <h5>Sections</h5>           
+                                                <div>
+                                                    <IconButton onClick={expandAllFolder}>
+                                                        <KeyboardDoubleArrowDownIcon />
+                                                    </IconButton>
+                                                    <IconButton onClick={collaspeAllFolder}>
+                                                        <KeyboardDoubleArrowUpIcon />
+                                                    </IconButton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="float-child-section-tree">
+                                            <TreeView
+                                                aria-label="rich object"
+                                                expanded={expandedFolder}
+                                                sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+                                                defaultCollapseIcon={<ExpandLessIcon />}
+                                                defaultExpandIcon={<ExpandMoreIcon />}                                    
+                                                onNodeSelect={(e, n) => {
+                                                    setDocs([]);
+                                                    setBotHeight('50%')
+                                                    setLoadingDocument(true);
+                                                    fetch(documentUrl.replace('{sectionId}', n), {
+                                                        method: "GET",
+                                                        headers: { "Authorization": `Bearer ${token}` }
+                                                    }).then(res => res.json())
+                                                        .then(json => {
+                                                            setAllDocs(json);
+                                                            setScrollDefaults(json);
+                                                            documentElement.current.scrollTop = 0;
+                                                            setLoadingDocument(false)
+                                                        });
+                                                }}
+                                            >
+                                                {data.map(m => renderTree(m))}
+                                            </TreeView>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="float-child-document">
-                                    <h5>Documents</h5>
-                                    <div className="float-child-document-tree" onScroll={onDocumentScroll} ref={documentElement}>
-                                        <div ref={topElement}></div>   
-                                        {
-                                            loadingDocument && <div style={{ height: '100%' }}><Loading /></div>
-                                        }
-                              
-                                        <TreeView
-                                            style={{ width: '100%', height: 'auto', display:  loadingDocument ? 'hidden' :'block' }}
-                                            aria-label="rich object 2"
-                                            sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-                                            defaultCollapseIcon={<ExpandLessIcon />}
-                                            defaultExpandIcon={<ExpandMoreIcon />}
-                                            onNodeSelect={(e, n) => {
+                                    <div className="float-child-document">                                    
+                                        <div className="float-child-header">
+                                            <div className="float-child-header-row">
+                                                <h5>Documents</h5>           
+                                                <div>
+                                                    <IconButton onClick={expandAllDocument}>
+                                                        <KeyboardDoubleArrowDownIcon />
+                                                    </IconButton>
+                                                    <IconButton onClick={collaspeAllDocument}>
+                                                        <KeyboardDoubleArrowUpIcon />
+                                                    </IconButton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="float-child-document-tree" onScroll={onDocumentScroll} ref={documentElement}>
+                                            <div className="float-child-document-tree-container" ref={botElement}>
+                                            {
+                                                loadingDocument && <div style={{ height: '100%' }}><Loading /></div>
+                                            }
+                                                <TreeView
+                                                    ref={topElement}
+                                                    expanded={expanded}
+                                                    style={{ width: '100%', height: 'auto', display:  loadingDocument ? 'hidden' :'block' }}
+                                                    aria-label="rich object 2"
+                                                    sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+                                                    defaultCollapseIcon={<ExpandLessIcon />}
+                                                    defaultExpandIcon={<ExpandMoreIcon />}
+                                                    onNodeToggle={collaspe}
+                                                    onNodeSelect={(e, n) => {
 
-                                                let selectedDoc = findNodeInDocs(docs, n);
-                                                // if (selectedDoc.children && selectedDoc.children.length > 0) {
-                                                //     return;
-                                                // }
+                                                        let selectedDoc = findNodeInDocs(docs, n);
+                                                        // if (selectedDoc.children && selectedDoc.children.length > 0) {
+                                                        //     return;
+                                                        // }
 
-                                                setSelectedDocumentInfo({ id: n, title: selectedDoc.text, documentNumber: selectedDoc.documentNumber, type: selectedDoc.documentType })
+                                                        setSelectedDocumentInfo({ id: n, title: selectedDoc.text, documentNumber: selectedDoc.documentNumber, type: selectedDoc.documentType })
 
-                                            }}
-                                        >
-                                            {docs.map( m => renderTree1(m))}
-                                        </TreeView>   
-                                        <div ref={botElement}></div>   
-                                    </div> 
-                                </div>
+                                                    }}
+                                                >
+                                                    {docs.map( m => renderTree1(m))}
+                                                </TreeView>  
+                                            </div> 
+                                        </div> 
+                                    </div>
                                 </Split>
                             </div>
                         </div>
