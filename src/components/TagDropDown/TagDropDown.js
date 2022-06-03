@@ -89,6 +89,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    marginRight: '5px',
   };
 
   const customStyles = {
@@ -170,7 +171,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
   const setAndCheckCreatableDropDown = options => {
     let newOptions = [];
     if (creatable) {
-      newOptions = [noTagOption, ...options, createTagOption];
+      newOptions = [...options, createTagOption];
       setTagOptions(newOptions);
     } else {
       setTagOptions(options);
@@ -293,7 +294,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
           }
           ref={dropDownRef}
           placeholder={placeholder}
-          defaultValue={creatable ? noTagOption : (defaultTag && defaultTag.value ? defaultTag : selectedTags)}
+          defaultValue={creatable ? null : (defaultTag && defaultTag.value ? defaultTag : selectedTags)}
           isSearchable
           isClearable={creatable ? false : true}
           options={tagOptions}
