@@ -1,6 +1,6 @@
 //customization-new-file
 import React, { Component, useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
-import Select from 'react-select';
+import Select, { components, SingleValue, MultiValue } from 'react-select';
 import { SketchPicker } from 'react-color';
 import actions from 'actions';
 import selectors from 'selectors';
@@ -33,8 +33,8 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     ]
   );
 
-  createTagUrl = createTagUrl ? createTagUrl : `${defaultBaseUrlAddress}/api/bundle/jobtag/664`;
-  getTagsUrl = getTagsUrl ? getTagsUrl : `${defaultBaseUrlAddress}/api/bundle/jobtag/664`;
+  createTagUrl = createTagUrl ? createTagUrl : `${defaultBaseUrlAddress}/api/bundle/jobtag/1`;
+  getTagsUrl = getTagsUrl ? getTagsUrl : `${defaultBaseUrlAddress}/api/bundle/jobtag/1`;
 
   const noTagOption = { value: 'no-tag', label: 'No tag' };
   const createTagOption = { value: 'create-tag', label: 'Create new tag...' };
@@ -221,10 +221,29 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     }).then(r => setShowTagCreateForm(false));
   };
 
+  const addData = props => {
+    return props.data.value;
+  };
+
+  const SingleValue = ({
+    children,
+    ...props
+  }) => (
+    <components.SingleValue{...props}>{children}<hidden class='selected-tag' data-id={addData(props)}></hidden></components.SingleValue>
+  );
+  
+  const MultiValue = ({
+    children,
+    ...props
+  }) => (
+    <components.SingleValue{...props}>{children}<hidden class='selected-tag' data-id={addData(props)}></hidden></components.SingleValue>
+  );
+
   return (
     showElement && (
-      <div className="custom-select" style={{ width: controlWidth ? controlWidth : '200px' }}>
+      <div className="custom-select" data-element="tagSelectBox" style={{ width: controlWidth ? controlWidth : '200px' }}>
         <Select
+          components={{ SingleValue, MultiValue }}
           onChange={(option, { action }) => {
             if (creatable) {
               if (action === 'select-option') {
