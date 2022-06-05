@@ -36,7 +36,6 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
   createTagUrl = createTagUrl ? createTagUrl : `${defaultBaseUrlAddress}/api/bundle/jobtag/1`;
   getTagsUrl = getTagsUrl ? getTagsUrl : `${defaultBaseUrlAddress}/api/bundle/jobtag/1`;
 
-  const noTagOption = { value: 'no-tag', label: 'No tag' };
   const createTagOption = { value: 'create-tag', label: 'Create new tag...' };
 
   const dropDownRef = useRef();
@@ -48,6 +47,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
   const [tagColor, setTagColor] = useState('');
   const [showElement, setShowElement] = useState(false);
   const [previousOptions, setPreviousOptions] = useState([]);
+  const [noTagOption, setNoTagOption] = useState({ value: 'no-tag', label: 'No tag' });
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -175,17 +175,29 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
   };
 
   const setAndCheckCreatableDropDown = options => {
+    let noTag = noTagOption;
     let newOptions = [...options];
 
-    if (creatable || setDropDownChanged !== undefined) {
-      if (selectedOption.length == 0) {
-        setSelectedOption([noTagOption]);
-        setPreviousOptions([noTagOption]);
+    console.log({options, selectedOption})
+ 
+    if (options && options.some(e => e.label === 'No Tag')) {   
+      noTag = options.find(e => e.label === 'No Tag');
+      setNoTagOption(noTag);
+
+      if (creatable && selectedOption.length > 0 && selectedOption[0].value === noTagOption.value) {
+        selectedOption[0] = noTag;
       }
     }
 
-    if (!newOptions.some(e => e.value === noTagOption.value)) {      
-      newOptions.unshift(noTagOption);
+    if (creatable || setDropDownChanged !== undefined) {
+      if (selectedOption.length == 0) {
+        setSelectedOption([noTag]);
+        setPreviousOptions([noTag]);
+      }
+    }
+
+    if (!newOptions.some(e => e.value === noTag.value)) {      
+      newOptions.unshift(noTag);
     }
 
     if (creatable) {
@@ -264,16 +276,12 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
         <Select
           components={{ SingleValue, MultiValue }}
           onChange={(option, { action }) => {
+            
             if (!option) {
               option = [];
             }
 
             setSelectedOption(option);
-
-            let selectedOption = (option
-              .filter(x => !previousOptions.includes(x))
-              .concat(previousOptions.filter(x => !option.includes(x))))[0];
-            setPreviousOptions(option);
 
             if (creatable) {
               if (action === 'select-option') {
@@ -312,13 +320,18 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
                 dispatch(actions.setDefaultTag(option));
               }
             } else {
+              let selectedOption = (option
+                .filter(x => !previousOptions.includes(x))
+                .concat(previousOptions.filter(x => !option.includes(x))))[0];
+              setPreviousOptions(option);
+
               if (setDropDownChanged !== undefined) {
                 if (action === 'clear' || selectedOption.value == noTagOption.value) {
                   setSelectedOption([noTagOption]);
                   setSelectedTags([noTagOption]);
                   setPreviousOptions([noTagOption]);
                 } else {
-                  if (option.some(e => e.value === noTagOption.value)) {
+                  if (option && option.some(e => e.value === noTagOption.value)) {
                     option = option.filter(i => i.value !== noTagOption.value);
             
                     setSelectedOption(option);

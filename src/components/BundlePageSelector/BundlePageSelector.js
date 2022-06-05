@@ -105,6 +105,8 @@ export default ({ isModalOpen }) => {
     const SetSectionMap = (json) => {   
         documentScroll.sections.clear();
         documentScroll.sectionGroupChildOffset.clear();
+        documentScroll.sectionGroupChildOffsetCollasped.clear();
+        documentScroll.sectionGroupChildOffsetExpanded.clear();
         
         let group = 1;
         let count = 1;
@@ -137,7 +139,9 @@ export default ({ isModalOpen }) => {
             documentScroll.sectionMap.set(item.id.toString(), item)
 
             childOffset += item.descendants;
-            documentScroll.sectionGroupChildOffset.set(group, childOffset);
+            documentScroll.sectionGroupChildOffset.set(group, row - 1);
+            documentScroll.sectionGroupChildOffsetCollasped.set(group, row - 1);
+            documentScroll.sectionGroupChildOffsetExpanded.set(group, childOffset);
         
             if ((count - 1) % sectionSize === 0) {
                 row = 1;
@@ -251,6 +255,7 @@ export default ({ isModalOpen }) => {
         
         documentScroll.expanded = documentScroll.sectionMap.size - documentScroll.json.length;
         documentScroll.expandedList = [];
+        documentScroll.sectionGroupChildOffset = new Map(documentScroll.sectionGroupChildOffsetExpanded);
 
         let containerHeight = (documentScroll.sectionMap.size) * elementHeight;
 
@@ -265,6 +270,7 @@ export default ({ isModalOpen }) => {
         setExpanded([])
         documentScroll.expanded = 0;
         documentScroll.expandedList = [];
+        documentScroll.sectionGroupChildOffset = new Map(documentScroll.sectionGroupChildOffsetCollasped);
 
         let containerHeight = (documentScroll.json.length) * elementHeight;
 
@@ -277,10 +283,14 @@ export default ({ isModalOpen }) => {
 
     const expandAllFolder = () => {
         setExpandedFolder(expandableFolders);
+
+        // Set all sections to +decentdants
     };
 
     const collaspeAllFolder = () => {
         setExpandedFolder([]);
+
+        //Reset all sections back to normal.
     };
 
     const setTopHeight = (height) => {
@@ -344,6 +354,8 @@ export default ({ isModalOpen }) => {
         maxIndex: 0,
         sections: new Map(),
         sectionGroupChildOffset: new Map(),
+        sectionGroupChildOffsetCollasped: new Map(),
+        sectionGroupChildOffsetExpanded: new Map(),
         sectionMap: new Map(),
         expanded: 0,
         expandedList: [],
