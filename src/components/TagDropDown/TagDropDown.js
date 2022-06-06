@@ -39,9 +39,8 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
   const createTagOption = { value: 'create-tag', label: 'Create new tag...' };
 
   const dropDownRef = useRef();
-  selectedOption
-  const [selectedOption, setSelectedOption] = useState([]);
   const [tagOptions, setTagOptions] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState(selectedTags);
   const [showTagCreateForm, setShowTagCreateForm] = useState(false);
   const [tagName, setTagName] = useState('');
   const [tagColor, setTagColor] = useState('');
@@ -174,25 +173,40 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     setTagColor(color.hex);
   };
 
+  const setTags = (options) => {
+    setSelectedOptions(options);
+
+    if (setSelectedTags) {
+      setSelectedTags(options);
+    }
+  }
+
   const setAndCheckCreatableDropDown = options => {
     let noTag = noTagOption;
     let newOptions = [...options];
 
-    console.log({options, selectedOption})
- 
     if (options && options.some(e => e.label === 'No Tag')) {   
       noTag = options.find(e => e.label === 'No Tag');
       setNoTagOption(noTag);
 
-      if (creatable && selectedOption.length > 0 && selectedOption[0].value === noTagOption.value) {
-        selectedOption[0] = noTag;
+      if (creatable && selectedOptions !== undefined && selectedOptions.length > 0 && selectedOptions[0].value === noTagOption.value) {
+        selectedOptions[0] = noTag;
       }
     }
 
-    if (creatable || setDropDownChanged !== undefined) {
-      if (selectedOption.length == 0) {
-        setSelectedOption([noTag]);
+    if (selectedOptions === undefined || selectedOptions.length == 0) {
+      if (creatable) {
+        setTags([noTag]);
         setPreviousOptions([noTag]);
+      } else if (setDropDownChanged !== undefined) {
+        if (defaultTag && defaultTag.value) {
+          setTags([defaultTag]);
+          setPreviousOptions([defaultTag]);
+        } 
+        else {
+          setTags([noTag]);
+          setPreviousOptions([noTag]);
+        }   
       }
     }
 
@@ -240,14 +254,19 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
       if (res.status === 200) {
         let id = await res.json();
 
-        let newTagOptionState = {
-          loaded: tagOptionsState.loaded, options: [...tagOptionsState.options, {
-            label: tagName,
-            value: `${id}-${tagColor}`,
-          }]
+        const newTag = {
+          label: tagName,
+          value: `${id}-${tagColor}`,
         };
 
-        dispatch(actions.setTagOptions(newTagOptionState));
+        let newTagOptionState = {
+          loaded: tagOptionsState.loaded, 
+          options: [...tagOptionsState.options, newTag]
+        };
+  
+        setTags([newTag]);
+        OnChangeCreatableOptionEvent(newTag);
+        dispatch(actions.setTagOptions(newTagOptionState));  
       }
     }).then(r => setShowTagCreateForm(false));
   };
@@ -270,6 +289,42 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     <components.SingleValue{...props}>{children}<hidden class='selected-tag' data-id={addData(props)}></hidden></components.SingleValue>
   );
 
+  const OnChangeCreatableOptionEvent = (option) => {
+    if (option.value === 'create-tag') {
+      setShowTagCreateForm(true);
+      return;
+    }
+    if (option.value === 'no-tag') {
+      dispatch(actions.setDefaultTag({}));
+      return;
+    }
+    let toolNames = ['AnnotationCreateTextHighlight',
+      'AnnotationCreateEllipse',
+      'AnnotationCreateRectangle',
+      'AnnotationCreateLine',
+      'AnnotationCreateFreeHand',
+      'AnnotationCreateFreeHandHighlight',
+      'AnnotationCreatePolygon',
+      'AnnotationCreatePolygonCloud',
+      'AnnotationCreatePolyline',
+      'AnnotationCreateArrow',
+      'AnnotationCreateFreeText',
+      'AnnotationCreateTextUnderline',
+      'AnnotationCreateTextStrikeout',
+      'AnnotationCreateTextSquiggly',
+      'AnnotationCreateSticky'];
+    let color = new window.Annotations.Color(option.value.split('-')[1]);
+    toolNames.forEach(toolName => {
+      if (toolName === 'AnnotationCreateFreeText') {
+        setToolStyles(toolName, 'TextColor', color);
+      } else {
+        setToolStyles(toolName, 'StrokeColor', color);
+      }
+    });
+
+    dispatch(actions.setDefaultTag(option));
+  }
+
   return (
     showElement && (
       <div className="custom-select" data-element="tagSelectBox" style={{ width: controlWidth ? controlWidth : '200px' }}>
@@ -281,43 +336,11 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
               option = [];
             }
 
-            setSelectedOption(option);
+            setTags(option);
 
             if (creatable) {
               if (action === 'select-option') {
-                if (option.value === 'create-tag') {
-                  setShowTagCreateForm(true);
-                  return;
-                }
-                if (option.value === 'no-tag') {
-                  dispatch(actions.setDefaultTag({}));
-                  return;
-                }
-                let toolNames = ['AnnotationCreateTextHighlight',
-                  'AnnotationCreateEllipse',
-                  'AnnotationCreateRectangle',
-                  'AnnotationCreateLine',
-                  'AnnotationCreateFreeHand',
-                  'AnnotationCreateFreeHandHighlight',
-                  'AnnotationCreatePolygon',
-                  'AnnotationCreatePolygonCloud',
-                  'AnnotationCreatePolyline',
-                  'AnnotationCreateArrow',
-                  'AnnotationCreateFreeText',
-                  'AnnotationCreateTextUnderline',
-                  'AnnotationCreateTextStrikeout',
-                  'AnnotationCreateTextSquiggly',
-                  'AnnotationCreateSticky'];
-                let color = new window.Annotations.Color(option.value.split('-')[1]);
-                toolNames.forEach(toolName => {
-                  if (toolName === 'AnnotationCreateFreeText') {
-                    setToolStyles(toolName, 'TextColor', color);
-                  } else {
-                    setToolStyles(toolName, 'StrokeColor', color);
-                  }
-                });
-
-                dispatch(actions.setDefaultTag(option));
+                OnChangeCreatableOptionEvent(option);
               }
             } else {
               let selectedOption = (option
@@ -327,15 +350,13 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
 
               if (setDropDownChanged !== undefined) {
                 if (action === 'clear' || selectedOption.value == noTagOption.value) {
-                  setSelectedOption([noTagOption]);
-                  setSelectedTags([noTagOption]);
+                  setTags([noTagOption]);
                   setPreviousOptions([noTagOption]);
                 } else {
                   if (option && option.some(e => e.value === noTagOption.value)) {
                     option = option.filter(i => i.value !== noTagOption.value);
             
-                    setSelectedOption(option);
-                    setSelectedTags(option);
+                    setTags(option);
                     setPreviousOptions(option);
                   }
                 }
@@ -343,13 +364,13 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
                 setDropDownChanged(true);
               }
               if (setSelectedTags) {
-                setSelectedTags(option);
+                setTags(option);
               }
             }
           }
           }
           ref={dropDownRef}
-          value={selectedOption}
+          value={selectedOptions}
           placeholder={placeholder}
           defaultValue={creatable ? [] : (defaultTag && defaultTag.value ? defaultTag : selectedTags)}
           isSearchable
