@@ -33,13 +33,18 @@ import { FormLabel } from '@mui/material';
 import { TextField } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Select from 'react-select';
 import Switch from 'components/Switch';
 import { getAnnotationClass, getAnnotationClassForFilterModal } from 'helpers/getAnnotationClass';
 import TagDropDown from 'components/TagDropDown';
 import QueryBuilder from 'components/QueryBuilder';
 import { ConstructionOutlined } from '@mui/icons-material';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarDays } from '@fortawesome/free-solid-svg-icons';
+
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 
 //customization
 const hidden = [];
@@ -178,7 +183,7 @@ const FilterAnnotModal = () => {
           // debugger
         }
 
-        if (isFromCommentDatePickerShown && fromCommentDate !== '' && fromCommentDate !== "yyyy-mm-dd") {
+        if (isFromCommentDatePickerShown && fromCommentDate !== null && fromCommentDate !== '' && fromCommentDate !== "yyyy-mm-dd") {
           if (annotCommentDate !== "" && annotCommentDate != null) {
             fromCommentDateApply = annotCommentDate < fromCommentDate;
           } else {
@@ -186,7 +191,7 @@ const FilterAnnotModal = () => {
           }
         }
 
-        if (isToCommentDatePickerShown && toCommentDateRange !== '' && toCommentDateRange !== "yyyy-mm-dd") {
+        if (isToCommentDatePickerShown && toCommentDateRange !== null && toCommentDateRange !== '' && toCommentDateRange !== "yyyy-mm-dd") {
           if (annotCommentDate !== "" && annotCommentDate != null) {
             toCommentDateApply = annotCommentDate > toCommentDateRange;
           } else {
@@ -203,7 +208,7 @@ const FilterAnnotModal = () => {
           //debugger
         }
 
-        if (isFromAttributeDatePickerShown && fromAttributeDate !== '' && fromAttributeDate !== "yyyy-mm-dd") {
+        if (isFromAttributeDatePickerShown && fromAttributeDate !== null && fromAttributeDate !== '' && fromAttributeDate !== "yyyy-mm-dd") {
           if (annotAttributeDate !== "" && annotAttributeDate != null) {
             fromAttributeDateApply = annotAttributeDate < fromAttributeDate;
           } else {
@@ -211,7 +216,7 @@ const FilterAnnotModal = () => {
           }
         }
 
-        if (isToAttributeDatePickerShown && toAttributeDateRange !== '' && toAttributeDateRange !== "yyyy-mm-dd") {
+        if (isToAttributeDatePickerShown && toAttributeDateRange !== null && toAttributeDateRange !== '' && toAttributeDateRange !== "yyyy-mm-dd") {
           if (annotAttributeDate !== "" && annotAttributeDate != null) {
             toAttributeDateApply = annotAttributeDate > toAttributeDateRange;
           } else {
@@ -646,38 +651,39 @@ const FilterAnnotModal = () => {
               <p>Comment date</p>
             </div>
             <div className='date-cell'>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker
-                  inputFormat="yyyy-MM-dd"
-                  value={fromCommentDate}  
-                  maxDate={toCommentDate}
-                  onChange={(newValue) => {
-                    setFromCommentDate(newValue);  
-                    setFromCommentDateRange(newValue);
-                    setIsFromCommentDatePickerShown(true);
-                  }}
-                  renderInput={(params) => <TextField {...params} helperText={null} />}
-                />
-              </LocalizationProvider>
+              <div className="date-field">
+                  <DatePicker
+                    placeholderText="yyyy-mm-dd"
+                    dateFormat="yyyy-MM-dd"
+                    selected={fromCommentDate}
+                    maxDate={toCommentDate}
+                    onChange={newValue => {
+                      setFromCommentDate(newValue);  
+                      setFromCommentDateRange(newValue);
+                      setIsFromCommentDatePickerShown(true);
+                    }}
+                  />
+                  <FontAwesomeIcon icon={faCalendarDays} />
+                </div>
             </div>
             <div className='date-cell-seperator'>
               <p>➞</p>
             </div>
             <div className='date-cell'>
-
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DatePicker
-                    value={toCommentDate}  
+              <div className="date-field">
+                <DatePicker
+                    placeholderText="yyyy-mm-dd"
                     minDate={fromCommentDate}
-                    inputFormat="yyyy-MM-dd"
-                    onChange={(newValue) => {
+                    dateFormat="yyyy-MM-dd"
+                    selected={toCommentDate}
+                    onChange={newValue => {
                       setToCommentDate(newValue);    
                       setToCommentDateRange(newValue);                    
                       setIsToCommentDatePickerShown(true);
                     }}
-                    renderInput={(params) => <TextField {...params} helperText={null} />}
                   />
-                </LocalizationProvider>
+                  <FontAwesomeIcon icon={faCalendarDays} />
+                </div>
             </div>
           </div>
           <div className='date-row'>
@@ -685,38 +691,39 @@ const FilterAnnotModal = () => {
               <p>Attributed date</p>
             </div>
             <div className='date-cell'>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <div className="date-field">
                 <DatePicker
-                  value={fromAttributeDate}  
-                  maxDate={toAttributeDate}
-                  inputFormat="yyyy-MM-dd"
-                  onChange={(newValue) => {
-                    setFromAttributeDate(newValue);  
-                    setFromAttributeDateRange(newValue);                    
-                    setIsFromAttributeDatePickerShown(true);  
-                  }}
-                  renderInput={(params) => <TextField {...params} helperText={null} />}
-                />
-              </LocalizationProvider>
+                    placeholderText="yyyy-mm-dd"
+                    dateFormat="yyyy-MM-dd"
+                    maxDate={toAttributeDate}
+                    selected={fromAttributeDate}
+                    onChange={newValue => {
+                      setFromAttributeDate(newValue);  
+                      setFromAttributeDateRange(newValue);                    
+                      setIsFromAttributeDatePickerShown(true);  
+                    }}
+                  />
+                  <FontAwesomeIcon icon={faCalendarDays} />
+              </div>
             </div>
             <div className='date-cell-seperator'>
               <p>➞</p>
             </div>
             <div className='date-cell'>
-
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DatePicker
-                    value={toAttributeDate}  
+              <div className="date-field">
+                <DatePicker
+                    placeholderText="yyyy-mm-dd"
+                    dateFormat="yyyy-MM-dd"
+                    selected={toAttributeDate}
                     minDate={fromAttributeDate}
-                    inputFormat="yyyy-MM-dd"
-                    onChange={(newValue) => {
+                    onChange={newValue => {
                       setToAttributeDate(newValue);   
                       setToAttributeDateRange(newValue);                    
-                      setIsToAttributeDatePickerShown(true); 
+                      setIsToAttributeDatePickerShown(true);  
                     }}
-                    renderInput={(params) => <TextField {...params} helperText={null} />}
                   />
-                </LocalizationProvider>
+                  <FontAwesomeIcon icon={faCalendarDays} />
+              </div>
             </div>
           </div>
         </div>
