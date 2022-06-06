@@ -681,7 +681,7 @@ const FilterAnnotModal = () => {
           </div>
           <div className='date-row'>
             <div className='date-cell-header'>
-              <p>Attibuted date</p>
+              <p>Attributed date</p>
             </div>
             <div className='date-cell'>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
