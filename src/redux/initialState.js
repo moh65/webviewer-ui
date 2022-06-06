@@ -652,7 +652,7 @@ export default {
         ],
       },
       redactonBurninDateUrl: '',
-      defaultUrlBaseAddress: 'https://legalstore.poc.fileman.com.au/bundle'
+      defaultUrlBaseAddress: 'https:/https://legalstore.poc.fileman.com.au/bundle/'
     },
     //customization
   },

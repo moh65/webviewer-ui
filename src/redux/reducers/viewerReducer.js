@@ -407,6 +407,8 @@ export default initialState => (state = initialState, action) => {
       return { ...state, customized: { ...state.customized, tagOptions: payload.tagOptions } };
     case 'SET_REDACTION_BURNIN_DATE_URL':
       return { ...state, customized: { ...state.customized, redactonBurninDateUrl: payload.redactonBurninDateUrl } };
+    case 'SET_DEFAULT_URL_BASE_ADDRESS':
+      return { ...state, customized: { ...state.customized, defaultUrlBaseAddress: payload.defaultUrlBaseAddress } };
 
     //customization
 

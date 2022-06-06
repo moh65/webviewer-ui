@@ -10,7 +10,8 @@ export default store => (sectionUrl,
     documentPagesUrl,
     loadDocumentInNewTabUrl,
     metadataTypeUrl,
-    redactionBurninDateUrl) => {
+    redactionBurninDateUrl,
+    defaultUrlBaseAddress) => {
 
     store.dispatch(actions.setSectionUrl(sectionUrl));
 
@@ -31,4 +32,6 @@ export default store => (sectionUrl,
     store.dispatch(actions.setMetadataTypeUrl(metadataTypeUrl));
 
     store.dispatch(actions.setRedactionBurninDateUrl(redactionBurninDateUrl));
+
+    store.dispatch(actions.setdefaultUrlBaseAddress(defaultUrlBaseAddress));
 };

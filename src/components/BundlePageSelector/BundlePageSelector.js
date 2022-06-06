@@ -558,7 +558,7 @@ export default ({ isModalOpen }) => {
         highlight.Opacity = 0;
         highlight.Quads = quads;
         highlight.Author = core.getCurrentUser();
-        highlight.setContents(text);
+        //highlight.setContents(text);
         highlight.setCustomData('trn-annot-preview', text);
 
         linkAnnotArray.forEach((link, index) => {
