@@ -175,7 +175,7 @@ const FilterAnnotModal = () => {
         let annotCommentDate = annot['wN'];
 
         if (annotCommentDate !== "") {
-          debugger
+          // debugger
         }
 
         if (isFromCommentDatePickerShown && fromCommentDate !== '' && fromCommentDate !== "yyyy-mm-dd") {
@@ -200,7 +200,7 @@ const FilterAnnotModal = () => {
         let annotAttributeDate = annot.getCustomData('custom-date');
 
         if (annotAttributeDate !== "") {
-          debugger
+          //debugger
         }
 
         if (isFromAttributeDatePickerShown && fromAttributeDate !== '' && fromAttributeDate !== "yyyy-mm-dd") {
@@ -253,8 +253,9 @@ const FilterAnnotModal = () => {
           let filteredTagValues = filteredTags.map(t => t.value.split('-')[0]);
 
           let commonValues = filteredTagValues.filter((n) => tag.indexOf(n) !== -1);
-          filteredTagShouldApply = commonValues.length > 0 ? false : true;
+          const containsNo = filteredTagValues.some(i => i === 'no');
 
+          filteredTagShouldApply = (tag.length === 0 && containsNo) || commonValues.length > 0 ? false : true;
         }
 
         //customization

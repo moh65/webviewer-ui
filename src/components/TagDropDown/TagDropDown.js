@@ -36,16 +36,18 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
   createTagUrl = createTagUrl ? createTagUrl : `${defaultBaseUrlAddress}/api/bundle/jobtag/1`;
   getTagsUrl = getTagsUrl ? getTagsUrl : `${defaultBaseUrlAddress}/api/bundle/jobtag/1`;
 
-  const noTagOption = { value: 'no-tag', label: 'No tag' };
   const createTagOption = { value: 'create-tag', label: 'Create new tag...' };
 
   const dropDownRef = useRef();
-
+  selectedOption
+  const [selectedOption, setSelectedOption] = useState([]);
   const [tagOptions, setTagOptions] = useState([]);
   const [showTagCreateForm, setShowTagCreateForm] = useState(false);
   const [tagName, setTagName] = useState('');
   const [tagColor, setTagColor] = useState('');
   const [showElement, setShowElement] = useState(false);
+  const [previousOptions, setPreviousOptions] = useState([]);
+  const [noTagOption, setNoTagOption] = useState({ value: 'no-tag', label: 'No tag' });
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -152,7 +154,11 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     singleValue: (provided, state) => {
       const bgColor = state.data.value.split('-')[1];
       if (state.data.value === 'no-tag') {
-        return { ...provided };
+        return { 
+          ...valueStyles,
+          ...labelStyles,
+          maxWidth: '95%',
+        };
       }
       return {
         ...valueStyles,
@@ -169,12 +175,36 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
   };
 
   const setAndCheckCreatableDropDown = options => {
-    let newOptions = [];
+    let noTag = noTagOption;
+    let newOptions = [...options];
+
+    console.log({options, selectedOption})
+ 
+    if (options && options.some(e => e.label === 'No Tag')) {   
+      noTag = options.find(e => e.label === 'No Tag');
+      setNoTagOption(noTag);
+
+      if (creatable && selectedOption.length > 0 && selectedOption[0].value === noTagOption.value) {
+        selectedOption[0] = noTag;
+      }
+    }
+
+    if (creatable || setDropDownChanged !== undefined) {
+      if (selectedOption.length == 0) {
+        setSelectedOption([noTag]);
+        setPreviousOptions([noTag]);
+      }
+    }
+
+    if (!newOptions.some(e => e.value === noTag.value)) {      
+      newOptions.unshift(noTag);
+    }
+
     if (creatable) {
-      newOptions = [...options, createTagOption];
+      newOptions.push(createTagOption);
       setTagOptions(newOptions);
     } else {
-      setTagOptions(options);
+      setTagOptions(newOptions);
     }
   };
 
@@ -246,6 +276,13 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
         <Select
           components={{ SingleValue, MultiValue }}
           onChange={(option, { action }) => {
+            
+            if (!option) {
+              option = [];
+            }
+
+            setSelectedOption(option);
+
             if (creatable) {
               if (action === 'select-option') {
                 if (option.value === 'create-tag') {
@@ -283,7 +320,26 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
                 dispatch(actions.setDefaultTag(option));
               }
             } else {
-              if (setDropDownChanged) {
+              let selectedOption = (option
+                .filter(x => !previousOptions.includes(x))
+                .concat(previousOptions.filter(x => !option.includes(x))))[0];
+              setPreviousOptions(option);
+
+              if (setDropDownChanged !== undefined) {
+                if (action === 'clear' || selectedOption.value == noTagOption.value) {
+                  setSelectedOption([noTagOption]);
+                  setSelectedTags([noTagOption]);
+                  setPreviousOptions([noTagOption]);
+                } else {
+                  if (option && option.some(e => e.value === noTagOption.value)) {
+                    option = option.filter(i => i.value !== noTagOption.value);
+            
+                    setSelectedOption(option);
+                    setSelectedTags(option);
+                    setPreviousOptions(option);
+                  }
+                }
+
                 setDropDownChanged(true);
               }
               if (setSelectedTags) {
@@ -293,8 +349,9 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
           }
           }
           ref={dropDownRef}
+          value={selectedOption}
           placeholder={placeholder}
-          defaultValue={creatable ? null : (defaultTag && defaultTag.value ? defaultTag : selectedTags)}
+          defaultValue={creatable ? [] : (defaultTag && defaultTag.value ? defaultTag : selectedTags)}
           isSearchable
           isClearable={creatable ? false : true}
           options={tagOptions}

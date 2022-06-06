@@ -76,11 +76,16 @@
                     }
                     .date-buttons {
                         display: table;
-                        padding: 6px 0 6px 0;
+                        padding: 0px 0 0px 0;
+                        -webkit-border-vertical-spacing: 5px;
                         .date-row {
-                            display: table-row; 
+                            display: table-row;
+                            margin-top: 6px;
+                            line-height: 35px;
                             .date-cell {
                                 display: table-cell;
+                                height: 35px;
+                                margin-top: 6px;
                                 .MuiOutlinedInput-root {
                                     height: 35px;
                                     outline: none;
@@ -103,6 +108,10 @@
                                 width: 150px;
                                 vertical-align: middle;
                                 font-size: small;
+                                height: 35px;
+                                p {
+                                    margin-bottom: 0px !important;
+                                }
                             }
                             .date-cell-seperator {
                                 display: table-cell;
@@ -110,15 +119,21 @@
                                 font-size: x-large;
                                 vertical-align: middle;
                                 padding-left: 10px;
-                                padding-right: 10px
+                                padding-right: 10px;
+                                height: 35px;
+                                p {
+                                    height: 35px;
+                                    margin-bottom: 0px !important;
+                                }
                             }
                         }
                     }
                     .annotationTypes {
                         display: inline-flex;
-                        padding: 6px 0 6px 0;
+                        padding: 6px 0 0 0;
                         margin-left: -10px;
                         grid-template-columns: 100px 100px;
+                        height: 37px;
                         .annotationType {
                             margin-right: 30px !important;
                             .MuiCheckbox-root {

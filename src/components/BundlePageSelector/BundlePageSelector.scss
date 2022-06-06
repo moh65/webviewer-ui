@@ -21,11 +21,10 @@
     float: left;
     height: 430px;
     display: table-cell;
-    margin-bottom: 20px; 
-    margin-top: 25px;
+    margin-top: 20px;
     padding-right: 5px;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 5px;
+    padding-bottom: 35px;
         
     h5 {
         font-size: .875rem;
@@ -35,18 +34,18 @@
 ul[role="tree"]{
     display: block !important;
     width: 100% !important;
-    height: 100% !important;
+    position: relative;
 }
 
 .float-child-document {
     width: 60%;
     float: left;
     padding-left: 5px;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 5px;
+    padding-bottom: 35px;
     height: 430px;
     display: table-cell;
-    margin-top: 25px;
+    margin-top: 20px;
         
     h5 {
         font-size: .875rem;
@@ -87,7 +86,8 @@ ul[role="tree"]{
     position: unset !important;
     left: unset !important;
     top: unset !important;
-    margin: 10px; 
+    margin-top: 20px; 
+    margin-left: 20px;
     display: grid !important;
     justify-items: center;
     float: left;
@@ -112,7 +112,8 @@ ul[role="tree"]{
 
 .gallery-view {
     display: inline-flex;
-    height: fit-content !important;
+    //height: fit-content !important;
+
 }
 
 .gallery-outline {
@@ -120,7 +121,7 @@ ul[role="tree"]{
     border-width: 1px;
     border-radius: 5px;
     border-color: lightgray;
-    padding: 10px;
+    //padding: 10px;
     overflow-x: hidden;
     height: 400px !important;
 }
@@ -134,10 +135,15 @@ ul[role="tree"]{
 }
 
 .react-photo-gallery--gallery {
-    width: 100% !important;
+    width: 100% !important;   
+    overflow-y: scroll;
+    width: auto; 
     div {
         display: inline-flow;
-        height: fit-content !important;
+        height: 100% !important;
+        div:last-child {
+            margin-bottom: 20px;
+        }
     }
 }
 
@@ -226,9 +232,24 @@ ul[role="tree"]{
     border-radius: 5px;
 }
 
+.float-child-header {
+    display: table;
+    margin-bottom: 5px;
+    .float-child-header-row {
+        display: table-row;
+        div {
+            display: inline-flex;;
+            width: 85px;
+        }
+        h5 {
+            display: table-cell;
+            width: 100%;
+        }
+    }
+}
+
 ul[role=tree] {
     max-width: unset !important;
-    min-height: 100% !important;
     height: unset !important;
     padding: 5px;
 }
