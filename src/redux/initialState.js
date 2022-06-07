@@ -645,10 +645,11 @@ export default {
       tagOptions:{
         loaded: false,
         options:[
-          { label:'tag1', value:'1-#afafaf' },
-          { label:'tag2', value:'1-#1a2f4d' },
-          { label:'tag3', value:'1-#987654' },
-          { label:'This is an example of a really long tag name', value:'1-#D0021B' },
+          { label:'No Tag', value:'1-#b5b3b4' },
+          { label:'tag1', value:'2-#afafaf' },
+          { label:'tag2', value:'3-#1a2f4d' },
+          { label:'tag3', value:'4-#987654' },
+          { label:'This is an example of a really long tag name', value:'5-#D0021B' },
         ],
       },
       redactonBurninDateUrl: '',

@@ -44,12 +44,12 @@ const propTypes = {
 };
 
 const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextChange, isUnread, isNonReplyNoteRead, onReplyClicked }) => {
-  const [
+  let [
     noteDateFormat,
     iconColor,
     isNoteStateDisabled,
     language,
-    notesShowLastUpdatedDate
+    notesShowLastUpdatedDate,
   ] = useSelector(
     state => [
       selectors.getNoteDateFormat(state),
@@ -60,9 +60,6 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
     ],
     shallowEqual,
   );
-
-
-
 
   const { isSelected, searchInput, resize, pendingEditTextMap, onTopNoteContentClicked, sortStrategy } = useContext(
     NoteContext,
@@ -292,7 +289,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
       if (text === '') {
         return null;
       }
-      console.log('annotation = ' + annotation.Subject)
+
       return (
         <div className="selected-text-preview">
           <NoteTextPreview linesToBreak={1} annotation={annotation}>
@@ -350,17 +347,29 @@ const ContentArea = ({
   textAreaValue,
   onTextAreaValueChange
 }) => {
-  const [
+  let [
     autoFocusNoteOnAnnotationSelection,
     isMentionEnabled,
     isNotesPanelOpen,
-    defaultBaseUrlAddress
+    defaultBaseUrlAddress,   
+    currentDocumentInfo
   ] = useSelector(state => [
     selectors.getAutoFocusNoteOnAnnotationSelection(state),
     selectors.getIsMentionEnabled(state),
     selectors.isElementOpen(state, 'notesPanel'), ,
-    selectors.getDefaultUrlBaseAddress(state)
+    selectors.getDefaultUrlBaseAddress(state),
+    selectors.getThisDocumentInfo(state),
   ]);
+
+  currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
+    id: 4043,
+    title: 'Annette Wallis Atkins Costs Disclosure Signed',
+    dateFormat: 'dd-MM-yyyy',
+    timeFormat: 'HH:mm:ss'
+  };
+
+  currentDocumentInfo.displayDateFormat = '' + currentDocumentInfo.dateFormat.toLocaleUpperCase();
+  currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'dd').replace('YY', 'yy'); 
 
   let [redactionBurninDateUrl, token] = useSelector(state => [
     selectors.getRedactonBurninDateUrl(state),
@@ -435,7 +444,7 @@ const ContentArea = ({
   const linkAnnotation = allAnnotations.find(s => s.Subject === 'Link' && s.InReplyTo === annotation.Id);
 
   useEffect(() => {
-    if (noteDate !== null) {
+    if (noteDate !== null && noteDate !== undefined && noteDate !== "" && noteDate !== "null") {
       setShowDateField(true);
     }
   }, [noteDate]);
@@ -494,18 +503,30 @@ const ContentArea = ({
               label="Add Date"
               className="mb-10"
               checked={showDateField}
-              onChange={() => setShowDateField(!showDateField)}
+              onChange={() => {
+                if (showDateField && (noteDate != '' && noteDate != null && noteDate != undefined)) {
+                  setCustomDataChanged(true);
+                }
+                
+                setShowDateField(!showDateField);
+                setNoteDate('');
+              }}
             />
             {showDateField && (
               <div className="date-field">
                 <DatePicker
-                  placeholderText="Add Date (dd/mm/yyyy)"
-                  dateFormat="dd/MM/yyyy"
+                  placeholderText={currentDocumentInfo.displayDateFormat}
+                  dateFormat={currentDocumentInfo.dateFormat}
                   selected={Date.parse(noteDate)}
                   onChange={newDate => {
                     setCustomDataChanged(true);
-                    const newNoteDate = format(newDate, 'yyyy/MM/dd');
-                    setNoteDate(newNoteDate);
+
+                    if (newDate == null || newDate == '') {
+                      setNoteDate('');
+                    } else {
+                      const newNoteDate = format(newDate, 'yyyy/MM/dd');
+                      setNoteDate(newNoteDate);
+                    }
                   }}
                 />
                 <FontAwesomeIcon icon={faCalendarDays} />
