@@ -356,7 +356,7 @@ const ContentArea = ({
   ] = useSelector(state => [
     selectors.getAutoFocusNoteOnAnnotationSelection(state),
     selectors.getIsMentionEnabled(state),
-    selectors.isElementOpen(state, 'notesPanel'), ,
+    selectors.isElementOpen(state, 'notesPanel'),
     selectors.getDefaultUrlBaseAddress(state),
     selectors.getThisDocumentInfo(state),
   ]);

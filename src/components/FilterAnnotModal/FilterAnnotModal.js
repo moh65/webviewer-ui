@@ -193,7 +193,7 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
         }
 
         if (isFromCommentDatePickerShown && fromCommentDate !== null && fromCommentDate !== '' && fromCommentDate !== currentDocumentInfo.dateFormat.toLocaleLowerCase()) {
-          if (annotCommentDate !== "" && annotCommentDate != null) {
+          if (annotCommentDate !== "" && annotCommentDate != null && annotCommentDate != 'null') {
             fromCommentDateApply = annotCommentDate < fromCommentDate;
           } else {
             fromCommentDateApply = true;
@@ -201,7 +201,7 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
         }
 
         if (isToCommentDatePickerShown && toCommentDateRange !== null && toCommentDateRange !== '' && toCommentDateRange !== currentDocumentInfo.dateFormat.toLocaleLowerCase()) {
-          if (annotCommentDate !== "" && annotCommentDate != null) {
+          if (annotCommentDate !== "" && annotCommentDate != null && annotCommentDate != 'null') {
             toCommentDateApply = annotCommentDate > toCommentDateRange;
           } else {
             toCommentDateApply = true;
@@ -218,7 +218,7 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
         }
 
         if (isFromAttributeDatePickerShown && fromAttributeDate !== null && fromAttributeDate !== '' && fromAttributeDate !== currentDocumentInfo.dateFormat.toLocaleLowerCase()) {
-          if (annotAttributeDate !== "" && annotAttributeDate != null) {
+          if (annotAttributeDate !== "" && annotAttributeDate != null && annotAttributeDate != 'null') {
             const attributeDate = new Date(annotAttributeDate);
             fromAttributeDateApply = attributeDate < fromAttributeDate;
           } else {
@@ -226,8 +226,9 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
           }
         }
 
+
         if (isToAttributeDatePickerShown && toAttributeDateRange !== null && toAttributeDateRange !== '' && toAttributeDateRange !== currentDocumentInfo.dateFormat.toLocaleLowerCase()) {
-          if (annotAttributeDate !== "" && annotAttributeDate != null) {
+          if (annotAttributeDate !== "" && annotAttributeDate != null && annotAttributeDate != 'null') {
             const attributeDate = new Date(annotAttributeDate);
             toAttributeDateApply = attributeDate > toAttributeDateRange;
           } else {
