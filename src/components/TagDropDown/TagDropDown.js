@@ -138,6 +138,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
         ...labelStyles,
         backgroundColor: bgColor,
         paddingRight: 0,
+        padding: 1,
         color: pickTextColorFromBgColor(bgColor)
       };
     },
@@ -352,7 +353,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
 
               if (setDropDownChanged !== undefined) {
 
-                if (action === 'clear' || selectedOption.value === noTagOption.value) {
+                if (action === 'clear' || (option.length === 0 && (action === 'remove-value' || action === 'pop-value')) || selectedOption.value === noTagOption.value) {
                   setTags([noTagOption]);
                 } else {
                   if (option && option.some(e => e.value === noTagOption.value)) {
@@ -402,7 +403,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
                 <button className="btn btn-cancel" onClick={() => setShowTagCreateForm(false)}>Cancel</button>
               </div>
               <div className="fm-container-child">
-                <button className="btn btn-success" onClick={saveTag}>Save</button>
+                <button className="btn btn-success" disabled={tagName == "" || tagColor == ""} onClick={saveTag}>Save</button>
               </div>
             </div>
           </Swipeable>
