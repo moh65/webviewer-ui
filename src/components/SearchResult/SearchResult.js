@@ -82,9 +82,12 @@ const SearchResultPropTypes = {
 
 function SearchResult(props) {
   const { height, searchStatus, searchResults, activeResultIndex, t, onClickResult, pageLabels, isProcessingSearchResults } = props;
-  const cellMeasureCache = React.useMemo(() => {
-    return new CellMeasurerCache({ defaultHeight: 50, fixedWidth: true });
-  }, []);
+  // const cellMeasureCache = React.useMemo(() => {
+  //   return new CellMeasurerCache({ defaultHeight: 50, fixedWidth: true });
+  // }, []);
+  const cellMeasureCache = 
+     new CellMeasurerCache({ defaultHeight: 50, fixedWidth: true});
+  
   const listRef = React.useRef(null);
 
   if (searchResults.length === 0) {
@@ -96,15 +99,7 @@ function SearchResult(props) {
     const { index, key, parent, style } = rendererOptions;
     const result = searchResults[index];
     return (
-      <CellMeasurer
-        cache={cellMeasureCache}
-        columnIndex={0}
-        key={key}
-        parent={parent}
-        rowIndex={index}
-      >
-        {({ registerChild }) => (
-          <div role="row" ref={registerChild} style={style}>
+      <div role="row" key={key} style={style}>
             <SearchResultListSeparator
               currentResultIndex={index}
               searchResults={searchResults}
@@ -118,8 +113,30 @@ function SearchResult(props) {
               onSearchResultClick={onClickResult}
             />
           </div>
-        )}
-      </CellMeasurer>
+      // <CellMeasurer
+      //   cache={cellMeasureCache}
+      //   columnIndex={0}
+      //   key={key}
+      //   parent={parent}
+      //   rowIndex={index}
+      // >
+      //   {({ registerChild }) => (
+      //     <div role="row" ref={registerChild} key={key} style={style}>
+      //       <SearchResultListSeparator
+      //         currentResultIndex={index}
+      //         searchResults={searchResults}
+      //         pageLabels={pageLabels}
+      //         t={t}
+      //       />
+      //       <SearchResultListItem
+      //         result={result}
+      //         currentResultIndex={index}
+      //         activeResultIndex={activeResultIndex}
+      //         onSearchResultClick={onClickResult}
+      //       />
+      //     </div>
+      //   )}
+      // </CellMeasurer>
     );
   }, [cellMeasureCache, searchResults, activeResultIndex, t, pageLabels]);
 
@@ -145,16 +162,37 @@ function SearchResult(props) {
   }
 
   return (
-    <VirtualizedList
-      width={200}
-      height={height}
-      overscanRowCount={10}
-      rowCount={searchResults.length}
-      deferredMeasurementCache={cellMeasureCache}
-      rowHeight={cellMeasureCache.rowHeight}
-      rowRenderer={rowRenderer}
-      ref={listRef}
-    />
+    // <VirtualizedList
+    //   width={200}
+    //   height={height}
+    //   overscanRowCount={10}
+    //   rowCount={searchResults.length}
+    //   deferredMeasurementCache={cellMeasureCache}
+    //   rowHeight={cellMeasureCache.rowHeight}
+    //   rowRenderer={rowRenderer}
+    //   ref={listRef}
+    // />
+
+    searchResults.map((m, index) => {
+      const result = searchResults[index];
+      return (
+      <div role="row" >
+            <SearchResultListSeparator
+              currentResultIndex={index}
+              searchResults={searchResults}
+              pageLabels={pageLabels}
+              t={t}
+            />
+            <SearchResultListItem
+              result={result}
+              currentResultIndex={index}
+              activeResultIndex={activeResultIndex}
+              onSearchResultClick={onClickResult}
+            />
+          </div>
+      )
+    })
+
   );
 }
 SearchResult.propTypes = SearchResultPropTypes;
