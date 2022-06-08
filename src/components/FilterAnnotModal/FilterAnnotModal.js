@@ -61,6 +61,11 @@ const FilterAnnotModal = () => {
 
   const dropRef = useRef();
 
+  const fromCommentDateCalendarRef = useRef();
+  const toCommentDateCalendarRef = useRef();
+  const fromAttributeDateCalendarRef = useRef();
+  const toAttributeDateCalendarRef = useRef();
+
   currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
     id: 4043,
     title: 'Annette Wallis Atkins Costs Disclosure Signed',
@@ -664,6 +669,8 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
             <div className='date-cell'>
               <div className="date-field">
                   <DatePicker
+                    id="dateFromComment"
+                    ref={fromCommentDateCalendarRef}
                     placeholderText={currentDocumentInfo.displayDateFormat}
                     dateFormat={currentDocumentInfo.dateFormat}
                     showYearDropdown
@@ -684,6 +691,8 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
             <div className='date-cell'>
               <div className="date-field">
                 <DatePicker
+                    id="dateToComment"
+                    ref={toCommentDateCalendarRef}
                     placeholderText={currentDocumentInfo.displayDateFormat}
                     dateFormat={currentDocumentInfo.dateFormat}
                     showYearDropdown
@@ -706,6 +715,8 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
             <div className='date-cell'>
               <div className="date-field">
                 <DatePicker
+                    id="dateFromAttribute"
+                    ref={fromAttributeDateCalendarRef}
                     placeholderText={currentDocumentInfo.displayDateFormat}
                     dateFormat={currentDocumentInfo.dateFormat}
                     showYearDropdown
@@ -726,6 +737,8 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
             <div className='date-cell'>
               <div className="date-field">
                 <DatePicker
+                    id="dateToAttribute"
+                    ref={toAttributeDateCalendarRef}
                     placeholderText={currentDocumentInfo.displayDateFormat}
                     dateFormat={currentDocumentInfo.dateFormat}
                     showYearDropdown
@@ -758,13 +771,32 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
   // these two lines were removed from below method
   // {renderColorTypes()}
   // {renderStatusTypes()}
+
+  // e.stopPropagation is preventing the datepickers from closing from the outer website. This function detects the events and closes
+  // the pickers.
+  const closeDatePickers = (event) => {
+    if (event.target.classList.value.indexOf("datepicker") === -1 && event.target.className !== 'react-datepicker-ignore-onclickoutside') {
+      if (event.target.id !== fromAttributeDateCalendarRef.current.props.id) {
+        fromAttributeDateCalendarRef.current.setOpen(false);
+      }
+      if (event.target.id !== toAttributeDateCalendarRef.current.props.id) {
+        toAttributeDateCalendarRef.current.setOpen(false);
+      }
+      if (event.target.id !== fromCommentDateCalendarRef.current.props.id) {
+        fromCommentDateCalendarRef.current.setOpen(false);
+      }
+      if (event.target.id !== toCommentDateCalendarRef.current.props.id) {
+        toCommentDateCalendarRef.current.setOpen(false);
+      }
+    }
+  }
   //customization
 
   return isDisabled ? null : (
     <Swipeable onSwipedUp={closeModal} onSwipedDown={closeModal} preventDefaultTouchmoveEvent>
       <div className={modalClass} data-element="filterModal" onMouseDown={closeModal}>
         <FocusTrap locked={isOpen} focusLastOnUnlock>
-          <div className="container" onMouseDown={e => e.stopPropagation()}>
+          <div className="container" onMouseDown={e => {closeDatePickers(event); e.stopPropagation()}}>
             <div className="modal4-header">
                 <h5 className="modal-title">Comment Filters</h5>
                 <button type="button" aria-label="Close" class="close" onClick={closeModal}>×</button>
