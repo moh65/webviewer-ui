@@ -50,16 +50,26 @@ import { format } from 'date-fns';
 const hidden = [];
 
 const FilterAnnotModal = () => {
-  const [isDisabled, isOpen, tagOptionsState] = useSelector(state => [
+  let [isDisabled, isOpen, tagOptionsState, currentDocumentInfo] = useSelector(state => [
     selectors.isElementDisabled(state, 'filterModal'),
     selectors.isElementOpen(state, 'filterModal'),
     selectors.getTagOptions(state),
-
+    selectors.getThisDocumentInfo(state),
   ]);
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
   const dropRef = useRef();
+
+  currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
+    id: 4043,
+    title: 'Annette Wallis Atkins Costs Disclosure Signed',
+    dateFormat: 'dd-MM-yyyy',
+    timeFormat: 'HH:mm:ss'
+};
+
+currentDocumentInfo.displayDateFormat = "" + currentDocumentInfo.dateFormat.toLocaleUpperCase();
+currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'dd').replace('YY', 'yy'); 
 
   const [applied, setApplied] = useState(false);
   const [authors, setAuthors] = useState([]);
@@ -74,17 +84,16 @@ const FilterAnnotModal = () => {
   const [statusFilter, setStatusFilter] = useState([]);
 
   //customization
-
   const [privateFilter, setPrivateFilter] = useState(false);
-  const [toCommentDateRange, setToCommentDateRange] = useState('yyyy-mm-dd');
-  const [fromCommentDateRange, setFromCommentDateRange] = useState('yyyy-mm-dd');
+  const [toCommentDateRange, setToCommentDateRange] = useState(currentDocumentInfo.dateFormat.toLocaleLowerCase());
+  const [fromCommentDateRange, setFromCommentDateRange] = useState(currentDocumentInfo.dateFormat.toLocaleLowerCase());
   const [fromCommentDate, setFromCommentDate] = useState(null);
   const [toCommentDate, setToCommentDate] = useState(null);
   const [isFromCommentDatePickerShown, setIsFromCommentDatePickerShown] = useState(false);
   const [isToCommentDatePickerShown, setIsToCommentDatePickerShown] = useState(false);
 
-  const [toAttributeDateRange, setToAttributeDateRange] = useState('yyyy-mm-dd');
-  const [fromAttributeDateRange, setFromAttributeDateRange] = useState('yyyy-mm-dd');
+  const [toAttributeDateRange, setToAttributeDateRange] = useState(currentDocumentInfo.dateFormat.toLocaleLowerCase());
+  const [fromAttributeDateRange, setFromAttributeDateRange] = useState(currentDocumentInfo.dateFormat.toLocaleLowerCase());
   const [fromAttributeDate, setFromAttributeDate] = useState(null);
   const [toAttributeDate, setToAttributeDate] = useState(null);
   const [isFromAttributeDatePickerShown, setIsFromAttributeDatePickerShown] = useState(false);
@@ -183,16 +192,16 @@ const FilterAnnotModal = () => {
           // debugger
         }
 
-        if (isFromCommentDatePickerShown && fromCommentDate !== null && fromCommentDate !== '' && fromCommentDate !== "yyyy-mm-dd") {
-          if (annotCommentDate !== "" && annotCommentDate != null) {
+        if (isFromCommentDatePickerShown && fromCommentDate !== null && fromCommentDate !== '' && fromCommentDate !== currentDocumentInfo.dateFormat.toLocaleLowerCase()) {
+          if (annotCommentDate !== "" && annotCommentDate != null && annotCommentDate != 'null') {
             fromCommentDateApply = annotCommentDate < fromCommentDate;
           } else {
             fromCommentDateApply = true;
           }
         }
 
-        if (isToCommentDatePickerShown && toCommentDateRange !== null && toCommentDateRange !== '' && toCommentDateRange !== "yyyy-mm-dd") {
-          if (annotCommentDate !== "" && annotCommentDate != null) {
+        if (isToCommentDatePickerShown && toCommentDateRange !== null && toCommentDateRange !== '' && toCommentDateRange !== currentDocumentInfo.dateFormat.toLocaleLowerCase()) {
+          if (annotCommentDate !== "" && annotCommentDate != null && annotCommentDate != 'null') {
             toCommentDateApply = annotCommentDate > toCommentDateRange;
           } else {
             toCommentDateApply = true;
@@ -208,17 +217,20 @@ const FilterAnnotModal = () => {
           //debugger
         }
 
-        if (isFromAttributeDatePickerShown && fromAttributeDate !== null && fromAttributeDate !== '' && fromAttributeDate !== "yyyy-mm-dd") {
-          if (annotAttributeDate !== "" && annotAttributeDate != null) {
-            fromAttributeDateApply = annotAttributeDate < fromAttributeDate;
+        if (isFromAttributeDatePickerShown && fromAttributeDate !== null && fromAttributeDate !== '' && fromAttributeDate !== currentDocumentInfo.dateFormat.toLocaleLowerCase()) {
+          if (annotAttributeDate !== "" && annotAttributeDate != null && annotAttributeDate != 'null') {
+            const attributeDate = new Date(annotAttributeDate);
+            fromAttributeDateApply = attributeDate < fromAttributeDate;
           } else {
             fromAttributeDateApply = true;
           }
         }
 
-        if (isToAttributeDatePickerShown && toAttributeDateRange !== null && toAttributeDateRange !== '' && toAttributeDateRange !== "yyyy-mm-dd") {
-          if (annotAttributeDate !== "" && annotAttributeDate != null) {
-            toAttributeDateApply = annotAttributeDate > toAttributeDateRange;
+
+        if (isToAttributeDatePickerShown && toAttributeDateRange !== null && toAttributeDateRange !== '' && toAttributeDateRange !== currentDocumentInfo.dateFormat.toLocaleLowerCase()) {
+          if (annotAttributeDate !== "" && annotAttributeDate != null && annotAttributeDate != 'null') {
+            const attributeDate = new Date(annotAttributeDate);
+            toAttributeDateApply = attributeDate > toAttributeDateRange;
           } else {
             toAttributeDateApply = true;
           }
@@ -229,7 +241,6 @@ const FilterAnnotModal = () => {
   
         let isPrivate = annot.getCustomData("custom-private");
         let privatePublicShow = true;
-
         switch(visibility) { 
           case 'Private': { 
              if (isPrivate.toLocaleLowerCase() !== "true") {
@@ -318,15 +329,15 @@ const FilterAnnotModal = () => {
     setPrivateFilter(true);
     setVisiblity('All');
 
-    setToCommentDateRange('yyyy-mm-dd');
-    setFromCommentDateRange('yyyy-mm-dd');
+    setToCommentDateRange(currentDocumentInfo.dateFormat.toLocaleLowerCase());
+    setFromCommentDateRange(currentDocumentInfo.dateFormat.toLocaleLowerCase());
     setFromCommentDate(null);
     setToCommentDate(null);
     setIsFromCommentDatePickerShown(false);
     setIsToCommentDatePickerShown(false);
 
-    setToAttributeDateRange('yyyy-mm-dd');
-    setFromAttributeDateRange('yyyy-mm-dd');
+    setToAttributeDateRange(currentDocumentInfo.dateFormat.toLocaleLowerCase());
+    setFromAttributeDateRange(currentDocumentInfo.dateFormat.toLocaleLowerCase());
     setFromAttributeDate(null);
     setToAttributeDate(null);
     setIsFromAttributeDatePickerShown(false);
@@ -653,8 +664,8 @@ const FilterAnnotModal = () => {
             <div className='date-cell'>
               <div className="date-field">
                   <DatePicker
-                    placeholderText="yyyy-mm-dd"
-                    dateFormat="yyyy-MM-dd"
+                    placeholderText={currentDocumentInfo.displayDateFormat}
+                    dateFormat={currentDocumentInfo.dateFormat}
                     selected={fromCommentDate}
                     maxDate={toCommentDate}
                     onChange={newValue => {
@@ -672,9 +683,9 @@ const FilterAnnotModal = () => {
             <div className='date-cell'>
               <div className="date-field">
                 <DatePicker
-                    placeholderText="yyyy-mm-dd"
+                    placeholderText={currentDocumentInfo.displayDateFormat}
+                    dateFormat={currentDocumentInfo.dateFormat}
                     minDate={fromCommentDate}
-                    dateFormat="yyyy-MM-dd"
                     selected={toCommentDate}
                     onChange={newValue => {
                       setToCommentDate(newValue);    
@@ -693,8 +704,8 @@ const FilterAnnotModal = () => {
             <div className='date-cell'>
               <div className="date-field">
                 <DatePicker
-                    placeholderText="yyyy-mm-dd"
-                    dateFormat="yyyy-MM-dd"
+                    placeholderText={currentDocumentInfo.displayDateFormat}
+                    dateFormat={currentDocumentInfo.dateFormat}
                     maxDate={toAttributeDate}
                     selected={fromAttributeDate}
                     onChange={newValue => {
@@ -712,8 +723,8 @@ const FilterAnnotModal = () => {
             <div className='date-cell'>
               <div className="date-field">
                 <DatePicker
-                    placeholderText="yyyy-mm-dd"
-                    dateFormat="yyyy-MM-dd"
+                    placeholderText={currentDocumentInfo.displayDateFormat}
+                    dateFormat={currentDocumentInfo.dateFormat}
                     selected={toAttributeDate}
                     minDate={fromAttributeDate}
                     onChange={newValue => {

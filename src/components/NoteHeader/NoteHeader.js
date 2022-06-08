@@ -19,6 +19,8 @@ import Tag from 'components/Tag';
 
 import './NoteHeader.scss';
 import { typeOf } from 'react-is';
+import { format } from 'date-fns';
+import { ConstructionOutlined } from '@mui/icons-material';
 
 
 
@@ -61,6 +63,22 @@ function NoteHeader(props) {
     sortStrategy,
   } = props;
 
+  let [
+    currentDocumentInfo
+  ] = useSelector(state => [
+    selectors.getThisDocumentInfo(state),
+  ]);
+
+  currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
+    id: 4043,
+    title: 'Annette Wallis Atkins Costs Disclosure Signed',
+    dateFormat: 'dd-MM-yyyy',
+    timeFormat: 'HH:mm:ss'
+  };
+
+  currentDocumentInfo.displayDateFormat = "" + currentDocumentInfo.dateFormat.toLocaleUpperCase();
+  currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'dd').replace('YY', 'yy'); 
+
   const [t] = useTranslation();
   const date = (sortStrategy === NotesPanelSortStrategy.MODIFIED_DATE || (notesShowLastUpdatedDate && sortStrategy !== NotesPanelSortStrategy.CREATED_DATE)) ? getLatestActivityDate(annotation) : annotation.DateCreated;
   const numberOfReplies = annotation.getReplies().length;
@@ -87,8 +105,11 @@ function NoteHeader(props) {
       setCustomPrivate(cp);
     }
 
-    if (cd != null && cd != undefined) {
+    if (cd != 'null' && cd !== null && cd !== undefined && cd != '') {
+      cd = format(Date.parse(cd), currentDocumentInfo.dateFormat);
       setCustomDate(cd);
+    } else {
+      setCustomDate('');
     }
 
     if (ct !== null && ct !== undefined && ct !== '') {

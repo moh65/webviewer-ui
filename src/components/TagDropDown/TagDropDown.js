@@ -40,12 +40,12 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
 
   const dropDownRef = useRef();
   const [tagOptions, setTagOptions] = useState([]);
-  const [selectedOptions, setSelectedOptions] = useState(selectedTags);
+  const [selectedOptions, setSelectedOptions] = useState(selectedTags === undefined ? [] : selectedTags);
   const [showTagCreateForm, setShowTagCreateForm] = useState(false);
   const [tagName, setTagName] = useState('');
   const [tagColor, setTagColor] = useState('');
   const [showElement, setShowElement] = useState(false);
-  const [previousOptions, setPreviousOptions] = useState([]);
+  const [previousOptions, setPreviousOptions] = useState(selectedTags === undefined ? [] : selectedTags);
   const [noTagOption, setNoTagOption] = useState({ value: 'no-tag', label: 'No tag' });
   const dispatch = useDispatch();
 
@@ -175,9 +175,14 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
 
   const setTags = (options) => {
     setSelectedOptions(options);
+    setPreviousOptions(options);
 
     if (setSelectedTags) {
       setSelectedTags(options);
+    }
+
+    if (creatable && options.length > 0) {
+      OnChangeCreatableOptionEvent(options[0]);
     }
   }
 
@@ -191,21 +196,19 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
 
       if (creatable && selectedOptions !== undefined && selectedOptions.length > 0 && selectedOptions[0].value === noTagOption.value) {
         selectedOptions[0] = noTag;
+        OnChangeCreatableOptionEvent(selectedOptions[0]);
       }
     }
 
     if (selectedOptions === undefined || selectedOptions.length == 0) {
       if (creatable) {
         setTags([noTag]);
-        setPreviousOptions([noTag]);
       } else if (setDropDownChanged !== undefined) {
         if (defaultTag && defaultTag.value) {
           setTags([defaultTag]);
-          setPreviousOptions([defaultTag]);
         } 
         else {
           setTags([noTag]);
-          setPreviousOptions([noTag]);
         }   
       }
     }
@@ -346,25 +349,24 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
               let selectedOption = (option
                 .filter(x => !previousOptions.includes(x))
                 .concat(previousOptions.filter(x => !option.includes(x))))[0];
-              setPreviousOptions(option);
 
               if (setDropDownChanged !== undefined) {
-                if (action === 'clear' || selectedOption.value == noTagOption.value) {
+
+                if (action === 'clear' || selectedOption.value === noTagOption.value) {
                   setTags([noTagOption]);
-                  setPreviousOptions([noTagOption]);
                 } else {
                   if (option && option.some(e => e.value === noTagOption.value)) {
                     option = option.filter(i => i.value !== noTagOption.value);
             
                     setTags(option);
-                    setPreviousOptions(option);
                   }
                 }
 
                 setDropDownChanged(true);
-              }
-              if (setSelectedTags) {
-                setTags(option);
+              } else {
+                if (setSelectedTags) {
+                  setTags(option);
+                }
               }
             }
           }
