@@ -477,6 +477,7 @@ const ContentArea = ({
                   setDropDownChanged={setCustomDataChanged}
                   setSelectedTags={setSelectedTags}
                   selectedTags={selectedTags}
+                  controlWidth="calc(100% - 20px)"
                   creatable={false}
                   placeholder={"No tag ..."}
                 />

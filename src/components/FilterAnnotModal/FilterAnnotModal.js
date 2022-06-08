@@ -666,6 +666,7 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
                   <DatePicker
                     placeholderText={currentDocumentInfo.displayDateFormat}
                     dateFormat={currentDocumentInfo.dateFormat}
+                    showYearDropdown
                     selected={fromCommentDate}
                     maxDate={toCommentDate}
                     onChange={newValue => {
@@ -685,6 +686,7 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
                 <DatePicker
                     placeholderText={currentDocumentInfo.displayDateFormat}
                     dateFormat={currentDocumentInfo.dateFormat}
+                    showYearDropdown
                     minDate={fromCommentDate}
                     selected={toCommentDate}
                     onChange={newValue => {
@@ -706,6 +708,7 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
                 <DatePicker
                     placeholderText={currentDocumentInfo.displayDateFormat}
                     dateFormat={currentDocumentInfo.dateFormat}
+                    showYearDropdown
                     maxDate={toAttributeDate}
                     selected={fromAttributeDate}
                     onChange={newValue => {
@@ -725,6 +728,7 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
                 <DatePicker
                     placeholderText={currentDocumentInfo.displayDateFormat}
                     dateFormat={currentDocumentInfo.dateFormat}
+                    showYearDropdown
                     selected={toAttributeDate}
                     minDate={fromAttributeDate}
                     onChange={newValue => {
