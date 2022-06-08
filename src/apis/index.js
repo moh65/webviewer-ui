@@ -191,6 +191,7 @@ import reloadOutline from './reloadOutline';
 //customization
 import setCustomURLs from './setCustomURLs';
 import setThisDocumentInfo from './setThisDocumentInfo';
+import core from "core";
 
 //customization
 
@@ -413,8 +414,151 @@ export default store => {
     enablePageDeletionConfirmationModal: enablePageDeletionConfirmationModal(store)
   };
 
+  // objForWebViewerUI.overrideSearchExecution((value, options) => {
 
-  
+  //   fetch('http://localhost:5600/api/search/build/f3396a7768184e9b8e2baa5ca1893e34/19/55237/logicalItemPageId/0/10', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json', "Authorization": `Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QiLCJjdHkiOiJKV1QifQ.eyJuYmYiOjE2NTQ2NDUyMjEsImV4cCI6MTY1NDY0ODgyMSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY1NDM5NTI1OSwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.D0Um9V3bdUFLBOQL4EPXynNV75amTL6czDZR2l7ZsC8irUNTaLjIn1FpW-W0odP78snLXbinJowqzjQrzPvESsvzlOSq1_h_wEG7uEAQACD8odWfBuSZuNfspt0unf5pcDPUcE_KkvXJkpTBVS4aIBmk5irHJCUpkJ9IF2IREVuIXlgjSUle5ZI-A22y9-k7gaTE1E7Bn1U7aeEIxLwsNUsouxzoJblS03iGbzizBUN4WYqUhqF208uCV9Q1NrI7LRL_fek8lRHPkTsBOG5GKsjU2dWgU0o6p6vqqGlUggNkDWdyWtJzM3OZtsqkpevXBYrda0-jsphi3IaE-x828g` },
+  //     body: JSON.stringify(value)
+  //   }).then(async response => {
+  //     if (response.ok) {
+
+  //       let r = await response.json();
+
+  //       showSearchResult(r, 0)
+
+  //     } else {
+
+  //     }
+  //   }).catch(e => {
+
+  //   });
+  // })
+
+  // const showSearchResult = (searchResultData, pageNum, instance) => {
+  //   const finishedPages = [];
+
+  //   let SearchMode = core.getSearchMode();
+  //   let documentViewer = window.documentViewer;
+
+  //   //this.openedFromSearch = true      
+  //   let results = []
+
+  //   documentViewer.clearSearchResults()
+
+  //   objForWebViewerUI.closeElements(['notesPanel'])
+  //   objForWebViewerUI.openElements(['searchPanel'])
+
+  //   function doSearch(pn, word) {
+  //     const mode = SearchMode.WHOLE_WORD | SearchMode.HIGHLIGHT
+
+  //     const options = {
+  //       fullSearch: true,
+  //       onResult: (result) => {
+  //         if (result.resultCode === 2 && !finishedPages.includes(result.pageNum)) {
+  //           //documentViewer.displayAdditionalSearchResult(result)
+  //           results.push(result)
+  //         }
+  //       },
+  //       onPageEnd: arg => {
+  //         if (!finishedPages.includes(pn)) {
+  //           documentViewer.displayAdditionalSearchResults(results)
+  //           //   documentViewer.setActiveSearchResult(results[0])
+  //           finishedPages.push(pn)
+  //           //   results = []
+  //         }
+  //         showResult()
+  //       },
+  //       onDocumentEnd: arg => {
+  //         //if (pageNum != 0) { documentViewer.setCurrentPage(pageNum) }
+  //       },
+  //       startPage: pn,
+  //       endPage: pn
+  //     }
+
+  //     documentViewer.textSearchInit(word, mode, options)
+  //   }
+
+  //   let textToBeHighlighted = []
+  //   let reg = /<span(.*?)>(.*?)<\/span>/g
+
+  //   let highlightCounter = 0
+  //   let searchResultIndex = 0
+  //   let matches = null
+
+  //   setTimeout(() => {
+  //     showResult()
+  //   }, 50)
+
+  //   function showResult() {
+  //     if (searchResultData && searchResultData.BundlePageSearchResults && searchResultIndex < searchResultData.BundlePageSearchResults.length) {
+  //       let searchResult = searchResultData.BundlePageSearchResults[searchResultIndex]
+  //       let highlightedResults = !searchResult.HighlightedText ? searchResult.highlightedText : searchResult.HighlightedText
+  //       let pageNum = !searchResult.PageNumber ? searchResult.pageNumber : searchResult.PageNumber
+
+  //       if (highlightCounter < highlightedResults.length) {
+  //         matches = matches == null ? highlightedResults[highlightCounter].matchAll(reg) : matches
+  //         let word = ''
+  //         try {
+  //           do {
+  //             word = matches.next().value[2]
+  //           } while (textToBeHighlighted.includes(word.trim().toLowerCase()))
+
+  //           textToBeHighlighted.push(word.trim().toLowerCase())
+  //           doSearch(parseInt(pageNum), word)
+  //         } catch (e) {
+  //           highlightCounter++
+  //           matches = null
+  //           showResult()
+  //         }
+  //       } else {
+  //         highlightCounter = 0
+  //         matches = null
+  //         ++searchResultIndex
+  //         textToBeHighlighted = []
+  //         showResult()
+  //       }
+  //     } else {
+  //       //highlight finished
+
+  //       // let rows = window.document.querySelectorAll('[data-element=searchPanel] .results [role=row]');
+  //       // let prevPage = { height: 0, isFirst: false };
+  //       // let needToChangeTop = false;
+  //       // let changeTop = 27;
+        
+  //       // for (const row of rows) {
+  //       //   let pageSplitter = row.querySelector('div[role=cell]')
+  //       //   if (pageSplitter) {
+  //       //     let firstPageHeight = parseInt(row.style.height.replace('px', ''));
+  //       //     prevPage = { height: firstPageHeight, isFirst: true };
+  //       //     if (needToChangeTop) {
+  //       //       debugger
+  //       //       let top = parseInt(row.style.top.replace('px', ''));
+  //       //       row.style.top = `${(top + changeTop)}px`;
+  //       //       changeTop += 27;
+  //       //     }
+  //       //   } else if (needToChangeTop) {
+  //       //     debugger
+  //       //     let top = parseInt(row.style.top.replace('px', ''));
+  //       //     row.style.top = `${(top + changeTop)}px`;
+  //       //   } else {
+  //       //     debugger
+  //       //     let pageHeight = parseInt(row.style.height.replace('px', ''));
+  //       //     if (prevPage && prevPage.isFirst) {
+  //       //       if (prevPage.height === pageHeight) {
+  //       //         needToChangeTop = true;
+  //       //         let top = parseInt(row.style.top.replace('px', ''));
+  //       //         row.style.top = `${(top + changeTop)}px`;
+  //       //       }
+  //       //     }
+  //       //   }
+
+  //       // }
+  //     }
+  //   }
+  // }
+
+
   window.instance = {
     // keys needed for webviewer.js
     CORE_NAMESPACE_KEY: CORE_NAMESPACE,

@@ -121,6 +121,8 @@ export default store => async () => {
   window.instance.UI.loadedFromServer = false;
   window.instance.UI.serverFailed = false;
 
+  // window.instance.UI.enableFeatures([window.instance.UI.Feature.FilePicker])
+
   window.documentViewer
     .getAnnotationManager()
     .getFieldManager()
