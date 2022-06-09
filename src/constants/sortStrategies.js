@@ -244,10 +244,14 @@ const sortStrategies = {
     getSortedNotes: notes =>
       notes.sort((a, b) => {
         //customization
-        const isPrivateA = a.getCustomData('custom-private');
-        const isPrivateB = b.getCustomData('custom-private');
+        let isPrivateA = a.getCustomData('custom-private');
+        let isPrivateB = b.getCustomData('custom-private');
+       
+        isPrivateA = isPrivateA.trim() === '' ? 'false' : isPrivateA;
+        isPrivateB = isPrivateB.trim() === '' ? 'false' : isPrivateB;
 
-        if ((isPrivateA === '' && isPrivateB === '') || (isPrivateA === isPrivateB))
+
+        if (isPrivateA === isPrivateB)
           return 0;
         
         return isPrivateA.toLowerCase() === 'true' ? -1 : 1;
@@ -255,11 +259,11 @@ const sortStrategies = {
         //customization
       }),
     shouldRenderSeparator: (prevNote, currNote) => {
-      const isPrivatePrev = prevNote.getCustomData('custom-private');
-      const isPrivateCurr = currNote.getCustomData('custom-private');
+      let isPrivatePrev = prevNote.getCustomData('custom-private');
+      let isPrivateCurr = currNote.getCustomData('custom-private');
 
-      if (isPrivateCurr === '' && isPrivatePrev === '')
-        return false;
+      isPrivatePrev = isPrivatePrev.trim() === '' ? 'false' : isPrivatePrev;
+      isPrivateCurr = isPrivateCurr.trim() === '' ? 'false' : isPrivateCurr;
 
       if (isPrivateCurr === isPrivatePrev)
         return false;
@@ -267,9 +271,11 @@ const sortStrategies = {
       return true;
     },
     getSeparatorContent: (prevNote, currNote) => {
-      const isPrivate = currNote.getCustomData('custom-private');
+      let isPrivate = currNote.getCustomData('custom-private');
 
-      return isPrivate === '' || isPrivate.toLowerCase() === 'false' ? i18next.t('annotation.public') : i18next.t('annotation.private');
+      isPrivate = isPrivate.trim() === '' ? 'false' : isPrivate;
+
+      return isPrivate.toLowerCase() === 'false' ? i18next.t('annotation.public') : i18next.t('annotation.private');
     },
   },
   //customization
