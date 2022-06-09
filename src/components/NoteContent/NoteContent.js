@@ -464,7 +464,7 @@ const ContentArea = ({
 
   if (container) {
     ReactDOM.render(
-      renderEditButtons(annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, onTextAreaValueChange, removeButtonContents)
+      renderEditButtons(annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, setContents, onTextAreaValueChange, removeButtonContents)
     , container);
   }
   //Initial render
@@ -554,7 +554,7 @@ const ContentArea = ({
           //customization
         )}
   
-        { !container && renderEditButtons(annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, onTextAreaValueChange)}
+        { !container && renderEditButtons(annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, setContents, onTextAreaValueChange)}
       </div>
     </div>
     //customization
@@ -562,7 +562,7 @@ const ContentArea = ({
   
 };
 
-const renderEditButtons = (annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, onTextAreaValueChange, removeButtonContents) => {
+const renderEditButtons = (annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, setContents, onTextAreaValueChange, removeButtonContents) => {
   return (
   <div className="edit-buttons">
   {
@@ -620,6 +620,10 @@ const renderEditButtons = (annotation, dispatch, redactionBurninDateUrl, token, 
       annotation.setCustomData("custom-date", noteDate);
       annotation.setCustomData('custom-tag-options', selectedTags);
       annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0]));
+      
+      if (removeButtonContents) {
+        removeButtonContents();
+      }
       //customization
     }}
   >
