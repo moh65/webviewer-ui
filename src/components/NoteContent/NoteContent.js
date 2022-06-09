@@ -1,4 +1,5 @@
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState, render } from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -266,6 +267,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
                 setIsEditing={setIsEditing}
                 textAreaValue={textAreaValue}
                 onTextAreaValueChange={onTextChange}
+
               />
               // : <div className={classNames('container', { 'reply-content': isReply })} onClick={handleContentsClicked} style={contentStyle}>
               //   {renderContents(contentsToRender, richTextStyle)}
@@ -345,7 +347,7 @@ const ContentArea = ({
   noteIndex,
   setIsEditing,
   textAreaValue,
-  onTextAreaValueChange
+  onTextAreaValueChange,
 }) => {
   let [
     autoFocusNoteOnAnnotationSelection,
@@ -382,6 +384,7 @@ const ContentArea = ({
   const textareaRef = useRef();
   const isReply = annotation.isReply();
   const dispatch = useDispatch();
+  const container = document.getElementById('annotation-footer-' + annotation.Id);
 
   useEffect(() => {
     // on initial mount, focus the last character of the textarea
@@ -453,7 +456,18 @@ const ContentArea = ({
 
   const contentClassName = classNames('edit-content', { 'reply-content': isReply })
 
+  const removeButtonContents = () => {
+    ReactDOM.render(
+      <div></div>
+      , container);
+  }
 
+  if (container) {
+    ReactDOM.render(
+      renderEditButtons(annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, onTextAreaValueChange, removeButtonContents)
+    , container);
+  }
+  //Initial render
 
   return (
     <div>
@@ -539,71 +553,81 @@ const ContentArea = ({
           </div>
           //customization
         )}
-      </div>
-      <div className="edit-buttons">
-        {
-          (annotation.Subject === "Redact") &&
-          <button
-            className="apply-button"
-            onClick={async e => {
-              e.stopPropagation();
-
-              window.documentViewer.getAnnotationManager().enableRedaction();
-              let isEnabled = core.isCreateRedactionEnabled();
-              applyRedactionFromCommentBox(annotation, dispatch, redactionBurninDateUrl, token);
-            }}
-          >
-            <FontAwesomeIcon icon={faStrikethrough} />
-            {t('Apply Redaction')}
-          </button>
-        }
-        {/*customization*/}
-        <button
-          className="delete-button"
-          onClick={e => {
-            e.stopPropagation();
-            core.deleteAnnotations([annotation, ...annotation.getGroupedChildren()]);
-          }}
-        >
-          <FontAwesomeIcon icon={faTrashCan} />
-          {t('action.delete')}
-        </button>
-        {/*customization*/}
-        <button
-          className="cancel-button"
-          onClick={e => {
-            e.stopPropagation();
-            setIsEditing(false, noteIndex);
-            // Clear pending text
-            onTextAreaValueChange(undefined, annotation.Id);
-
-          }}
-        >
-          <FontAwesomeIcon icon={faBan} />
-          {t('action.cancel')}
-        </button>
-        <button
-          className={`save-button${!commentTextChanged && !customDataChanged ? ' disabled' : ''}`}
-          disabled={!commentTextChanged && !customDataChanged}
-          onClick={e => {
-            e.stopPropagation();
-            setContents(e);
-            //customization
-            annotation.setCustomData('custom-private', isPrivate);
-            annotation.setCustomData("custom-date", noteDate);
-            annotation.setCustomData('custom-tag-options', selectedTags);
-            annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0]));
-            //customization
-          }}
-        >
-          <FontAwesomeIcon icon={faCheck} />
-          {t('action.save')}
-        </button>
+  
+        { !container && renderEditButtons(annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, onTextAreaValueChange)}
       </div>
     </div>
     //customization
   );
+  
 };
+
+const renderEditButtons = (annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, onTextAreaValueChange, removeButtonContents) => {
+  return (
+  <div className="edit-buttons">
+  {
+    (annotation.Subject === "Redact") &&
+    <button
+      className="apply-button"
+      onClick={async e => {
+        e.stopPropagation();
+
+        window.documentViewer.getAnnotationManager().enableRedaction();
+        let isEnabled = core.isCreateRedactionEnabled();
+        applyRedactionFromCommentBox(annotation, dispatch, redactionBurninDateUrl, token);
+      }}
+    >
+      <FontAwesomeIcon icon={faStrikethrough} />
+      {t('Apply Redaction')}
+    </button>
+  }
+  {/*customization*/}
+  <button
+    className="delete-button"
+    onClick={e => {
+      e.stopPropagation();
+      core.deleteAnnotations([annotation, ...annotation.getGroupedChildren()]);
+    }}
+  >
+    <FontAwesomeIcon icon={faTrashCan} />
+    Delete
+  </button>
+  {/*customization*/}
+  <button
+    className="cancel-button"
+    onClick={e => {
+      e.stopPropagation();
+      setIsEditing(false, noteIndex);
+      // Clear pending text
+      onTextAreaValueChange(undefined, annotation.Id);
+
+      if (removeButtonContents) {
+        removeButtonContents();
+      }
+    }}
+  >
+    <FontAwesomeIcon icon={faBan} />
+    Cancel
+  </button>
+  <button
+    className={`save-button${!commentTextChanged && !customDataChanged ? ' disabled' : ''}`}
+    disabled={!commentTextChanged && !customDataChanged}
+    onClick={e => {
+      e.stopPropagation();
+      setContents(e);
+      //customization
+      annotation.setCustomData('custom-private', isPrivate);
+      annotation.setCustomData("custom-date", noteDate);
+      annotation.setCustomData('custom-tag-options', selectedTags);
+      annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0]));
+      //customization
+    }}
+  >
+    <FontAwesomeIcon icon={faCheck} />
+    Save
+  </button>
+</div>
+)}
 
 ContentArea.propTypes = {
   noteIndex: PropTypes.number.isRequired,

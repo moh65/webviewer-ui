@@ -273,6 +273,7 @@ const Note = ({
           )}
         </React.Fragment>
       )}
+      <div id={('annotation-footer-' + annotation.Id)}></div>
       {isSelected && <AnnotationNoteConnectorLine annotation={annotation} noteContainerRef={containerRef} />}
     </div>
   );

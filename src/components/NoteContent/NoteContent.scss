@@ -175,76 +175,6 @@
   }
 
   .edit-buttons {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin-top: 10px;
-    margin-bottom: -12px;
-
-    > div {
-      margin-right: 4px;
-    }
-
-    button {
-      flex: 1;
-      @include button-reset;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      height: 40px;
-      padding: 0 8px;
-      font-weight: 600;
-      svg {
-        margin-top: -0.125em;
-        margin-right: 6px;
-        font-size: 14px;
-      }
-      &.disabled {
-        background: var(--gray-6);
-        border-color: var(--gray-6);
-        cursor: not-allowed;
-      }
-    }
-
-    .apply-button {
-      background: var(--blue-5);
-      color: var(--white);
-      width: 100%;
-      flex: 1 1 100%;
-      margin-left: 40px;
-      margin-bottom: 14px;
-      margin-right: 12px;
-      &:hover {
-        background: var(--blue-6);
-        color: var(--white);
-      }
-    }
-    .save-button {
-      background: var(--success);
-      color: var(--white);
-      &:hover {
-        background: var(--success-active);
-        color: var(--white);
-      }
-    }
-    .cancel-button {
-      background-color: var(--gray-2);
-      color: var(--text-color);
-      &:hover {
-        background-color: var(--gray-4);
-        color: var(--text-color);
-      }
-    }
-    .delete-button {
-      background: var(--primary);
-      color: var(--white);
-      &:hover {
-        background: var(--primary-active);
-        color: var(--white);
-      }
-    }
   }
 
   &.isReply {
@@ -286,5 +216,76 @@
   .selected-text-preview {
     padding-left: 40px;
     padding-top: 8px;
+  }
+}
+
+.edit-buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  > div {
+    margin-right: 4px;
+  }
+
+  button {
+    flex: 1;
+    @include button-reset;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 40px;
+    padding: 0 8px;
+    font-weight: 600;
+    svg {
+      margin-top: -0.125em;
+      margin-right: 6px;
+      font-size: 14px;
+    }
+    &.disabled {
+      background: var(--gray-6);
+      border-color: var(--gray-6);
+      cursor: not-allowed;
+    }
+  }
+
+  .apply-button {
+    background: var(--blue-5);
+    color: var(--white);
+    width: 100%;
+    flex: 1 1 100%;
+    margin-left: 40px;
+    margin-bottom: 14px;
+    margin-right: 12px;
+    &:hover {
+      background: var(--blue-6);
+      color: var(--white);
+    }
+  }
+  .save-button {
+    background: var(--success);
+    color: var(--white);
+    &:hover {
+      background: var(--success-active);
+      color: var(--white);
+    }
+  }
+  .cancel-button {
+    background-color: var(--gray-2);
+    color: var(--text-color);
+    &:hover {
+      background-color: var(--gray-4);
+      color: var(--text-color);
+    }
+  }
+  .delete-button {
+    background: var(--primary);
+    color: var(--white);
+    &:hover {
+      background: var(--primary-active);
+      color: var(--white);
+    }
   }
 }
