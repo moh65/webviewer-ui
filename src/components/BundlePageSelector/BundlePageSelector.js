@@ -136,7 +136,7 @@ export default ({ isModalOpen }) => {
             const descendants = SetSectionMapRecursive(item);
             item['descendants'] = descendants;
             item['expanded'] = 0;
-            documentScroll.sectionMap.set(item.id.toString(), item)
+            documentScroll.sectionMap.set(item.id.toString(), item) 
 
             childOffset += item.descendants;
             documentScroll.sectionGroupChildOffset.set(group, row - 1);
@@ -212,6 +212,10 @@ export default ({ isModalOpen }) => {
         setDocs(sectionDocs);
     };
 
+    const collaspeFolder = (event, nodeIds) => {
+        setExpandedFolder(nodeIds);
+    }
+
     const collaspe = (event, nodeIds) => {
         setExpanded(nodeIds)
 
@@ -283,8 +287,6 @@ export default ({ isModalOpen }) => {
 
     const expandAllFolder = () => {
         setExpandedFolder(expandableFolders);
-
-        // Set all sections to +decentdants
     };
 
     const collaspeAllFolder = () => {
@@ -458,10 +460,9 @@ export default ({ isModalOpen }) => {
 
         for (let i = 0; i < sectionData.length; i++) {
             const child = sectionData[i];
-
-            if (child.children && child.children > 0) {
-                expandableFoldersIds.push(child.id);
-                GetSectionInfoRecursive(sectionData[i], expandableFoldersIds);
+            if (child.children && child.children.length > 0) {
+                expandableFoldersIds.push(child.id.toString());
+                GetSectionInfoRecursive(child, expandableFoldersIds);
             }
         }
 
@@ -472,8 +473,8 @@ export default ({ isModalOpen }) => {
         for (let i = 0; i < item.children.length; i++) {
             const child = item.children[i];
 
-            if (child.children && child.children > 0) {
-                expandableFoldersIds.push(child.id);
+            if (child.children && child.children.length > 0) {
+                expandableFoldersIds.push(child.id.toString());
                 GetSectionInfoRecursive(child, expandableFoldersIds);
             }
         }
@@ -481,7 +482,6 @@ export default ({ isModalOpen }) => {
 
     const renderTree = (nodes) => {
         return (
-
             <TreeItem key={nodes.id} nodeId={nodes.id.toString()} label={nodes.text}>
                 {Array.isArray(nodes.children)
                     ? nodes.children.map((node) => renderTree(node))
@@ -775,7 +775,8 @@ export default ({ isModalOpen }) => {
                                                 expanded={expandedFolder}
                                                 sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                                                 defaultCollapseIcon={<ExpandLessIcon />}
-                                                defaultExpandIcon={<ExpandMoreIcon />}                                    
+                                                defaultExpandIcon={<ExpandMoreIcon />}  
+                                                onNodeToggle={collaspeFolder}                   
                                                 onNodeSelect={(e, n) => {
                                                     setDocs([]);
                                                     setBotHeight('50%')
