@@ -176,7 +176,10 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
 
   const setTags = (options) => {
     setSelectedOptions(options);
-    setPreviousOptions(options);
+
+    if (!creatable || options.value !== 'create-tag') {
+      setPreviousOptions(options);
+    }
 
     if (setSelectedTags) {
       setSelectedTags(options);
@@ -329,6 +332,10 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     dispatch(actions.setDefaultTag(option));
   }
 
+  const ResetToPreviousTag = () => {
+    setTags(previousOptions);
+  }
+
   return (
     showElement && (
       <div className="custom-select" data-element="tagSelectBox" style={{ width: controlWidth ? controlWidth : '200px' }}>
@@ -400,7 +407,10 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
             </div>
             <div className="fm-container clear">
               <div className="fm-container-child">
-                <button className="btn btn-cancel" onClick={() => setShowTagCreateForm(false)}>Cancel</button>
+                <button className="btn btn-cancel" onClick={() => {
+                  ResetToPreviousTag();
+                  setShowTagCreateForm(false)
+                }}>Cancel</button>
               </div>
               <div className="fm-container-child">
                 <button className="btn btn-success" disabled={tagName == "" || tagColor == ""} onClick={saveTag}>Save</button>

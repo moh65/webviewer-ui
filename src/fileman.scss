@@ -241,5 +241,18 @@
 }*/
 
 .HeaderToolsContainer {
-  display: none;
+  // display: none;
+}
+
+.row > .Icon {
+  width: 23px;
+  max-width: 23px;
+  padding-right: unset;
+  padding-left: unset;
+  margin: unset !important;
+}
+
+.row > * {
+  width: unset;
+  max-width: unset;
 }
