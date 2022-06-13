@@ -245,14 +245,17 @@
 }
 
 .row > .Icon {
-  width: 23px;
-  max-width: 23px;
+  width: 23px !important;
   padding-right: unset;
   padding-left: unset;
   margin: unset !important;
 }
 
 .row > * {
-  width: unset;
-  max-width: unset;
+  width: unset  !important;
+  max-width: unset !important;
+}
+
+.row.active {
+  max-width: 100%  !important;
 }
