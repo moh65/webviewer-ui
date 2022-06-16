@@ -11,6 +11,7 @@ import { hexToRgba2 } from 'helpers/color';
 import setToolStyles from 'helpers/setToolStyles';
 
 import './TagDropDown.scss';
+import { ColorizeOutlined } from '@mui/icons-material';
 
 export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, creatable, placeholder, controlWidth }, ref) => {
   let [
@@ -275,7 +276,10 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
         OnChangeCreatableOptionEvent(newTag);
         dispatch(actions.setTagOptions(newTagOptionState));  
       }
-    }).then(r => setShowTagCreateForm(false));
+    }).then(r => {      
+      setTagName('');
+      setShowTagCreateForm(false);
+    });
   };
 
   const addData = props => {
@@ -320,12 +324,17 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
       'AnnotationCreateTextStrikeout',
       'AnnotationCreateTextSquiggly',
       'AnnotationCreateSticky'];
-    let color = new window.Annotations.Color(option.value.split('-')[1]);
+    let hex = option.value.split('-')[1];
+    let color = new window.Annotations.Color(hex);
+    let fillColour = new window.Annotations.Color(hex);
+    fillColour.A = 0.1;
     toolNames.forEach(toolName => {
       if (toolName === 'AnnotationCreateFreeText') {
         setToolStyles(toolName, 'TextColor', color);
       } else {
         setToolStyles(toolName, 'StrokeColor', color);
+        setToolStyles(toolName, 'Opacity', 1);
+        setToolStyles(toolName, 'FillColor', fillColour);
       }
     });
 
@@ -409,7 +418,8 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
               <div className="fm-container-child">
                 <button className="btn btn-cancel" onClick={() => {
                   ResetToPreviousTag();
-                  setShowTagCreateForm(false)
+                  setTagName('');
+                  setShowTagCreateForm(false);
                 }}>Cancel</button>
               </div>
               <div className="fm-container-child">

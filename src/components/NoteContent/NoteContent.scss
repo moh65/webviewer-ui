@@ -93,11 +93,13 @@
     .date-field {
       position: relative;
       margin-bottom: 10px;
+      font-size: medium;
       input {
         padding-right: 25px;
         margin-bottom: 0;
       }
       > svg {
+        font-size: medium;  
         position: absolute;
         top: 8px;
         right: 8px;
@@ -288,4 +290,39 @@
       color: var(--white);
     }
   }
+}
+
+.react-datepicker__header__dropdown.react-datepicker__header__dropdown--scroll {
+  position: relative;
+  left: 47px;
+  top: -39px;
+  font-family: "Helvetica Neue", helvetica, arial, sans-serif;
+  font-size: 15.104px;
+  font-weight: 700;
+  line-height: 35px;
+  color: white;
+  height: 0px;
+}
+
+.react-datepicker__current-month.react-datepicker__current-month--hasYearDropdown {
+  position: relative;
+  height: 28px;
+  top: -8px;
+  padding-bottom: 0px;
+}
+
+.react-datepicker__year-dropdown {
+  background-color: var(--color-gray-4);
+}
+
+a.react-datepicker__navigation.react-datepicker__navigation--years.react-datepicker__navigation--years-upcoming {
+  color: black;
+}
+
+span.react-datepicker__year-read-view--selected-year {
+  color: transparent;
+}
+
+.react-datepicker__year-option {
+  color: black;
 }

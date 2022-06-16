@@ -1,0 +1,21 @@
+@import "../../constants/styles";
+@import "../../constants/modal";
+@import "../../fileman.scss";
+
+.note-link > div > strong > a > svg {
+  margin-right: 6px !important;
+  padding-top: 5px;
+}
+
+.note-link {
+  width: 100%;
+}
+
+.note-content {
+  display: inline-flex;
+  width: 100%;
+}
+
+.note-edit > button.cancel-button {
+  border-width: 1px;
+}

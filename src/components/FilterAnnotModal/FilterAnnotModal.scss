@@ -300,7 +300,7 @@ textarea, [type=date], .date-field input {
 .react-datepicker__current-month.react-datepicker__current-month--hasYearDropdown {
     position: relative;
     height: 28px;
-    top: -8px;
+    top: 0px;
     padding-bottom: 0px;
 }
 
@@ -319,5 +319,10 @@ span.react-datepicker__year-read-view--selected-year {
 .react-datepicker__year-option {
     color: black;
 }
+
+span.react-datepicker__year-read-view--down-arrow {
+    margin-top: 2px;
+}
+
 
 //customization

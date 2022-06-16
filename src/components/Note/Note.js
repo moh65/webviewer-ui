@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useContext, useState, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { useSelector, shallowEqual, useDispatch } from 'react-redux';
@@ -34,6 +35,10 @@ const Note = ({
   const dispatch = useDispatch();
   const [t] = useTranslation();
   const unreadReplyIdSet = new Set();
+
+  if (annotation.FillColor) {
+    annotation.FillColor.A = 0.1;
+  }
 
   const [
     noteTransformFunction,
@@ -172,7 +177,23 @@ const Note = ({
         setIsEditing(true, 1 + index);
       }
     })
+
+    if (!isSelected) {
+      if (removeButtonContents) {
+        removeButtonContents();
+      }
+    }
   }, [isSelected]);
+
+  const removeButtonContents = () => {
+    const container = document.getElementById('annotation-footer-' + annotation.Id);
+
+    if (container) {
+      ReactDOM.render(
+        <div></div>
+        , container);
+    }
+  }
 
   const showReplyArea = !Object.values(isEditingMap).some(val => val);
 

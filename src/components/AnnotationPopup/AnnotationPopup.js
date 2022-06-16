@@ -325,9 +325,7 @@ const AnnotationPopup = () => {
                 img="icon-header-chat-line"
                 onClick={commentOnAnnotation}
               />
-            )} 
-    //customization
-            */}
+            )} }
             {showEditStyleButton && (
               <ActionButton
                 dataElement="annotationStyleEditButton"
@@ -335,7 +333,9 @@ const AnnotationPopup = () => {
                 img="icon-menu-style-line"
                 onClick={() => setIsStylePopupOpen(true)}
               />
-            )}
+            )
+    //customization
+            */}
             {firstAnnotation.ToolName === 'CropPage' && (
               <ActionButton
                 dataElement="annotationCropButton"

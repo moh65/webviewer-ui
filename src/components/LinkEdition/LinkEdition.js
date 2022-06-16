@@ -5,6 +5,10 @@ import actions from 'actions';
 import selectors from 'selectors';
 import core from 'core';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLink, faExternalLinkSquare } from '@fortawesome/free-solid-svg-icons';
+
+import './LinkEdition.scss';
 
 export default ({ annotation }) => {
     const dispatch = useDispatch();
@@ -41,17 +45,27 @@ export default ({ annotation }) => {
     const goToUrl= (e) => {
         e.preventDefault();
         debugger
-        annotation.actions.U[0].onTriggered(annotation, {rc: true}, annotation.cE);
+        annotation.actions.U[0].onTriggered(annotation, {rc: true}, annotation.fE);
     }
 
     return (
-        <div>
-            <div>
-                <span>Link:</span>
-                <strong><a href="#" onClick={goToUrl}>{url}</a></strong>
+        <div className='note-content'>
+            <div className='note-link'>
+            {
+                url.includes('page-') && (
+                <div>
+                        <strong><a href="#" onClick={goToUrl}><FontAwesomeIcon icon={faLink} />{url}</a></strong>
+                </div>
+            )}
+            {
+                !url.includes('page-') && (
+                <div>
+                        <strong><a href="#" onClick={goToUrl}><FontAwesomeIcon icon={faExternalLinkSquare} />{url}</a></strong>
+                </div>
+            )}      
             </div>
-            <div>
-                <button onClick={showEditUrl}>Edit</button>
+            <div className='note-edit'>
+                <button className='cancel-button' onClick={showEditUrl}>Edit</button>
             </div>
         </div>
     )

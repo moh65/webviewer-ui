@@ -464,7 +464,7 @@ const ContentArea = ({
 
   if (container) {
     ReactDOM.render(
-      renderEditButtons(t, annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, setContents, onTextAreaValueChange, removeButtonContents)
+      renderEditButtons(t, annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, setContents, onTextAreaValueChange, removeButtonContents ? removeButtonContents : null)
     , container);
   }
   //Initial render
@@ -530,6 +530,7 @@ const ContentArea = ({
             {showDateField && (
               <div className="date-field">
                 <DatePicker
+                  showYearDropdown
                   placeholderText={currentDocumentInfo.displayDateFormat}
                   dateFormat={currentDocumentInfo.dateFormat}
                   selected={Date.parse(noteDate)}
@@ -614,13 +615,26 @@ const renderEditButtons = (t, annotation, dispatch, redactionBurninDateUrl, toke
     disabled={!commentTextChanged && !customDataChanged}
     onClick={e => {
       e.stopPropagation();
+
+      if (selectedTags && selectedTags.length > 0) {
+        const hex = selectedTags[0].value.split('-')[1]; 
+
+        let colour = new window.Annotations.Color(hex);
+        let fillColour = new window.Annotations.Color(hex);
+        fillColour.A = 0.1;
+        annotation.TextColor = colour;
+        annotation.Color = colour
+        annotation.StrokeColor = colour;
+        annotation.FillColor = fillColour;
+      }
+
       setContents(e);
       //customization
       annotation.setCustomData('custom-private', isPrivate);
       annotation.setCustomData("custom-date", noteDate);
       annotation.setCustomData('custom-tag-options', selectedTags);
       annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0]));
-      
+
       if (removeButtonContents) {
         removeButtonContents();
       }

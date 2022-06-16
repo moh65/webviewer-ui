@@ -574,7 +574,7 @@ export default ({ isModalOpen }) => {
         } else if (action.uri) {
             if (action.uri.includes('bundle_custom')) {
                 highlight.setCustomData('custom-link', `doc: ${action.doc_title} p-(${action.doc_page})`)
-                highlight.setCustomData('custom-link', 'page');
+                highlight.setCustomData('custom-link-type', 'page');
             } else {
                 //error it should not come here
             }
