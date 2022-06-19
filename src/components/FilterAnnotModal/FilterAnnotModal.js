@@ -369,7 +369,7 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
 
   const closeModal = () => {
     dispatch(actions.closeElement('filterModal'));
-    core.setToolMode(defaultTool);
+    // core.setToolMode(defaultTool);
   };
 
   useEffect(() => {

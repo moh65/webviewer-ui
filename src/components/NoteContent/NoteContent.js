@@ -354,13 +354,15 @@ const ContentArea = ({
     isMentionEnabled,
     isNotesPanelOpen,
     defaultBaseUrlAddress,   
-    currentDocumentInfo
+    currentDocumentInfo,
+    defaultTag,
   ] = useSelector(state => [
     selectors.getAutoFocusNoteOnAnnotationSelection(state),
     selectors.getIsMentionEnabled(state),
     selectors.isElementOpen(state, 'notesPanel'),
     selectors.getDefaultUrlBaseAddress(state),
     selectors.getThisDocumentInfo(state),
+    selectors.getDefaultTag(state),
   ]);
 
   currentDocumentInfo = currentDocumentInfo && currentDocumentInfo.id ? currentDocumentInfo : {
@@ -442,7 +444,7 @@ const ContentArea = ({
   const [showDateField, setShowDateField] = useState(false);
   const [customDataChanged, setCustomDataChanged] = useState(false);
   const [commentTextChanged, setCommentTextChanged] = useState(false);
-  const [selectedTags, setSelectedTags] = useState(annotTags != null && annotTags != undefined && annotTags != '' ? JSON.parse(annotTags) : []);
+  const [selectedTags, setSelectedTags] = useState(annotTags != null && annotTags != undefined && annotTags != '' ? JSON.parse(annotTags) : [defaultTag]);
   const allAnnotations = core.getAnnotationsList();
   const linkAnnotation = allAnnotations.find(s => s.Subject === 'Link' && s.InReplyTo === annotation.Id);
 
@@ -628,12 +630,13 @@ const renderEditButtons = (t, annotation, dispatch, redactionBurninDateUrl, toke
         annotation.FillColor = fillColour;
       }
 
-      setContents(e);
       //customization
       annotation.setCustomData('custom-private', isPrivate);
       annotation.setCustomData("custom-date", noteDate);
       annotation.setCustomData('custom-tag-options', selectedTags);
-      annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0]));
+      annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0])); 
+      
+      setContents(e);
 
       if (removeButtonContents) {
         removeButtonContents();

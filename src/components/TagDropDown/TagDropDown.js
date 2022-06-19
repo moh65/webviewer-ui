@@ -290,14 +290,14 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     children,
     ...props
   }) => (
-    <components.SingleValue{...props}>{children}<hidden class='selected-tag' data-id={addData(props)}></hidden></components.SingleValue>
+    <components.SingleValue{...props}>{children}<hidden class='selected-tag' data-id={addData(props)} data-object={JSON.stringify(props.data)}></hidden></components.SingleValue>
   );
   
   const MultiValue = ({
     children,
     ...props
   }) => (
-    <components.MultiValue{...props}>{children}<hidden class='selected-tag' data-id={addData(props)}></hidden></components.MultiValue>
+    <components.MultiValue{...props}>{children}<hidden class='selected-tag' data-id={addData(props)} data-object={JSON.stringify(props.data)}></hidden></components.MultiValue>
   );
 
   const OnChangeCreatableOptionEvent = (option) => {

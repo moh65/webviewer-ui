@@ -44,11 +44,13 @@ const Note = ({
     noteTransformFunction,
     customNoteSelectionFunction,
     unreadAnnotationIdSet,
+    defaultTag,
   ] = useSelector(
     state => [
       selectors.getNoteTransformFunction(state),
       selectors.getCustomNoteSelectionFunction(state),
-      selectors.getUnreadAnnotationIdSet(state),
+      selectors.getUnreadAnnotationIdSet(state),     
+      selectors.getDefaultTag(state),
     ],
     shallowEqual,
   );

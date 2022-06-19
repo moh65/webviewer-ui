@@ -85,48 +85,56 @@ function NoteHeader(props) {
   let color = annotation[iconColor]?.toHexString?.();
   const fillColor = getColor(annotation.FillColor);
 
-  const [customLink, setCustomLink] = useState(null);
-  const [customPrivate, setCustomPrivate] = useState(null);
-  const [customDate, setCustomDate] = useState(null);
-  const [customTag, setCustomTag] = useState(null);
-  const [showHeader, setShowHeader] = useState(true);
+  const getCustomData = () => {
+    const result = { cl: null, cp: null, cd: '', tags: null};
 
-  const setCustomData = () => {
     let cl = annotation.getCustomData('custom-link');
     let cp = annotation.getCustomData('custom-private');
     let cd = annotation.getCustomData('custom-date');
     let ct = annotation.getCustomData('custom-tag-options');
-
     if (cl != null && cl != undefined) {
-      setCustomLink(cl);
+      result.cl = cl;
     }
 
     if (cp != null && cp != undefined) {
-      setCustomPrivate(cp);
-    }
-
+      result.cp = cp;
+    } 
     if (cd != 'null' && cd !== null && cd !== undefined && cd != '') {
-      cd = format(Date.parse(cd), currentDocumentInfo.dateFormat);
-      setCustomDate(cd);
-    } else {
-      setCustomDate('');
+      result.cd = format(Date.parse(cd), currentDocumentInfo.dateFormat);
     }
 
     if (ct !== null && ct !== undefined && ct !== '') {
       const tags = JSON.parse(ct);
-      setCustomTag([...tags]);
+      result.tags = [...tags];
     }
+
+    return result;
   };
 
+  let [customLink, setCustomLink] = useState(null);
+  let [customPrivate, setCustomPrivate] = useState(null);
+  let [customDate, setCustomDate] = useState(null);
+  let [customTag, setCustomTag] = useState(null);
+  let [showHeader, setShowHeader] = useState(true);
 
-  // useEffect(() => {
-  //   console.log(`for annotation ${annotation.Id} noteIndex = ${noteIndex} isEditing = ${isEditing}`)
-  //   setCustomData();
-  // })
+  const InitaliseCustomData = () => {
+    const customData = getCustomData();
+    customLink = customData.cl;
+    customPrivate = customData.cp;
+    customDate = customData.cd;   
+    customTag = customData.tags;
+  }
 
-  useEffect(() => {
-    setCustomData();
-  }, []);
+  InitaliseCustomData();
+  
+  const setCustomData = () => {
+    const customData = getCustomData();
+    
+    setCustomLink(customData.cl);
+    setCustomPrivate(customData.cp);
+    setCustomDate(customData.cd);   
+    setCustomTag(customData.tags);
+  }
 
   useEffect(() => {
     if (isEditing === true && isSelected === true) {
@@ -183,7 +191,8 @@ function NoteHeader(props) {
               <div>
                 {customTag && (
                   <div className="note-detail custom-tag-container">
-                    {customTag.map(
+                    {
+                    customTag.map(
                       ({ label, value }) => (
                         <Tag key={label} label={label} value={value} />
                       )

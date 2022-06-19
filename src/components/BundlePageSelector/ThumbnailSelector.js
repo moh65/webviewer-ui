@@ -157,7 +157,11 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
                             <Button
                                 class='btn4-primary'
                                 startIcon={<FontAwesomeIcon icon="check" />}
-                                onClick={() => { onSelectThumbnail(selectedPage) }}
+                                onClick={() => { 
+                                    if (selectedPage.id) {
+                                        onSelectThumbnail(selectedPage) }
+                                    }
+                                }
                             >Select Page</Button>
                         </span>
 
