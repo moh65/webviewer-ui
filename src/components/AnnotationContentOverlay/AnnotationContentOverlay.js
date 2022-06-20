@@ -12,6 +12,10 @@ import actions from 'actions';
 
 import CustomElement from '../CustomElement';
 import FormFieldPlaceHolderOverlay from './FormFieldPlaceHolderOverlay';
+import Tag from 'components/Tag';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const MAX_CHARACTERS = 100;
 
@@ -28,7 +32,7 @@ const AnnotationContentOverlay = () => {
   const [annotation, setAnnotation] = useState();
   const [annotationVisibility, setAnnotationVisibility] = useState(false);
   const [annotationDate, setAnnotationDate] = useState('');
-  const [tagsName, setTagsName] = useState('');
+  const [tagsName, setTagsName] = useState(null);
   const [linkUrl, setLinkUrl] = useState('');
   //customization
   const [overlayPosition, setOverlayPosition] = useState({
@@ -85,9 +89,9 @@ const AnnotationContentOverlay = () => {
         let tags = annotation.getCustomData('custom-tag-options');
 
         if (tags != null && tags !== '') {
-          tags = JSON.parse(tags).map(m => m.label).join(',');
+          const customTags = JSON.parse(tags);
+          setTagsName([...customTags]);
         }
-        setTagsName(tags);
 
         let link = annotation.getCustomData('custom-link');
         setLinkUrl(link && link !== '' && link != {} ? link : null);
@@ -127,32 +131,41 @@ const AnnotationContentOverlay = () => {
       ref={overlayRef}
     >
       <div className="author">{core.getDisplayAuthor(annotation['Author'])}</div>
-      <div className="contents">
+
+      {/*customization*/}
+      <div className='note-detail'>
+        {
+          annotationVisibility === 'true'
+            ? <><FontAwesomeIcon icon={faEyeSlash} /> Private</>
+            : <><FontAwesomeIcon icon={faEye} /> Public</>
+        }
+      </div>
+      {tagsName && (
+      <div className="note-detail custom-tag-container">
+        {
+        tagsName.map(
+          ({ label, value }) => (
+            <Tag key={label} label={label} value={value} />
+          )
+        )}
+      </div>
+      )}
+      {annotationDate != null && annotationDate != '' && annotationDate != 'null' && annotationDate != 'yyyy-mm-dd' && (
+      <div className='note-detail'>
+          <strong>Date:</strong> {annotationDate}
+      </div>
+      )}
+      <div className="note-detail contents">
         {contents.length > MAX_CHARACTERS
           ? `${contents.slice(0, MAX_CHARACTERS)}...`
           : contents}
       </div>
-      {/*customization*/}
-      <div>
-        {
-          annotationVisibility != null && annotationVisibility != '' ? `Private :${annotationVisibility}` : ``
-        }
-      </div>
-      <div>
-        {
-          annotationDate != null && annotationDate != '' && annotationDate != 'yyyy-mm-dd' ? `Date: ${annotationDate}` : ''
-        }
-      </div>
-      <div>
-        {
-          tagsName != null && tagsName != '' ? `Tags: ${tagsName}` : ''
-        }
-      </div>
-      <div>
-        {
-          linkUrl != null ? `Link: ${linkUrl}` : ''
-        }
-      </div>
+      {
+        linkUrl != null && (
+        <div className='note-detail'>
+          <strong>Link:</strong> {linkUrl}
+        </div>
+      )}
       {/*customization*/}
       {numberOfReplies > 0 && (
         <div className="replies">

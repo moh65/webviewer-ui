@@ -12,10 +12,20 @@
 
   .author {
     font-weight: bold;
+    margin-bottom: 10px;
   }
 
   .contents, .replies {
     margin-top: 5px;
     white-space: pre-wrap;
   }
+}  
+
+.note-detail {
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.custom-tag-container {
+  margin: -3px;
 }
