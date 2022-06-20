@@ -36,7 +36,10 @@ const Note = ({
   const [t] = useTranslation();
   const unreadReplyIdSet = new Set();
 
-  if (annotation.FillColor) {
+  if (annotation.FillColor && annotation.FillColor !== 0.1 && annotation.Subject !== 'Redact') {
+    annotation.FillColor.G = annotation.StrokeColor.G;
+    annotation.FillColor.R = annotation.StrokeColor.R;
+    annotation.FillColor.B = annotation.StrokeColor.B;
     annotation.FillColor.A = 0.1;
   }
 

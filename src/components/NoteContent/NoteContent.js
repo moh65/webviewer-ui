@@ -620,14 +620,17 @@ const renderEditButtons = (t, annotation, dispatch, redactionBurninDateUrl, toke
 
       if (selectedTags && selectedTags.length > 0) {
         const hex = selectedTags[0].value.split('-')[1]; 
-
         let colour = new window.Annotations.Color(hex);
-        let fillColour = new window.Annotations.Color(hex);
-        fillColour.A = 0.1;
+
         annotation.TextColor = colour;
         annotation.Color = colour
         annotation.StrokeColor = colour;
-        annotation.FillColor = fillColour;
+
+        if (annotation.Subject !== 'Redact') {
+          let fillColour = new window.Annotations.Color(hex);
+          fillColour.A = 0.1;
+          annotation.FillColor = fillColour;
+        }
       }
 
       //customization
