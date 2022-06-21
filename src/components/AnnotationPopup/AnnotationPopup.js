@@ -366,14 +366,15 @@ const AnnotationPopup = () => {
                 onClick={() => core.groupAnnotations(primaryAnnotation, selectedAnnotations)}
               />
             )}
-            {canUngroup && (
+            /*
+            {/*canUngroup && (
               <ActionButton
                 dataElement="annotationUngroupButton"
                 title="action.ungroup"
                 img="ic_ungroup_24px"
                 onClick={() => core.ungroupAnnotations(selectedAnnotations)}
               />
-            )}
+            )*/}
             {includesFormFieldAnnotation && (
               <ActionButton
                 title="action.formFieldEdit"

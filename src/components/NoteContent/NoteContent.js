@@ -466,7 +466,7 @@ const ContentArea = ({
 
   if (container) {
     ReactDOM.render(
-      renderEditButtons(t, annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, setContents, onTextAreaValueChange, removeButtonContents ? removeButtonContents : null)
+      renderEditButtons(t, annotation, isReply, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, setContents, onTextAreaValueChange, removeButtonContents ? removeButtonContents : null)
     , container);
   }
   //Initial render
@@ -557,7 +557,7 @@ const ContentArea = ({
           //customization
         )}
   
-        { !container && renderEditButtons(t, annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, setContents, onTextAreaValueChange)}
+        { !container && renderEditButtons(t, annotation, isReply, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, setContents, onTextAreaValueChange)}
       </div>
     </div>
     //customization
@@ -565,7 +565,7 @@ const ContentArea = ({
   
 };
 
-const renderEditButtons = (t, annotation, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, setContents, onTextAreaValueChange, removeButtonContents) => {
+const renderEditButtons = (t, annotation, isReply, dispatch, redactionBurninDateUrl, token, commentTextChanged, customDataChanged, noteIndex, isPrivate, noteDate, selectedTags, setIsEditing, setContents, onTextAreaValueChange, removeButtonContents) => {
   return (
   <div className="edit-buttons">
   {
@@ -618,26 +618,29 @@ const renderEditButtons = (t, annotation, dispatch, redactionBurninDateUrl, toke
     onClick={e => {
       e.stopPropagation();
 
-      if (selectedTags && selectedTags.length > 0) {
-        const hex = selectedTags[0].value.split('-')[1]; 
-        let colour = new window.Annotations.Color(hex);
+      if (!isReply) {
+        if (selectedTags && selectedTags.length > 0) {
+          const hex = selectedTags[0].value.split('-')[1]; 
+          let colour = new window.Annotations.Color(hex);
 
-        annotation.TextColor = colour;
-        annotation.Color = colour
-        annotation.StrokeColor = colour;
+          annotation.TextColor = colour;
+          annotation.Color = colour
+          annotation.StrokeColor = colour;
 
-        if (annotation.Subject !== 'Redact') {
-          let fillColour = new window.Annotations.Color(hex);
-          fillColour.A = 0.1;
-          annotation.FillColor = fillColour;
+          if (annotation.Subject !== 'Redact') {
+            let fillColour = new window.Annotations.Color(hex);
+            fillColour.A = 0.1;
+            annotation.FillColor = fillColour;
+          }
         }
-      }
 
-      //customization
-      annotation.setCustomData('custom-private', isPrivate);
-      annotation.setCustomData("custom-date", noteDate);
-      annotation.setCustomData('custom-tag-options', selectedTags);
-      annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0])); 
+        //customization
+        annotation.setCustomData('custom-private', isPrivate);
+        annotation.setCustomData("custom-date", noteDate);
+        annotation.setCustomData('custom-tag-options', selectedTags);
+        
+        annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0])); 
+      }
       
       setContents(e);
 
