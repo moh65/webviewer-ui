@@ -372,7 +372,7 @@ const LinkModal = () => {
                           value={url}
                           onChange={e => setURL(e.target.value)}
                         />
-                        <Button class="btn4-primary" onClick={addURLLink} startIcon={<FontAwesomeIcon icon="check" />}>
+                        <Button type="submit" class="btn4-primary" startIcon={<FontAwesomeIcon icon="check" />}>
                           {t('action.link')}
                         </Button>
                         <Button class="btn4-secondary" onClick={closeModal} startIcon={<FontAwesomeIcon icon="ban" />}>
