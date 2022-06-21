@@ -104,6 +104,7 @@ const AnnotationContentOverlay = () => {
             setOverlayPosition({ left, top });
           }
         }
+
         dispatch(actions.openElement('annotationContentOverlay'));
       } else {
         setAnnotation(null);
@@ -155,11 +156,13 @@ const AnnotationContentOverlay = () => {
           <strong>Date:</strong> {annotationDate}
       </div>
       )}
+      { contents &&
       <div className="note-detail contents">
         {contents.length > MAX_CHARACTERS
           ? `${contents.slice(0, MAX_CHARACTERS)}...`
           : contents}
       </div>
+      }
       {
         linkUrl != null && (
         <div className='note-detail'>
@@ -204,7 +207,7 @@ const AnnotationContentOverlay = () => {
     )
   }
 
-  if (contents && isOverlayOpen) {
+  if (isOverlayOpen) {
     return renderContents();
   }
 
