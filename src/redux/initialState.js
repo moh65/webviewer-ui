@@ -377,7 +377,6 @@ export default {
       { dataElement: 'annotationRedactButton' },
       { dataElement: 'annotationCropButton' },
       { dataElement: 'annotationGroupButton' },
-      { dataElement: 'annotationUngroupButton' },
       { dataElement: 'formFieldEditButton' },
       { dataElement: 'annotationDeleteButton' },
       { dataElement: 'calibrateButton' },
