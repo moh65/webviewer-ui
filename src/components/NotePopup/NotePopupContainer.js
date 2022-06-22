@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 
 function NotePopupContainer(props) {
-  const { annotation, setIsEditing, noteIndex } = props; // eslint-disable-line react/prop-types
+  const { annotation, setIsEditing, noteIndex, customImported } = props; // eslint-disable-line react/prop-types
 
   const [canModify, setCanModify] = React.useState(core.canModify(annotation));
   const [canModifyContents, setCanModifyContents] = React.useState(core.canModifyContents(annotation));
@@ -34,6 +34,10 @@ function NotePopupContainer(props) {
   }, [annotation, setIsEditing, noteIndex]);
 
   const handleDelete = React.useCallback(function handleDelete() {
+    if (customImported) {
+      annotation.Author = core.getCurrentUser();
+    }
+    
     core.deleteAnnotations([annotation, ...annotation.getGroupedChildren()]);
   }, [annotation]);
 
@@ -41,7 +45,7 @@ function NotePopupContainer(props) {
   const closePopup = () => setIsOpen(false);
 
   const isEditable = canModifyContents;
-  const isDeletable = canModify && !annotation?.NoDelete;
+  const isDeletable = (canModify && !annotation?.NoDelete) || customImported;
 
   const passProps = {
     handleEdit,

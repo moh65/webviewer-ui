@@ -86,12 +86,14 @@ function NoteHeader(props) {
   const fillColor = getColor(annotation.FillColor);
 
   const getCustomData = () => {
-    const result = { cl: null, cp: null, cd: '', tags: null};
+    const result = { cl: null, cp: null, cd: '', tags: null, ci: false};
 
     let cl = annotation.getCustomData('custom-link');
     let cp = annotation.getCustomData('custom-private');
     let cd = annotation.getCustomData('custom-date');
     let ct = annotation.getCustomData('custom-tag-options');
+    let ci = annotation.getCustomData('custom-imported');
+
     if (cl != null && cl != undefined) {
       result.cl = cl;
     }
@@ -108,14 +110,20 @@ function NoteHeader(props) {
       result.tags = [...tags];
     }
 
+    if (ci != null && ci != undefined) {
+      result.ci = ci;
+    }
+
     return result;
   };
+  
 
   let [customLink, setCustomLink] = useState(null);
   let [customPrivate, setCustomPrivate] = useState(null);
   let [customDate, setCustomDate] = useState(null);
   let [customTag, setCustomTag] = useState(null);
   let [showHeader, setShowHeader] = useState(true);
+  let [customImported, setCustomImporter] = useState(false);
 
   const InitaliseCustomData = () => {
     const customData = getCustomData();
@@ -123,6 +131,7 @@ function NoteHeader(props) {
     customPrivate = customData.cp;
     customDate = customData.cd;   
     customTag = customData.tags;
+    customImported = customData.ci;
   }
 
   InitaliseCustomData();
@@ -134,6 +143,7 @@ function NoteHeader(props) {
     setCustomPrivate(customData.cp);
     setCustomDate(customData.cd);   
     setCustomTag(customData.tags);
+    setCustomImporter(customData.ci);
   }
 
   useEffect(() => {
@@ -220,12 +230,13 @@ function NoteHeader(props) {
                 isSelected={isSelected}
               />
             } */}
-            {!isEditing && isSelected &&
+            {!isEditing && isSelected && 
               <NotePopup
                 noteIndex={noteIndex}
                 annotation={annotation}
                 setIsEditing={setIsEditing}
                 isReply={isReply}
+                customImported={customImported}
               />}
           </div>
         </div>

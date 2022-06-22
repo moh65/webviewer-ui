@@ -290,6 +290,13 @@ const AnnotationPopup = () => {
 
   const show3DShortCutButton = firstAnnotation instanceof Annotations.Model3DAnnotation && !isMobile();
 
+  let customImport = false
+  let ci = firstAnnotation.getCustomData('custom-imported');
+
+  if (ci != null && ci != undefined && firstAnnotation.isImporting !== undefined && firstAnnotation.isImporting === false) {
+    customImport = ci;
+  }
+
   const onResize = () => {
     setStylePopupRepositionFlag(!stylePopupRepositionFlag);
   }
@@ -387,13 +394,18 @@ const AnnotationPopup = () => {
             )
             }
             {
-            canModify && (
+            (canModify || customImport) && (
               <ActionButton
                 dataElement="annotationDeleteButton"
                 title="action.delete"
                 img="icon-delete-line"
                 onClick={() => {
-                  debugger
+                  debugger   
+                  if (customImport) {
+                    const annotations = core.getSelectedAnnotations();
+                    annotations[0].Author = core.getCurrentUser();
+                  }
+
                   core.deleteAnnotations(core.getSelectedAnnotations());
                   dispatch(actions.closeElement('annotationPopup'));
                 }}
