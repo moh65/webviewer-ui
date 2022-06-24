@@ -411,7 +411,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
               <label htmlFor="tagName">Tag Name:</label>
               <input type="text" id="tagName" value={tagName} onChange={e => setTagName(e.target.value)} />
               <br />
-              <label htmlFor="tagColor">Tag Color:</label>
+              <label htmlFor="tagColor">Tag Colour:</label>
               <SketchPicker color={tagColor} onChange={colorPickerHandler} />
             </div>
             <div className="fm-container clear">
