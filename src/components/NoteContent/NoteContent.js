@@ -627,10 +627,12 @@ const renderEditButtons = (t, annotation, isReply, dispatch, redactionBurninDate
           annotation.Color = colour
           annotation.StrokeColor = colour;
 
-          if (annotation.Subject !== 'Redact') {
-            let fillColour = new window.Annotations.Color(hex);
-            fillColour.A = 0.1;
-            annotation.FillColor = fillColour;
+          if (annotation.Subject === "Rectangle" || annotation.Subject === "Ellipse") {
+            annotation.FillColor.G = annotation.StrokeColor.G;
+            annotation.FillColor.R = annotation.StrokeColor.R;
+            annotation.FillColor.B = annotation.StrokeColor.B;
+            annotation.FillColor.A = 0.1;
+            annotation.Opacity = 1.0;
           }
         }
 

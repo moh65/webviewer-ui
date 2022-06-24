@@ -36,11 +36,12 @@ const Note = ({
   const [t] = useTranslation();
   const unreadReplyIdSet = new Set();
 
-  if (annotation.FillColor && annotation.FillColor !== 0.1 && annotation.Subject !== 'Redact') {
+  if (annotation.Subject === "Rectangle" || annotation.Subject === "Ellipse") {
     annotation.FillColor.G = annotation.StrokeColor.G;
     annotation.FillColor.R = annotation.StrokeColor.R;
     annotation.FillColor.B = annotation.StrokeColor.B;
     annotation.FillColor.A = 0.1;
+    annotation.Opacity = 1.0;
     core.getAnnotationManager().redrawAnnotation(annotation);
   }
 
