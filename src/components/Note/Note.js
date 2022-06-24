@@ -41,6 +41,7 @@ const Note = ({
     annotation.FillColor.R = annotation.StrokeColor.R;
     annotation.FillColor.B = annotation.StrokeColor.B;
     annotation.FillColor.A = 0.1;
+    core.getAnnotationManager().redrawAnnotation(annotation);
   }
 
   const [

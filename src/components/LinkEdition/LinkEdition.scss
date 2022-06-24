@@ -9,6 +9,7 @@
 
 .note-link {
   width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .note-content {
@@ -18,4 +19,8 @@
 
 .note-edit > button.cancel-button {
   border-width: 1px;
+}
+
+.note-edit {
+  min-width: 37px;
 }

@@ -640,6 +640,8 @@ const renderEditButtons = (t, annotation, isReply, dispatch, redactionBurninDate
         annotation.setCustomData('custom-tag-options', selectedTags);
         
         annotation.setCustomData('custom-tag', selectedTags.map(t => t.value.split('-')[0])); 
+
+        core.getAnnotationManager().redrawAnnotation(annotation);
       }
       
       setContents(e);
