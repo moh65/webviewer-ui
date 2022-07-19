@@ -423,7 +423,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
                 }}>Cancel</button>
               </div>
               <div className="fm-container-child">
-                <button className="btn btn-success" disabled={tagName == "" || tagColor == ""} onClick={saveTag}>Save</button>
+                <button className="btn btn-success" disabled={tagName == "" || tagColor == "" || tagName == "No Tag"} onClick={saveTag}>Save</button>
               </div>
             </div>
           </Swipeable>
