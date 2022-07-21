@@ -216,7 +216,7 @@ function NoteHeader(props) {
                 )}
                 {customLink !== '' && (
                   <div className="note-detail">
-                    <strong>URL:</strong> {customLink}
+                    <strong>URL:</strong> {customLink.replace('&amp;', '&')}
                   </div>
                 )}
               </div>

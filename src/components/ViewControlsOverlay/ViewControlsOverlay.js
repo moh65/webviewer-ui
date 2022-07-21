@@ -19,6 +19,8 @@ function ViewControlsOverlay() {
   const displayMode = useSelector(selectors.getDisplayMode);
   const isDisabled = useSelector(state => selectors.isElementDisabled(state, 'viewControlsOverlay'));
   const isReaderMode = useSelector(selectors.isReaderMode);
+  const currentPage = useSelector(state => selectors.getCurrentPage(state));
+  const docViewer = instance.Core.documentViewer;
 
   const totalPageThreshold = 1000;
 
@@ -59,6 +61,14 @@ function ViewControlsOverlay() {
   }
 
   const showReaderButton = core.isFullPDFEnabled() && window.documentViewer?.getDocument()?.getType() === 'pdf';
+
+  const rotateSinglePageClockwise = () => {
+    docViewer.rotateClockwise(currentPage);
+  };
+
+  const rotateSinglePageCounterClockwise = () => {
+    docViewer.rotateCounterClockwise(currentPage);
+  };
 
   return (
     <FlyoutMenu menu="viewControlsOverlay" trigger="viewControlsButton" onClose={undefined} ariaLabel={t('component.viewControlsOverlay')}>
@@ -142,6 +152,32 @@ function ViewControlsOverlay() {
               role="option"
             />
             <div className="title">{t('action.rotateCounterClockwise')}</div>
+          </DataElementWrapper>
+          <DataElementWrapper
+            dataElement="viewControlsDivider4"
+            className="divider"
+          />
+          <DataElementWrapper
+            dataElement="layoutHeader"
+            className="type"
+          >
+            Selected Page Orientation
+          </DataElementWrapper>
+          <DataElementWrapper className="row" onClick={rotateSinglePageClockwise} dataElement="">
+            <Button
+              title="Rotate Selected Page Clockwise"
+              img="icon-header-page-manipulation-page-rotation-clockwise-line"
+              role="option"
+            />
+            <div className="title">Rotate Clockwise</div>
+          </DataElementWrapper>
+          <DataElementWrapper className="row" onClick={rotateSinglePageCounterClockwise} dataElement="">
+            <Button
+              title="Rotate Selected Page Clockwise"
+              img="icon-header-page-manipulation-page-rotation-counterclockwise-line"
+              role="option"
+            />
+            <div className="title">Rotate Counter Clockwise</div>
           </DataElementWrapper>
           <DataElementWrapper
             dataElement="viewControlsDivider2"

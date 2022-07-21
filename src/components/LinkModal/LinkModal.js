@@ -242,7 +242,7 @@ const LinkModal = () => {
   const addURLLink = e => {
     e.preventDefault();
 
-    const action = new window.Actions.URI({ uri: url });
+    const action = new window.Actions.URI({ uri: url.replace('&', '&amp;')});
     const links = createLink(action);
 
     let pageNumbersToDraw = links.map(link => link.PageNumber);

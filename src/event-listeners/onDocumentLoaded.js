@@ -187,7 +187,7 @@ export default store => async () => {
         if (!url.startsWith('http')){
           url = 'http://' + url;
         }
-        window.open(url);
+        window.open(url.replace('&amp;', '&'));
       }
 
       return;

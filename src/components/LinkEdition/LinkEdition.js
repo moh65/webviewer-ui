@@ -60,7 +60,7 @@ export default ({ annotation }) => {
             {
                 !url.includes('page-') && (
                 <div>
-                        <strong><a href="#" onClick={goToUrl}><FontAwesomeIcon icon={faExternalLinkSquare} />{url}</a></strong>
+                        <strong><a href="#" onClick={goToUrl}><FontAwesomeIcon icon={faExternalLinkSquare} />{url.replace('&amp;', '&')}</a></strong>
                 </div>
             )}      
             </div>
