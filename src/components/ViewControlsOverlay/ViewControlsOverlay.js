@@ -169,15 +169,15 @@ function ViewControlsOverlay() {
               img="icon-header-page-manipulation-page-rotation-clockwise-line"
               role="option"
             />
-            <div className="title">Rotate Clockwise</div>
+            <div className="title">{t('action.rotateClockwise')}</div>
           </DataElementWrapper>
           <DataElementWrapper className="row" onClick={rotateSinglePageCounterClockwise} dataElement="">
             <Button
-              title="Rotate Selected Page Clockwise"
+              title="Rotate Selected Page Counterclockwise"
               img="icon-header-page-manipulation-page-rotation-counterclockwise-line"
               role="option"
             />
-            <div className="title">Rotate Counter Clockwise</div>
+            <div className="title">{t('action.rotateCounterClockwise')}</div>
           </DataElementWrapper>
           <DataElementWrapper
             dataElement="viewControlsDivider2"
