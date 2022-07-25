@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import Loading from 'components/loading';
 import Button from '@mui/material/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import actions from 'actions';
 
 export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
     let [
@@ -34,6 +35,7 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
     const [error, setError] = useState(false);
     const [pageThumbnailData, setPageThumbnailData] = useState([]);
     const [selectedPage, setSelectedPage] = useState({});
+    const dispatch = useDispatch();
 
     const thumbnailClickHandler = (img) => {
         setSelectedPage(img);
@@ -149,7 +151,7 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
                             <Button
                                 class='btn4-secondary'
                                 startIcon={<FontAwesomeIcon icon="ban" />}
-                                onClick={() => { onSelectThumbnail(selectedPage) }}
+                                onClick={() => { dispatch(actions.closeElement('linkModal')) }}
                             >Cancel</Button>
                         </span>
 
