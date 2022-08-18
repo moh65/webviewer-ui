@@ -163,7 +163,7 @@ function ViewControlsOverlay() {
           >
             Selected Page Orientation
           </DataElementWrapper>
-          <DataElementWrapper className="row" onClick={rotateSinglePageClockwise} dataElement="">
+          <DataElementWrapper className="row" onClick={rotateSinglePageClockwise} dataElement="rotateSinglePageClockwiseButton">
             <Button
               title="Rotate Selected Page Clockwise"
               img="icon-header-page-manipulation-page-rotation-clockwise-line"
@@ -171,7 +171,7 @@ function ViewControlsOverlay() {
             />
             <div className="title">{t('action.rotateClockwise')}</div>
           </DataElementWrapper>
-          <DataElementWrapper className="row" onClick={rotateSinglePageCounterClockwise} dataElement="">
+          <DataElementWrapper className="row" onClick={rotateSinglePageCounterClockwise} dataElement="rotateSinglePageCounterClockwiseButton">
             <Button
               title="Rotate Selected Page Counterclockwise"
               img="icon-header-page-manipulation-page-rotation-counterclockwise-line"
