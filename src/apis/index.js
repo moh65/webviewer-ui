@@ -191,6 +191,7 @@ import reloadOutline from './reloadOutline';
 //customization
 import setCustomURLs from './setCustomURLs';
 import setThisDocumentInfo from './setThisDocumentInfo';
+import updateTags from './updateTags';
 import core from "core";
 
 //customization
@@ -268,6 +269,7 @@ export default store => {
     //customization
     setCustomURLs: setCustomURLs(store),
     setThisDocumentInfo: setThisDocumentInfo(store),
+    updateTags: updateTags(store),
     //customization
     exportBookmarks: exportBookmarks(store),
     extractPagesWithAnnotations,
@@ -411,7 +413,7 @@ export default store => {
     disableDesktopOnlyMode: disableDesktopOnlyMode(store),
     isInDesktopOnlyMode: isInDesktopOnlyMode(store),
     disablePageDeletionConfirmationModal: disablePageDeletionConfirmationModal(store),
-    enablePageDeletionConfirmationModal: enablePageDeletionConfirmationModal(store)
+    enablePageDeletionConfirmationModal: enablePageDeletionConfirmationModal(store),
   };
 
   // objForWebViewerUI.overrideSearchExecution((value, options) => {
@@ -557,6 +559,7 @@ export default store => {
   //     }
   //   }
   // }
+
 
 
   window.instance = {

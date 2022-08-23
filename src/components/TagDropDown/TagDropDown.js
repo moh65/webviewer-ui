@@ -228,6 +228,39 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
     } else {
       setTagOptions(newOptions);
     }
+
+    if (creatable) {
+      if (selectedOptions.label !== 'No Tag' && selectedOptions.value !== undefined) {
+
+        const id = selectedOptions.value.split('-')[0]
+        let optionIndex = newOptions.findIndex(i => i.value !== 'create-tag' && i.value.split('-')[0] === id);
+
+        if (optionIndex >= 0) {
+          setTags(newOptions[optionIndex]);
+        } else {
+          setTags(noTag);
+        }
+      } 
+    } else if (selectedOptions.length > 0) {
+      let newSelectedOptions = [];
+      for (let j = 0; j < selectedOptions.length; j++) {
+
+        if (selectedOptions.label !== 'No Tag') {
+          const id = selectedOptions[j].value.split('-')[0]    
+          let optionIndex = newOptions.findIndex(i => i.value !== 'create-tag' && i.value.split('-')[0] === id);
+
+          if (optionIndex >= 0) {
+            newSelectedOptions.push(newOptions[optionIndex]);
+          }
+        } else {
+          newSelectedOptions.push(newOptions[optionIndex]);
+        }
+      }  
+
+      if (newSelectedOptions.length > 0) { 
+        setTags(newSelectedOptions);   
+      }
+    }
   };
 
   useEffect(() => {
