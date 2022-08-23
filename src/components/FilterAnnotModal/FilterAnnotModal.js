@@ -274,7 +274,8 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
           let filteredTagValues = filteredTags.map(t => t.value.split('-')[0]);
           let filteredTagLabels = filteredTags.map(t => t.label);
 
-          let commonValues = filteredTagValues.filter((n) => tag.indexOf('"' + n + '"') !== -1);
+
+          let commonValues = filteredTagValues.filter((n) => tag.indexOf('"' + n + '"') !== -1 || tag.indexOf('"' + n + '-') !== -1);
           const containsNo = filteredTagValues.some(i => i.toLocaleLowerCase() === 'no') || filteredTagLabels.some(i => i.toLocaleLowerCase() === 'no tag' );
 
           filteredTagShouldApply = (tag.length === 0 && containsNo) || commonValues.length > 0 ? false : true;

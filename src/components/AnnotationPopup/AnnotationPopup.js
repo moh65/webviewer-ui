@@ -394,14 +394,14 @@ const AnnotationPopup = () => {
             )
             }
             {
-            (canModify || customImport) && (
+            (canModify || (customImport && customImport !== "false")) && (
               <ActionButton
                 dataElement="annotationDeleteButton"
                 title="action.delete"
                 img="icon-delete-line"
                 onClick={() => {
                   debugger   
-                  if (customImport) {
+                  if (customImport && customImport !== "false" ) {
                     const annotations = core.getSelectedAnnotations();
                     annotations[0].Author = core.getCurrentUser();
                   }

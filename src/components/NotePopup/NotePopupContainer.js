@@ -44,7 +44,7 @@ function NotePopupContainer(props) {
   }, [annotation, setIsEditing, noteIndex]);
 
   const handleDelete = React.useCallback(function handleDelete() {
-    if (customImported) {
+    if (customImported && customImported !== "false") {
       annotation.Author = core.getCurrentUser();
     }
     
@@ -55,7 +55,7 @@ function NotePopupContainer(props) {
   const closePopup = () => setIsOpen(false);
 
   const isEditable = canModifyContents;
-  const isDeletable = (canModify && !annotation?.NoDelete) || (customImported && currentDocumentInfo.isGeneratedBundle !== undefined && currentDocumentInfo.isGeneratedBundle === false);
+  const isDeletable = (canModify && !annotation?.NoDelete) || (customImported && customImported !== "false" && currentDocumentInfo.isGeneratedBundle !== undefined && currentDocumentInfo.isGeneratedBundle === false);
 
   const passProps = {
     handleEdit,
