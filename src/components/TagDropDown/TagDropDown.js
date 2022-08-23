@@ -186,6 +186,10 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
       setSelectedTags(options);
     }
 
+    if (creatable && selectedOptions.value !== undefined) {
+      OnChangeCreatableOptionEvent(options);
+    }
+
     if (creatable && options.length > 0) {
       OnChangeCreatableOptionEvent(options[0]);
     }
