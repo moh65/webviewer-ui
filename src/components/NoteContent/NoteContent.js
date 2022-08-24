@@ -498,23 +498,22 @@ const ContentArea = ({
                   placeholder={"No tag ..."}
                 />
               </div>
-              <div className="col-shrink">
-                <Choice
-                  type="checkbox"
-                  label="Private"
-                  checked={isPrivate}
-                  onChange={e => {
-                    e.stopPropagation();
-                    setCustomDataChanged(true);
-                    if (e.target.checked) {
-                      setIsPrivate(true);
-                    } else {
-                      setIsPrivate(false);
-                    }
-                  }}
-                />
-              </div>
             </div>
+            <Choice
+              type="checkbox"
+              className="mb-10"
+              label="Private"
+              checked={isPrivate}
+              onChange={e => {
+                e.stopPropagation();
+                setCustomDataChanged(true);
+                if (e.target.checked) {
+                  setIsPrivate(true);
+                } else {
+                  setIsPrivate(false);
+                }
+              }}
+            />
             <Choice
               type="checkbox"
               label="Add Date"

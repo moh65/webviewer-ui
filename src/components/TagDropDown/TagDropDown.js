@@ -384,7 +384,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
 
   return (
     showElement && (
-      <div className="custom-select" data-element="tagSelectBox" style={{ width: controlWidth ? controlWidth : '200px' }}>
+      <div className="custom-select" data-element="tagSelectBox" style={{ width: controlWidth ? controlWidth : '300px' }}>
         <Select
           components={{ SingleValue, MultiValue }}
           onChange={(option, { action }) => {

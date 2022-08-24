@@ -54,7 +54,7 @@ export const getDocumentContentContainerWidthStyle = state => {
 
   const spaceTakenUpByPanels = 0 +
     (isLeftPanelOpen ? leftPanelWidth : 0) +
-    (isNotesPanelOpen ? notesPanelWidth : 0) +
+    (isNotesPanelOpen ? notesPanelWidth > 385 ? notesPanelWidth : 385 : 0) +
     (isSearchPanelOpen ? searchPanelWidth : 0);
 
   return `calc(100% - ${spaceTakenUpByPanels}px)`;
