@@ -147,15 +147,17 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
                         <Gallery direction='column' renderImage={imageRenderer} columns={3} photos={pageThumbnailData} className="gallery-view" />
                     </div>
                     <div className="button-container">
-                        <span className="button-action">
+
+
+                        <span className="button-action" style={{float: "left"}}>
                             <Button
-                                class='btn4-secondary'
-                                startIcon={<FontAwesomeIcon icon="ban" />}
-                                onClick={() => { dispatch(actions.closeElement('linkModal')) }}
-                            >Cancel</Button>
+                                class='btn4-change'
+                                startIcon={<FontAwesomeIcon icon="arrows-rotate" />}
+                                onClick={() => { setIsOpen(false); }}
+                            >{t('action.changeDocument')}</Button>
                         </span>
 
-                        <span className="button-action">
+                        <span className="button-action" style={{float: "right"}}>
                             <Button
                                 class='btn4-primary'
                                 startIcon={<FontAwesomeIcon icon="check" />}
@@ -167,12 +169,12 @@ export default ({ logicalItemInfo, isOpen, setIsOpen, onSelectThumbnail }) => {
                             >Select Page</Button>
                         </span>
 
-                        <span className="button-action">
+                        <span className="button-action" style={{float: "right"}}>
                             <Button
-                                class='btn4-change'
-                                startIcon={<FontAwesomeIcon icon="arrows-rotate" />}
-                                onClick={() => { setIsOpen(false); }}
-                            >{t('action.changeDocument')}</Button>
+                                class='btn4-secondary'
+                                startIcon={<FontAwesomeIcon icon="ban" />}
+                                onClick={() => { dispatch(actions.closeElement('linkModal')) }}
+                            >Cancel</Button>
                         </span>
                     </div>
                 </div>
