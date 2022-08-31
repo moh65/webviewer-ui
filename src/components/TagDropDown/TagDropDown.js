@@ -361,6 +361,11 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
       'AnnotationCreateTextStrikeout',
       'AnnotationCreateTextSquiggly',
       'AnnotationCreateSticky'];
+      
+    if (option.length > 0) {
+      option = option[0];
+    }
+
     let hex = option.value.split('-')[1];
     let color = new window.Annotations.Color(hex);
     let fillColour = new window.Annotations.Color(hex);
