@@ -41,7 +41,7 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
 
   const dropDownRef = useRef();
   const [tagOptions, setTagOptions] = useState([]);
-  const [selectedOptions, setSelectedOptions] = useState(selectedTags === undefined ? [] : selectedTags);
+  let [selectedOptions, setSelectedOptions] = useState(selectedTags === undefined ? [] : selectedTags);
   const [showTagCreateForm, setShowTagCreateForm] = useState(false);
   const [tagName, setTagName] = useState('');
   const [tagColor, setTagColor] = useState('');
@@ -233,7 +233,10 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
       setTagOptions(newOptions);
     }
 
-    if (creatable) {
+    if (creatable) {        
+      if (selectedOptions.length > 0) {
+        selectedOptions  = selectedOptions[0];
+      }
       if (selectedOptions.label !== 'No Tag' && selectedOptions.value !== undefined) {
 
         const id = selectedOptions.value.split('-')[0]
@@ -361,12 +364,13 @@ export default forwardRef(({ setDropDownChanged, setSelectedTags, selectedTags, 
       'AnnotationCreateTextStrikeout',
       'AnnotationCreateTextSquiggly',
       'AnnotationCreateSticky'];
-      
-    if (option.length > 0) {
-      option = option[0];
+    
+    let selectedTag = option;
+    if (selectedTag.length > 0) {
+      selectedTag = selectedTag[0];
     }
 
-    let hex = option.value.split('-')[1];
+    let hex = selectedTag.value.split('-')[1];
     let color = new window.Annotations.Color(hex);
     let fillColour = new window.Annotations.Color(hex);
     fillColour.A = 0.1;
