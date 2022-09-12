@@ -50,13 +50,14 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       selectors.isDocumentReadOnly(state),
       selectors.getEnableNotesPanelVirtualizedList(state),
       selectors.isInDesktopOnlyMode(state),
-    //customization
+      //customization
       selectors.isEditLinkMode(state),
-    //customization
+      //customization
     ],
     shallowEqual,
   );
   const currentWidth = currentLeftPanelWidth || currentNotesPanelWidth;
+
 
   const dispatch = useDispatch();
   const inputRef = useRef(null);
@@ -103,6 +104,37 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     return () => core.removeEventListener('documentUnloaded', onDocumentUnloaded);
   }, []);
 
+
+
+  useEffect(() => {
+    const annotationChangedListener2 = (annotations, action, { imported }) => {
+      if (imported) {
+        for(const ann of annotations)
+          ann.setCustomData('edit-mode', "0");
+        return
+      }
+
+      if (action === 'add') {
+        let id = '';
+        if (annotations.length === 2) {
+          id = annotations.find(f => f.Subject === 'Highlight').Id
+          annotations.find(f => f.Subject === 'Highlight').setCustomData('edit-mode', "1")
+        } else {
+          id = annotations[0].Id;
+          annotations[0].setCustomData('edit-mode', "1")
+        }
+      }
+    };
+
+    core.addEventListener('annotationChanged', annotationChangedListener2);
+    // console.warn('editmode, subscribing to annotation changes')
+    return () => {
+      core.removeEventListener('annotationChanged', annotationChangedListener2);
+      // console.warn('editmode, unsubscribing to annotation changes')
+    }
+  }, [])
+
+
   useEffect(() => {
     const _setNotes = () => {
       // setNotes(
@@ -146,12 +178,13 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
   useEffect(() => {
     const onAnnotationSelected = () => {
       const ids = {};
-
       core.getSelectedAnnotations().forEach(annot => {
         ids[annot.Id] = true;
+        // console.warn('editmode, selected annotation is = ' + annot.Id)
       });
       if (isOpen) {
         setSelectedNoteIds(ids);
+        // console.warn('editmode, annotation selected annotid = ' + Object.keys(ids))
         setScrollToSelectedAnnot(true);
       }
     };
@@ -277,7 +310,6 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
 
     //Collapse an expanded note when the top non-reply NoteContent is clicked
     const handleNoteClicked = () => {
-      //debugger
       if (selectedNoteIds[currNote.Id]) {
         setSelectedNoteIds(currIds => {
           const clone = { ...currIds };
@@ -293,7 +325,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       searchInput,
       resize,
       isSelected: selectedNoteIds[currNote.Id],
-      isContentEditable: false, /*core.canModifyContents(currNote) && !currNote.getContents() */
+      isContentEditable: core.canModifyContents(currNote) && !currNote.getContents(),
       pendingEditTextMap,
       setPendingEditText,
       pendingReplyMap,
@@ -303,10 +335,10 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       onTopNoteContentClicked: handleNoteClicked,
       isExpandedFromSearch: onlyReplyContainsSearchInput(currNote),
       scrollToSelectedAnnot,
-      sortStrategy,
+      sortStrategy
     };
 
-    
+
     if (index === singleSelectedNoteIndex && /*customization*/ !editLinkMode /*customization*/) {
       setTimeout(() => {
         setScrollToSelectedAnnot(false);

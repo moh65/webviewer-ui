@@ -54,7 +54,7 @@ const Note = ({
     state => [
       selectors.getNoteTransformFunction(state),
       selectors.getCustomNoteSelectionFunction(state),
-      selectors.getUnreadAnnotationIdSet(state),     
+      selectors.getUnreadAnnotationIdSet(state),
       selectors.getDefaultTag(state),
     ],
     shallowEqual,
@@ -82,6 +82,9 @@ const Note = ({
       core.removeEventListener('annotationChanged', annotationChangedListener);
     };
   }, [unreadAnnotationIdSet]);
+
+
+
 
   useEffect(() => {
     const prevHeight = containerHeightRef.current;
@@ -130,19 +133,25 @@ const Note = ({
   useEffect(() => {
     //If this is not a new one, rebuild the isEditing map
     const pendingText = pendingEditTextMap[annotation.Id]
-    if (pendingText !== '' && isContentEditable && !isDocumentReadOnly) {
-      setIsEditing(true, 0);
+
+    if ((pendingText !== '' && isContentEditable && !isDocumentReadOnly)) {
+      let editmode = annotation.getCustomData('edit-mode');
+      if (editmode !== "0")
+      {
+        setIsEditing(true, 0);
+        // console.warn('editmode, set edit to true for annotid = ' + annotation.Id)
+      }
     }
   }, [isDocumentReadOnly, isContentEditable, setIsEditing, annotation]);
 
   useDidUpdate(() => {
     if (isDocumentReadOnly || !isContentEditable) {
       setIsEditing(false, 0);
+      // console.warn('editmode, set to false in didupdate annotid = ' + annotation.Id)
     }
   }, [isDocumentReadOnly, isContentEditable, setIsEditing])
 
   const handleNoteClick = e => {
-    //debugger
     // stop bubbling up otherwise the note will be closed
     // due to annotation deselection
     e && e.stopPropagation();
@@ -189,6 +198,39 @@ const Note = ({
       if (removeButtonContents) {
         removeButtonContents();
       }
+      
+      // let editmode = annotation.getCustomData('edit-mode');
+      // let subject = annotation.Subject;
+      // console.warn('editmode in unselected, subject is ' + subject + ' and edit mode = ' + editmode)      
+      setIsEditing(false, 0);
+    } else {
+
+      let editmode = annotation.getCustomData('edit-mode');
+      let subject = annotation.Subject;
+      // console.warn('editmode in selected, subject is ' + subject + ' and edit mode = ' + editmode)
+      if (editmode !== "0")
+      {
+        setIsEditing(true, 0);
+        if (subject === 'Note' && !annotation.InReplyTo && editmode === '1'){
+          let editmodeCount = annotation.getCustomData('edit-mode-count');
+          // console.warn('editmode in count, subject is ' + subject + ' and edit mode count = ' + editmodeCount)
+
+          if (!editmodeCount){
+            annotation.setCustomData('edit-mode-count', 1)
+          } else {
+            annotation.setCustomData('edit-mode', "0");
+          }
+        } else {
+          annotation.setCustomData('edit-mode', "0");
+        }
+      }
+      else 
+      {
+        setIsEditing(false, 0);
+      }
+
+      
+      //console.warn('editmode, annotation is selected  ' + annotation.Id)
     }
   }, [isSelected]);
 
@@ -205,7 +247,7 @@ const Note = ({
   const showReplyArea = !Object.values(isEditingMap).some(val => val);
 
   const handleNoteKeydown = e => {
-    
+
     // Click if enter or space is pressed and is current target.
     const isNote = e.target === e.currentTarget;
     if (isNote && (e.key === 'Enter' || e.key === ' ')) {
