@@ -250,6 +250,10 @@ const AnnotationPopup = () => {
     toolNames.CHECK_BOX_FIELD,
   ];
 
+  const toolsWithStyling = [
+    toolNames.REDACTION,
+  ];
+
   const toolsThatCantHaveLinks = [
     toolNames.CROP,
     toolNames.SIGNATURE,
@@ -261,6 +265,7 @@ const AnnotationPopup = () => {
   ];
 
   const showCommentButton =
+    false //Customisation
     !isNotesPanelDisabled &&
     !multipleAnnotationsSelected &&
     firstAnnotation.ToolName !== toolNames.CROP &&
@@ -271,7 +276,7 @@ const AnnotationPopup = () => {
     hasStyle &&
     !isAnnotationStylePopupDisabled &&
     (!multipleAnnotationsSelected || canUngroup) &&
-    !toolsWithNoStyling.includes(firstAnnotation.ToolName) && !(firstAnnotation instanceof Annotations.Model3DAnnotation);
+    toolsWithStyling.includes(firstAnnotation.ToolName) && !(firstAnnotation instanceof Annotations.Model3DAnnotation);
 
   const showRedactionButton = redactionEnabled && !multipleAnnotationsSelected && !includesFormFieldAnnotation;
 
@@ -323,8 +328,7 @@ const AnnotationPopup = () => {
       ) : (shortCutKeysFor3DVisible && firstAnnotation instanceof Annotations.Model3DAnnotation) ?
         <ShortCutKeysFor3DComponent /> : (
           <CustomizablePopup dataElement="annotationPopup">
-            {/* 
-    //customization
+
             {showCommentButton && (
               <ActionButton
                 dataElement="annotationCommentButton"
@@ -332,7 +336,7 @@ const AnnotationPopup = () => {
                 img="icon-header-chat-line"
                 onClick={commentOnAnnotation}
               />
-            )} }
+            )} 
             {showEditStyleButton && (
               <ActionButton
                 dataElement="annotationStyleEditButton"
@@ -340,9 +344,8 @@ const AnnotationPopup = () => {
                 img="icon-menu-style-line"
                 onClick={() => setIsStylePopupOpen(true)}
               />
-            )
-    //customization
-            */}
+            )}
+
             {firstAnnotation.ToolName === 'CropPage' && (
               <ActionButton
                 dataElement="annotationCropButton"
