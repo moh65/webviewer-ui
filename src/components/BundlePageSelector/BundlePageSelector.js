@@ -375,7 +375,7 @@ export default ({ isModalOpen }) => {
     const renderSections = (jsonData) => {
         let children = [];
         if (jsonData.Children && jsonData.Children.length > 0) {
-            children = jsonData.Children.map(m => renderSections(m));
+            children = jsonData.Children.filter(i => i.ItemType === 'Section').map(m => renderSections(m));
         }
         return { text:  jsonData.DocumentNumber + jsonData.Name, id: jsonData.SectionId, children: children }
     }
