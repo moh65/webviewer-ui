@@ -1,3 +1,6 @@
+import fireEvent from 'helpers/fireEvent';
+import Events from 'constants/events';
+
 const OutlineUtils = {
   setDoc(doc) {
     this.doc = doc;
@@ -10,21 +13,59 @@ const OutlineUtils = {
     }
 
     await target.setTitle(newName);
-
+    const bookmarkEventObject = {
+      ...target,
+      bookmark: target,
+      path,
+      action: 'setOutlineName'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     return path;
   },
-  async addRootOutline(newName, pageNum) {
-    const newOutline = await this.createOutline(newName, pageNum);
+  async setOutlineDestination(path, pageNum, x, y, zoom) {
+    const target = await this.findPDFNetOutline(path);
+
+    if (!target) {
+      return;
+    }
+
+    const PDFNet = window.PDFNet;
+
+    return PDFNet.runWithCleanup(async () => {
+      const document = await this.doc.getPDFDoc();
+
+      const page = await document.getPage(pageNum);
+      const destination = await PDFNet.Destination.createXYZ(page, x, y, zoom);
+      target.setAction(await PDFNet.Action.createGoto(destination));
+      const bookmarkEventObject = {
+        ...target,
+        bookmark: target,
+        path,
+        action: 'setOutlineDestination'
+      };
+      fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
+    });
+  },
+  async addRootOutline(newName, pageNum, x, y, zoom) {
+    const newOutline = await this.createOutlineXYZ(newName, pageNum, x, y, zoom);
     const doc = await this.doc.getPDFDoc();
 
     await doc.addRootBookmark(newOutline);
 
+    const bookmarkEventObject = {
+      ...newOutline,
+      bookmark: newOutline,
+      path: '0',
+      action: 'addRootOutline'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     return '0';
   },
-  async addNewOutline(newName, path, pageNum) {
+  async addNewOutline(newName, path, pageNum, x, y, zoom) {
     let target;
 
-    if (path) {
+    const hasActiveOutline = !!path;
+    if (hasActiveOutline) {
       target = await this.findPDFNetOutline(path);
     } else {
       target = await this.getLastOutline();
@@ -34,12 +75,24 @@ const OutlineUtils = {
       return null;
     }
 
-    const newOutline = await this.createOutline(newName, pageNum);
-    await target.addNext(newOutline);
+    const newOutline = await this.createOutlineXYZ(newName, pageNum, x, y, zoom);
+    if (hasActiveOutline) {
+      await target.addChild(newOutline);
+    } else {
+      await target.addNext(newOutline);
+    }
 
-    return this.findPathInTree(newOutline);
+    const addedOutlinePath = await this.findPathInTree(newOutline);
+    const bookmarkEventObject = {
+      ...newOutline,
+      bookmark: newOutline,
+      path: addedOutlinePath,
+      action: 'addNewOutline'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
+    return addedOutlinePath;
   },
-  createOutline(newName, pageNum) {
+  createOutlineXYZ(newName, pageNum, x, y, zoom) {
     const PDFNet = window.PDFNet;
 
     return PDFNet.runWithCleanup(async () => {
@@ -47,7 +100,7 @@ const OutlineUtils = {
       const newOutline = await PDFNet.Bookmark.create(doc, newName);
 
       const page = await doc.getPage(pageNum);
-      const dest = await PDFNet.Destination.createFit(page);
+      const dest = await PDFNet.Destination.createXYZ(page, x, y, zoom);
       newOutline.setAction(await PDFNet.Action.createGoto(dest));
 
       return newOutline;
@@ -56,8 +109,19 @@ const OutlineUtils = {
   async deleteOutline(path) {
     const target = await this.findPDFNetOutline(path);
 
+    if (!target) {
+      return;
+    }
+
     if (target) {
+      const bookmarkEventObject = {
+        ...target,
+        bookmark: target,
+        path,
+        action: 'deleteOutline'
+      };
       await target.delete();
+      fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     }
 
     return null;
@@ -77,7 +141,14 @@ const OutlineUtils = {
     const copy = await target.copy();
     await target.delete();
     await prev.addPrev(copy);
-
+    const changedOutlinePath = await this.findPathInTree(copy);
+    const bookmarkEventObject = {
+      ...copy,
+      bookmark: copy,
+      path: changedOutlinePath,
+      action: 'moveOutlineUp'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     return this.findPathInTree(copy);
   },
   async moveOutlineDown(path) {
@@ -96,6 +167,14 @@ const OutlineUtils = {
     await target.delete();
     await next.addNext(copy);
 
+    const changedOutlinePath = await this.findPathInTree(copy);
+    const bookmarkEventObject = {
+      ...copy,
+      bookmark: copy,
+      path: changedOutlinePath,
+      action: 'moveOutlineDown'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     return this.findPathInTree(copy);
   },
   async moveOutlineBeforeTarget(path, targetPath) {
@@ -107,6 +186,15 @@ const OutlineUtils = {
     const copy = await currTarget.copy();
     await currTarget.delete();
     await target.addPrev(copy);
+
+    const changedOutlinePath = await this.findPathInTree(copy);
+    const bookmarkEventObject = {
+      ...copy,
+      bookmark: copy,
+      path: changedOutlinePath,
+      action: 'moveOutlineBeforeTarget'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     return this.findPathInTree(copy);
   },
   async moveOutlineAfterTarget(path, targetPath) {
@@ -118,6 +206,15 @@ const OutlineUtils = {
     const copy = await currTarget.copy();
     await currTarget.delete();
     await target.addNext(copy);
+
+    const changedOutlinePath = await this.findPathInTree(copy);
+    const bookmarkEventObject = {
+      ...copy,
+      bookmark: copy,
+      path: changedOutlinePath,
+      action: 'moveOutlineAfterTarget'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     return this.findPathInTree(copy);
   },
   async moveOutlineOutward(path) {
@@ -133,6 +230,14 @@ const OutlineUtils = {
 
     await parent.addNext(copy);
 
+    const changedOutlinePath = await this.findPathInTree(copy);
+    const bookmarkEventObject = {
+      ...copy,
+      bookmark: copy,
+      path: changedOutlinePath,
+      action: 'moveOutlineOutward'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     return this.findPathInTree(copy);
   },
   async moveOutlineOutwardBeforeParent(path) {
@@ -148,6 +253,14 @@ const OutlineUtils = {
 
     await parent.addPrev(copy);
 
+    const changedOutlinePath = await this.findPathInTree(copy);
+    const bookmarkEventObject = {
+      ...copy,
+      bookmark: copy,
+      path: changedOutlinePath,
+      action: 'moveOutlineOutwardBeforeParent'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     return this.findPathInTree(copy);
   },
   async moveOutlineOutwardBeforeAncestor(path, ancestorPath) {
@@ -163,6 +276,14 @@ const OutlineUtils = {
 
     await ancestorTarget.addPrev(copy);
 
+    const changedOutlinePath = await this.findPathInTree(copy);
+    const bookmarkEventObject = {
+      ...copy,
+      bookmark: copy,
+      path: changedOutlinePath,
+      action: 'moveOutlineOutwardBeforeAncestor'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     return this.findPathInTree(copy);
   },
   async moveOutlineInTarget(path, targetPath) {
@@ -186,6 +307,14 @@ const OutlineUtils = {
       await targetOutline.addChild(copy);
     }
 
+    const changedOutlinePath = await this.findPathInTree(copy);
+    const bookmarkEventObject = {
+      ...copy,
+      bookmark: copy,
+      path: changedOutlinePath,
+      action: 'moveOutlineInTarget'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     return this.findPathInTree(copy);
   },
   async moveOutlineInward(path) {
@@ -210,6 +339,14 @@ const OutlineUtils = {
       await prev.addChild(copy);
     }
 
+    const changedOutlinePath = await this.findPathInTree(copy);
+    const bookmarkEventObject = {
+      ...copy,
+      bookmark: copy,
+      path: changedOutlinePath,
+      action: 'moveOutlineInward'
+    };
+    fireEvent(Events.OUTLINE_BOOKMARKS_CHANGED, bookmarkEventObject);
     return this.findPathInTree(copy);
   },
   async getCanMoveState(path) {
@@ -297,7 +434,7 @@ const OutlineUtils = {
 
     return null;
   },
-  findPDFNetOutline(path) {
+  async findPDFNetOutline(path) {
     if (!path) {
       return Promise.resolve(null);
     }
@@ -311,6 +448,9 @@ const OutlineUtils = {
       let curr = rootOutline;
       for (let level = 0; level < paths.length; level++) {
         for (let i = 0; i < paths[level]; i++) {
+          if (!curr) {
+            return null;
+          }
           curr = await curr.getNext();
         }
 
@@ -339,7 +479,7 @@ const OutlineUtils = {
     }
     return false;
   },
-  getPath(outline) {
+  getPathArray(outline) {
     const paths = [];
 
     let curr = outline;
@@ -348,12 +488,19 @@ const OutlineUtils = {
       curr = curr.getParent();
     }
 
-    return paths.reverse().join(this.getSplitter());
+    return paths;
+  },
+  getPath(outline) {
+    return this.getPathArray(outline).reverse().join(this.getSplitter());
+  },
+  getNestedLevel(outline) {
+    return this.getPathArray(outline).length - 1;
   },
   getSplitter() {
     return '-';
   },
   async isValid(pdfnetOutline) {
+    // eslint-disable-next-line no-return-await
     return pdfnetOutline && (await pdfnetOutline.isValid());
   },
 };

@@ -7,34 +7,49 @@ import defaultTool from 'constants/defaultTool';
 import { PRIORITY_TWO } from 'constants/actionPriority';
 import Events from 'constants/events';
 
-export const setEnableDesktopOnlyMode = enableDesktopOnlyMode => ({
+export const setPresetCropDimensions = (presetCropDimensions) => ({
+  type: 'SET_PRESET_CROP_DIMENSIONS',
+  payload: { presetCropDimensions },
+});
+
+export const setPresetNewPageDimensions = (presetNewPageDimensions) => ({
+  type: 'SET_PRESET_NEW_PAGE_DIMENSIONS',
+  payload: { presetNewPageDimensions },
+});
+
+export const setDateTimeFormats = (dateTimeFormats) => ({
+  type: 'SET_DATE_TIME_FORMATS',
+  payload: { dateTimeFormats },
+});
+
+export const setEnableDesktopOnlyMode = (enableDesktopOnlyMode) => ({
   type: 'SET_ENABLE_DESKTOP_ONLY_MODE',
   payload: { enableDesktopOnlyMode },
 });
 
-export const setHighContrastMode = useHighContrastMode => ({
+export const setHighContrastMode = (useHighContrastMode) => ({
   type: 'SET_HIGH_CONTRAST_MODE',
   payload: { useHighContrastMode },
 });
 
-export const setCanUndo = canUndo => ({
+export const setCanUndo = (canUndo, documentViewerKey = 1) => ({
   type: 'SET_CAN_UNDO',
-  payload: { canUndo },
+  payload: { canUndo, documentViewerKey },
 });
 
-export const setCanRedo = canRedo => ({
+export const setCanRedo = (canRedo, documentViewerKey = 1) => ({
   type: 'SET_CAN_REDO',
-  payload: { canRedo },
+  payload: { canRedo, documentViewerKey },
 });
 
-export const setStandardStamps = t => async dispatch => {
+export const setStandardStamps = (t) => async (dispatch) => {
   const rubberStampTool = core.getTool('AnnotationCreateRubberStamp');
   const canvasWidth = 160;
   const canvasHeight = 58;
 
   const annotations = await rubberStampTool.getStandardStampAnnotations();
   const previews = await Promise.all(
-    annotations.map(annotation => {
+    annotations.map((annotation) => {
       const text = t(`rubberStamp.${annotation['Icon']}`);
 
       const options = {
@@ -58,14 +73,14 @@ export const setStandardStamps = t => async dispatch => {
   });
 };
 
-export const setCustomStamps = t => async dispatch => {
+export const setCustomStamps = (t) => async (dispatch) => {
   const rubberStampTool = core.getTool('AnnotationCreateRubberStamp');
   const canvasWidth = 160;
   const canvasHeight = 58;
 
   const annotations = await rubberStampTool.getCustomStampAnnotations();
   await Promise.all(
-    annotations.map(annotation => {
+    annotations.map((annotation) => {
       const text = t(`rubberStamp.${annotation['Icon']}`);
 
       const options = {
@@ -78,8 +93,7 @@ export const setCustomStamps = t => async dispatch => {
     }),
   );
 
-
-  const customStamps = annotations.map(annotation => ({
+  const customStamps = annotations.map((annotation) => ({
     annotation,
     imgSrc: annotation['ImageData'],
   }));
@@ -93,8 +107,9 @@ export const setCustomStamps = t => async dispatch => {
 export const setReadOnlyRibbons = () => (dispatch, getState) => {
   dispatch(setToolbarGroup('toolbarGroup-View'));
   const state = getState();
-  const toolbarGroupsToDisable = Object.keys(state.viewer.headers)
-    .filter(key => key.includes('toolbarGroup-') && key !== 'toolbarGroup-View');
+  const toolbarGroupsToDisable = Object.keys(state.viewer.headers).filter(
+    (key) => key.includes('toolbarGroup-') && key !== 'toolbarGroup-View',
+  );
 
   disableElements(toolbarGroupsToDisable, PRIORITY_TWO)(dispatch, getState);
 };
@@ -108,23 +123,19 @@ export const enableRibbons = () => (dispatch, getState) => {
   const isInFormFieldCreationMode = core.getFormFieldCreationManager().isInFormFieldCreationMode();
   const toolbarGroup = isInFormFieldCreationMode ? 'toolbarGroup-Forms' : state.viewer.toolbarGroup;
   dispatch(setToolbarGroup(toolbarGroup || 'toolbarGroup-Annotate'));
-  const toolbarGroupsToEnable = Object.keys(state.viewer.headers)
-    .filter(key => key.includes('toolbarGroup-'));
+  const toolbarGroupsToEnable = Object.keys(state.viewer.headers).filter((key) => key.includes('toolbarGroup-'));
 
   enableElements(toolbarGroupsToEnable, PRIORITY_TWO)(dispatch, getState);
 };
 
-const isElementDisabled = (state, dataElement) =>
-  state.viewer.disabledElements[dataElement]?.disabled;
+const isElementDisabled = (state, dataElement) => state.viewer.disabledElements[dataElement]?.disabled;
 
 export const allButtonsInGroupDisabled = (state, toolGroup) => {
   const dataElements = Object.values(state.viewer.toolButtonObjects)
     .filter(({ group }) => group === toolGroup)
     .map(({ dataElement }) => dataElement);
 
-  return dataElements.every(dataElement =>
-    isElementDisabled(state, dataElement),
-  );
+  return dataElements.every((dataElement) => isElementDisabled(state, dataElement));
 };
 
 export const setToolbarGroup = (toolbarGroup, pickTool = true) => (dispatch, getState) => {
@@ -147,7 +158,7 @@ export const setToolbarGroup = (toolbarGroup, pickTool = true) => (dispatch, get
 
   const getFirstToolNameForGroup = (state, toolGroup) => {
     const tools = state.viewer.toolButtonObjects;
-    const firstTool = Object.keys(tools).find(key => {
+    const firstTool = Object.keys(tools).find((key) => {
       return tools[key].group === toolGroup;
     });
     return firstTool;
@@ -158,29 +169,31 @@ export const setToolbarGroup = (toolbarGroup, pickTool = true) => (dispatch, get
     core.setToolMode(defaultTool);
     dispatch({
       type: 'SET_ACTIVE_TOOL_GROUP',
-      payload: { toolGroup: '' },
+      payload: { toolGroup: '', toolbarGroup },
     });
   } else {
     dispatch(openElements(['toolsHeader']));
     const state = getState();
-    const lastPickedToolGroup = state.viewer.lastPickedToolGroup[toolbarGroup] || getFirstToolGroupForToolbarGroup(state, toolbarGroup);
-    const lastPickedToolName = state.viewer.lastPickedToolForGroup[lastPickedToolGroup]
-      || getFirstToolNameForGroup(state, lastPickedToolGroup);
+    const lastPickedToolGroup =
+      state.viewer.lastPickedToolGroup[toolbarGroup] || getFirstToolGroupForToolbarGroup(state, toolbarGroup);
+    const lastPickedToolName =
+      state.viewer.lastPickedToolForGroup[lastPickedToolGroup] || getFirstToolNameForGroup(state, lastPickedToolGroup);
     if (pickTool) {
+      dispatch({
+        type: 'SET_ACTIVE_TOOL_GROUP',
+        payload: { toolGroup: lastPickedToolGroup, toolbarGroup },
+      });
+
       if (lastPickedToolName === 'AnnotationCreateSignature') {
         core.setToolMode(defaultTool);
       } else {
         core.setToolMode(lastPickedToolName);
       }
-      dispatch({
-        type: 'SET_ACTIVE_TOOL_GROUP',
-        payload: { toolGroup: lastPickedToolGroup },
-      });
     } else {
       core.setToolMode(defaultTool);
       dispatch({
         type: 'SET_ACTIVE_TOOL_GROUP',
-        payload: { toolGroup: '' },
+        payload: { toolGroup: '', toolbarGroup },
       });
     }
   }
@@ -191,43 +204,82 @@ export const setToolbarGroup = (toolbarGroup, pickTool = true) => (dispatch, get
   });
   fireEvent(Events.TOOLBAR_GROUP_CHANGED, toolbarGroup);
 };
-export const setSelectedStampIndex = index => ({
+export const setSelectedStampIndex = (index) => ({
   type: 'SET_SELECTED_STAMP_INDEX',
   payload: { index },
 });
-export const setOutlineControlVisibility = outlineControlVisibility => ({
+export const setOutlineControlVisibility = (outlineControlVisibility) => ({
   type: 'SET_OUTLINE_CONTROL_VISIBILITY',
   payload: { outlineControlVisibility },
 });
-export const setSelectedDisplayedSignatureIndex = index => ({
+export const setSelectedDisplayedSignatureIndex = (index) => ({
   type: 'SET_SELECTED_DISPLAYED_SIGNATURE_INDEX',
   payload: { index },
 });
-export const setSavedSignatures = savedSignatures => ({
+export const setSavedSignatures = (savedSignatures) => ({
   type: 'SET_SAVED_SIGNATURES',
   payload: { savedSignatures },
 });
-export const setDisplayedSignaturesFilterFunction = filterFunction => ({
+export const setDisplayedSignaturesFilterFunction = (filterFunction) => ({
   type: 'SET_DISPLAYED_SIGNATURES_FILTER_FUNCTION',
   payload: { filterFunction },
 });
-export const setLeftPanelWidth = width => ({
+export const setSignatureMode = (signatureMode) => ({
+  type: 'SET_SIGNATURE_MODE',
+  payload: { signatureMode }
+});
+
+export const setSavedInitials = (savedInitials) => ({
+  type: 'SET_SAVED_INITIALS',
+  payload: { savedInitials },
+});
+
+export const setSelectedDisplayedInitialsIndex = (index) => ({
+  type: 'SET_SELECTED_DISPLAYED_INITIALS_INDEX',
+  payload: { index },
+});
+
+export const setLeftPanelWidth = (width) => ({
   type: 'SET_LEFT_PANEL_WIDTH',
   payload: { width },
 });
-export const setSearchPanelWidth = width => ({
+export const setSearchPanelWidth = (width) => ({
   type: 'SET_SEARCH_PANEL_WIDTH',
   payload: { width },
 });
-export const setNotesPanelWidth = width => ({
+export const setNotesPanelWidth = (width) => ({
   type: 'SET_NOTES_PANEL_WIDTH',
   payload: { width },
 });
-export const setDocumentContainerWidth = width => ({
+export const setComparePanelWidth = (width) => ({
+  type: 'SET_COMPARE_PANEL_WIDTH',
+  payload: { width },
+});
+export const setRedactionPanelWidth = (width) => ({
+  type: 'SET_REDACTION_PANEL_WIDTH',
+  payload: { width },
+});
+export const setTextEditingPanelWidth = (width) => ({
+  type: 'SET_TEXT_EDITING_PANEL_WIDTH',
+  payload: { width },
+});
+export const setWv3dPropertiesPanelWidth = (width) => ({
+  type: 'SET_WV3D_PROPERTIES_PANEL_WIDTH',
+  payload: { width },
+});
+export const setWv3dPropertiesPanelModelData = (modelData) => ({
+  type: 'SET_WV3D_PROPERTIES_PANEL_MODEL_DATA',
+  payload: { modelData },
+});
+export const setWv3dPropertiesPanelSchema = (schema) => ({
+  type: 'SET_WV3D_PROPERTIES_PANEL_SCHEMA',
+  payload: { schema },
+});
+export const setDocumentContainerWidth = (width) => ({
   type: 'SET_DOCUMENT_CONTAINER_WIDTH',
   payload: { width },
 });
-export const setDocumentContainerHeight = height => ({
+export const setDocumentContainerHeight = (height) => ({
   type: 'SET_DOCUMENT_CONTAINER_HEIGHT',
   payload: { height },
 });
@@ -236,11 +288,10 @@ export const enableAllElements = () => ({
   type: 'ENABLE_ALL_ELEMENTS',
   payload: {},
 });
-export const openElement = dataElement => (dispatch, getState) => {
+export const openElement = (dataElement) => (dispatch, getState) => {
   const state = getState();
 
-  const isElementDisabled =
-    state.viewer.disabledElements[dataElement]?.disabled;
+  const isElementDisabled = state.viewer.disabledElements[dataElement]?.disabled;
   const isLeftPanelOpen = state.viewer.openElements['leftPanel'];
   const isElementOpen = isDataElementLeftPanel(dataElement, state)
     ? isLeftPanelOpen && state.viewer.activeLeftPanel === dataElement
@@ -268,20 +319,19 @@ export const openElement = dataElement => (dispatch, getState) => {
     }
   }
 };
-export const openElements = dataElements => dispatch => {
+export const openElements = (dataElements) => (dispatch) => {
   if (typeof dataElements === 'string') {
     dispatch(openElement(dataElements));
   } else {
-    dataElements.forEach(dataElement => {
+    dataElements.forEach((dataElement) => {
       dispatch(openElement(dataElement));
     });
   }
 };
-export const closeElement = dataElement => (dispatch, getState) => {
+export const closeElement = (dataElement) => (dispatch, getState) => {
   const state = getState();
 
-  const isElementDisabled =
-    state.viewer.disabledElements[dataElement]?.disabled;
+  const isElementDisabled = state.viewer.disabledElements[dataElement]?.disabled;
   const isElementClosed = isDataElementLeftPanel(dataElement, state)
     ? state.viewer.activeLeftPanel !== dataElement
     : !state.viewer.openElements[dataElement];
@@ -289,16 +339,20 @@ export const closeElement = dataElement => (dispatch, getState) => {
   if (isElementDisabled || isElementClosed) {
     return;
   }
-  
-  if (
-    isDataElementLeftPanel(dataElement, state) &&
-    state.viewer.openElements['leftPanel']
-  ) {
+
+  if (isDataElementLeftPanel(dataElement, state) && state.viewer.openElements['leftPanel']) {
     dispatch({ type: 'CLOSE_ELEMENT', payload: { dataElement: 'leftPanel' } });
     fireEvent(Events.VISIBILITY_CHANGED, { element: 'leftPanel', isVisible: false });
   } else {
     dispatch({ type: 'CLOSE_ELEMENT', payload: { dataElement } });
     fireEvent(Events.VISIBILITY_CHANGED, { element: dataElement, isVisible: false });
+
+    if (dataElement === 'pageManipulationOverlay') {
+      dispatch({
+        type: 'SET_PAGE_MANIPULATION_OVERLAY_ALTERNATIVE_POSITION',
+        payload: null
+      });
+    }
 
     if (dataElement === 'leftPanel' && state.viewer.openElements['leftPanel']) {
       fireEvent(Events.VISIBILITY_CHANGED, {
@@ -308,31 +362,32 @@ export const closeElement = dataElement => (dispatch, getState) => {
     }
   }
 };
-export const closeElements = dataElements => dispatch => {
+export const closeElements = (dataElements) => (dispatch) => {
   if (typeof dataElements === 'string') {
     dispatch(closeElement(dataElements));
   } else {
-    dataElements.forEach(dataElement => {
+    dataElements.forEach((dataElement) => {
       dispatch(closeElement(dataElement));
     });
   }
 };
 
-export const toggleElement = dataElement => (dispatch, getState) => {
+const rightPanelList = ['searchPanel', 'notesPanel', 'comparePanel', 'redactionPanel', 'wv3dPropertiesPanel', 'textEditingPanel'];
+export const toggleElement = (dataElement) => (dispatch, getState) => {
   const state = getState();
 
-  if (
-    state.viewer.disabledElements[dataElement]?.disabled
-  ) {
+  if (state.viewer.disabledElements[dataElement]?.disabled) {
     return;
   }
 
   // hack for new ui
   if (!state.viewer.notesInLeftPanel) {
-    if (dataElement === 'searchPanel') {
-      dispatch(closeElement('notesPanel'));
-    } else if (dataElement === 'notesPanel') {
-      dispatch(closeElement('searchPanel'));
+    if (rightPanelList.includes(dataElement)) {
+      for (const panel of rightPanelList) {
+        if (panel !== dataElement) {
+          dispatch(closeElement(panel));
+        }
+      }
     }
   }
 
@@ -343,16 +398,16 @@ export const toggleElement = dataElement => (dispatch, getState) => {
   }
 };
 
-export const setCustomModal = modalOptions => ({
-  type: 'SET_CUSTOM_MODAL',
+export const addCustomModal = (modalOptions) => ({
+  type: 'ADD_CUSTOM_MODAL',
   payload: modalOptions,
 });
 
-export const setActiveHeaderGroup = headerGroup => ({
+export const setActiveHeaderGroup = (headerGroup) => ({
   type: 'SET_ACTIVE_HEADER_GROUP',
   payload: { headerGroup },
 });
-export const setActiveLeftPanel = dataElement => (dispatch, getState) => {
+export const setActiveLeftPanel = (dataElement) => (dispatch, getState) => {
   const state = getState();
 
   if (isDataElementLeftPanel(dataElement, state)) {
@@ -361,12 +416,12 @@ export const setActiveLeftPanel = dataElement => (dispatch, getState) => {
         type: 'CLOSE_ELEMENT',
         payload: { dataElement: state.viewer.activeLeftPanel },
       });
-      fireEvent(Events.VisibilityChanged, {
+      fireEvent(Events.VISIBILITY_CHANGED, {
         element: state.viewer.activeLeftPanel,
         isVisible: false,
       });
       dispatch({ type: 'SET_ACTIVE_LEFT_PANEL', payload: { dataElement } });
-      fireEvent(Events.VisibilityChanged, { element: dataElement, isVisible: true });
+      fireEvent(Events.VISIBILITY_CHANGED, { element: dataElement, isVisible: true });
     }
   } else {
     const panelDataElements = [
@@ -384,30 +439,28 @@ export const setActiveLeftPanel = dataElement => (dispatch, getState) => {
     );
   }
 };
-export const setNotesPanelSortStrategy = sortStrategy => ({
+export const setNotesPanelSortStrategy = (sortStrategy) => ({
   type: 'SET_NOTES_PANEL_SORT_STRATEGY',
   payload: { sortStrategy },
 });
-export const setSortNotesBy = sortStrategy => {
-  console.warn(
-    'setSortNotesBy is deprecated, please use setNotesPanelSortStrategy instead',
-  );
+export const setSortNotesBy = (sortStrategy) => {
+  console.warn('setSortNotesBy is deprecated, please use setNotesPanelSortStrategy instead');
 
   return setNotesPanelSortStrategy(sortStrategy);
 };
-export const setNoteDateFormat = noteDateFormat => ({
+export const setNoteDateFormat = (noteDateFormat) => ({
   type: 'SET_NOTE_DATE_FORMAT',
   payload: { noteDateFormat },
 });
-export const setPrintedNoteDateFormat = noteDateFormat => ({
+export const setPrintedNoteDateFormat = (noteDateFormat) => ({
   type: 'SET_PRINTED_NOTE_DATE_FORMAT',
   payload: { noteDateFormat },
 });
-export const setCustomPanel = newPanel => ({
+export const setCustomPanel = (newPanel) => ({
   type: 'SET_CUSTOM_PANEL',
   payload: { newPanel },
 });
-export const setPageLabels = pageLabels => dispatch => {
+export const setPageLabels = (pageLabels) => (dispatch) => {
   if (pageLabels.length !== core.getTotalPages()) {
     console.warn('Number of page labels do not match with the total pages.');
     return;
@@ -420,42 +473,42 @@ export const setPageLabels = pageLabels => dispatch => {
 export const setSelectedPageThumbnails = (selectedThumbnailPageIndexes = []) => {
   fireEvent(Events.SELECTED_THUMBNAIL_CHANGED, selectedThumbnailPageIndexes);
 
-  return ({
+  return {
     type: 'SET_SELECTED_THUMBNAIL_PAGE_INDEXES',
     payload: { selectedThumbnailPageIndexes },
-  });
+  };
 };
 export const setShiftKeyThumbnailsPivotIndex = (shiftKeyThumbnailPivotIndex = null) => ({
   type: 'SET_SHIFT_KEY_THUMBNAIL_PIVOT_INDEX',
   payload: { shiftKeyThumbnailPivotIndex },
 });
-export const setSwipeOrientation = swipeOrientation => ({
+export const setSwipeOrientation = (swipeOrientation) => ({
   type: 'SET_SWIPE_ORIENTATION',
   payload: { swipeOrientation },
 });
-export const showWarningMessage = options => dispatch => {
+export const showWarningMessage = (options) => (dispatch) => {
   dispatch({ type: 'SET_WARNING_MESSAGE', payload: options });
   dispatch(openElement('warningModal'));
 };
-export const showErrorMessage = message => dispatch => {
+export const disableDeleteTabWarning = () => ({
+  type: 'DISABLE_DELETE_TAB_WARNING',
+  payload: { showDeleteTabWarning: false },
+});
+export const showErrorMessage = (message) => (dispatch) => {
   dispatch({ type: 'SET_ERROR_MESSAGE', payload: { message } });
   dispatch(openElement('errorModal'));
 };
-export const setCustomNoteFilter = filterFunc => ({
+export const setCustomNoteFilter = (filterFunc) => ({
   type: 'SET_CUSTOM_NOTE_FILTER',
   payload: { customNoteFilter: filterFunc },
 });
-export const setZoomList = zoomList => dispatch => {
+export const setZoomList = (zoomList) => (dispatch) => {
   const minZoomLevel = getMinZoomLevel();
   const maxZoomLevel = getMaxZoomLevel();
-  const filteredZoomList = zoomList.filter(
-    zoom => zoom >= minZoomLevel && zoom <= maxZoomLevel,
-  );
+  const filteredZoomList = zoomList.filter((zoom) => zoom >= minZoomLevel && zoom <= maxZoomLevel);
 
   if (filteredZoomList.length !== zoomList.length) {
-    const outOfRangeZooms = zoomList.filter(
-      zoom => !filteredZoomList.includes(zoom),
-    );
+    const outOfRangeZooms = zoomList.filter((zoom) => !filteredZoomList.includes(zoom));
     console.warn(`
       ${outOfRangeZooms.join(', ')} are not allowed zoom levels in the UI.
       Valid zoom levels should be in the range of ${minZoomLevel}-${maxZoomLevel}.
@@ -470,15 +523,15 @@ export const useEmbeddedPrint = (useEmbeddedPrint = true) => ({
   type: 'USE_EMBEDDED_PRINT',
   payload: { useEmbeddedPrint },
 });
-export const setMaxSignaturesCount = maxSignaturesCount => ({
+export const setMaxSignaturesCount = (maxSignaturesCount) => ({
   type: 'SET_MAX_SIGNATURES_COUNT',
   payload: { maxSignaturesCount },
 });
-export const setUserData = userData => ({
+export const setUserData = (userData) => ({
   type: 'SET_USER_DATA',
   payload: { userData },
 });
-export const setCustomMeasurementOverlay = customMeasurementOverlay => ({
+export const setCustomMeasurementOverlay = (customMeasurementOverlay) => ({
   type: 'SET_CUSTOM_MEASUREMENT_OVERLAY',
   payload: { customMeasurementOverlay },
 });
@@ -581,49 +634,68 @@ export const setCustomElementOverrides = (dataElement, overrides) => ({
   type: 'SET_CUSTOM_ELEMENT_OVERRIDES',
   payload: { dataElement, overrides },
 });
-export const setPageReplacementModalFileList = list => ({
+export const setPageReplacementModalFileList = (list) => ({
   type: 'SET_PAGE_REPLACEMENT_FILE_LIST',
   payload: { list },
 });
-export const setActiveTheme = theme => {
+export const setActiveTheme = (theme) => {
   fireEvent(Events.THEME_CHANGED, theme);
 
-  return ({
+  return {
     type: 'SET_ACTIVE_THEME',
     payload: { theme },
-  });
+  };
 };
-export const setSearchResults = searchResults => ({
+export const setSearchResults = (searchResults) => ({
   type: 'SET_SEARCH_RESULTS',
   payload: searchResults,
 });
 
-export const setClearSearchOnPanelClose = shouldClear => ({
+export const setClearSearchOnPanelClose = (shouldClear) => ({
   type: 'SET_CLEAR_SEARCH_ON_PANEL_CLOSE',
   payload: shouldClear,
 });
 
-export const setAnnotationContentOverlayHandler = annotationContentOverlayHandler => ({
+export const setAnnotationContentOverlayHandler = (annotationContentOverlayHandler) => ({
   type: 'SET_ANNOTATION_CONTENT_OVERLAY_HANDLER',
-  payload: { annotationContentOverlayHandler }
+  payload: { annotationContentOverlayHandler },
 });
 
 export const setAnnotationReadState = ({ isRead, annotationId }) => ({
   type: 'SET_ANNOTATION_READ_STATE',
-  payload: { isRead, annotationId }
+  payload: { isRead, annotationId },
 });
-export const addTrustedCertificates = certificates => ({
+export const addTrustedCertificates = (certificates) => ({
   type: 'ADD_TRUSTED_CERTIFICATES',
   payload: { certificates },
 });
-export const setSignatureValidationModalWidgetName = widgetName => ({
+export const addTrustList = (trustList) => ({
+  type: 'ADD_TRUST_LIST',
+  payload: { trustList },
+});
+export const setSignatureValidationModalWidgetName = (widgetName) => ({
   type: 'SET_VALIDATION_MODAL_WIDGET_NAME',
   payload: { validationModalWidgetName: widgetName },
 });
 
-export const setNoteSubmissionEnabledWithEnter = enableNoteSubmissionWithEnter => ({
+export const setNoteSubmissionEnabledWithEnter = (enableNoteSubmissionWithEnter) => ({
   type: 'SET_SUBMIT_COMMENT_MODE',
   payload: { enableNoteSubmissionWithEnter },
+});
+
+export const setNotesPanelTextCollapsing = (enableNotesPanelTextCollapsing) => ({
+  type: 'SET_NOTES_PANEL_TEXT_COLLAPSING',
+  payload: { enableNotesPanelTextCollapsing },
+});
+
+export const setNotesPanelRepliesCollapsing = (enableNotesPanelRepliesCollapsing) => ({
+  type: 'SET_NOTES_PANEL_REPLIES_COLLAPSING',
+  payload: { enableNotesPanelRepliesCollapsing },
+});
+
+export const setCommentThreadExpansion = (enableCommentThreadExpansion) => ({
+  type: 'SET_COMMENT_THREAD_EXPANSION',
+  payload: { enableCommentThreadExpansion },
 });
 
 export const enableFadePageNavigationComponent = () => ({
@@ -637,16 +709,81 @@ export const disableFadePageNavigationComponent = () => ({
 });
 
 export const enablePageDeletionConfirmationModal = () => ({
-  type: "PAGE_DELETION_CONFIRMATION_MODAL_POPUP",
-  payload: { pageDeletionConfirmationModalEnabled: true }
+  type: 'PAGE_DELETION_CONFIRMATION_MODAL_POPUP',
+  payload: { pageDeletionConfirmationModalEnabled: true },
 });
 
 export const disablePageDeletionConfirmationModal = () => ({
-  type: "PAGE_DELETION_CONFIRMATION_MODAL_POPUP",
-  payload: { pageDeletionConfirmationModalEnabled: false }
+  type: 'PAGE_DELETION_CONFIRMATION_MODAL_POPUP',
+  payload: { pageDeletionConfirmationModalEnabled: false },
 });
 
-export const setWatermarkModalOptions = watermarkModalOptions => ({
+export const setWatermarkModalOptions = (watermarkModalOptions) => ({
   type: 'SET_WATERMARK_MODAL_OPTIONS',
-  payload: { watermarkModalOptions }
+  payload: { watermarkModalOptions },
+});
+
+export const replaceRedactionSearchPattern = (searchPattern, regex) => ({
+  type: 'REPLACE_REDACTION_SEARCH_PATTERN',
+  payload: { searchPattern, regex },
+});
+
+export const setThumbnailSelectionMode = (thumbnailSelectionMode) => ({
+  type: 'SET_THUMBNAIL_SELECTION_MODE',
+  payload: { thumbnailSelectionMode },
+});
+
+export const addRedactionSearchPattern = (searchPattern) => ({
+  type: 'ADD_REDACTION_SEARCH_PATTERN',
+  payload: { searchPattern },
+});
+
+export const removeRedactionSearchPattern = (searchPatternType) => ({
+  type: 'REMOVE_REDACTION_SEARCH_PATTERN',
+  payload: { searchPatternType },
+});
+
+export const setColorMap = (colorMap) => ({
+  type: 'SET_COLOR_MAP',
+  payload: { colorMap }
+});
+
+export const setZoomStepFactors = (zoomStepFactors) => ({
+  type: 'SET_ZOOM_STEP_FACTORS',
+  payload: { zoomStepFactors },
+});
+
+export const setNotesPanelCustomHeader = (notesPanelCustomHeaderOptions) => ({
+  type: 'SET_NOTES_PANEL_CUSTOM_HEADER_OPTIONS',
+  payload: { notesPanelCustomHeaderOptions },
+});
+
+export const setNotesPanelEmptyPanel = (notesPanelCustomEmptyPanel) => ({
+  type: 'SET_NOTES_PANEL_CUSTOM_EMPTY_PANEL',
+  payload: { notesPanelCustomEmptyPanel },
+});
+
+export const addMeasurementScalePreset = (measurementSystem, newPreset, index) => ({
+  type: 'ADD_MEASUREMENT_SCALE_PRESET',
+  payload: { measurementSystem, newPreset, index }
+});
+
+export const removeMeasurementScalePreset = (measurementSystem, index) => ({
+  type: 'REMOVE_MEASUREMENT_SCALE_PRESET',
+  payload: { measurementSystem, index }
+});
+
+export const setIsMultipleScalesMode = (isMultipleScalesMode) => ({
+  type: 'SET_IS_MULTIPLE_SCALE_MODE',
+  payload: { isMultipleScalesMode }
+});
+
+export const setReplyAttachmentPreviewEnabled = (replyAttachmentPreviewEnabled) => ({
+  type: 'SET_REPLY_ATTACHMENT_PREVIEW',
+  payload: { replyAttachmentPreviewEnabled }
+});
+
+export const setReplyAttachmentHandler = (replyAttachmentHandler) => ({
+  type: 'SET_REPLY_ATTACHMENT_HANDLER',
+  payload: { replyAttachmentHandler }
 });

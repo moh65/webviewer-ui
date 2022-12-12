@@ -8,6 +8,7 @@ import ActionButton from 'components/ActionButton';
 import StatefulButton from 'components/StatefulButton';
 import CustomElement from 'components/CustomElement';
 import ToolGroupButtonsScroll from './ToolGroupButtonsScroll';
+import ScrollGroup from './ScrollGroup';
 import useMedia from 'hooks/useMedia';
 import { isMobileDeviceFunc } from 'helpers/device';
 
@@ -22,12 +23,11 @@ class HeaderItems extends React.PureComponent {
 
   render() {
     const { items, isToolGroupReorderingEnabled, isInDesktopOnlyMode } = this.props;
-    const toolGroupButtonsItems = items.filter(({ type }) => (type === 'toolGroupButton'));
     let handledToolGroupButtons = false;
 
     const headers = items.map((item, i) => {
-      const { type, dataElement, hidden, toolName, hiddenOnMobileDevice } = item;
-      let mediaQueryClassName = hidden ? hidden.map(screen => {
+      const { type, dataElement, hidden, hiddenOnMobileDevice } = item;
+      let mediaQueryClassName = hidden ? hidden.map((screen) => {
         let result = '';
         if (isInDesktopOnlyMode) {
           // if in desktop only mode and if it should hide in desktop
@@ -49,11 +49,17 @@ class HeaderItems extends React.PureComponent {
       switch (type) {
         case 'toolButton':
           return <ToolButton key={key} mediaQueryClassName={mediaQueryClassName} {...item} />;
+        case 'scrollGroup':
+          return <ScrollGroup key={key}>
+            <HeaderItems items={item.children} isToolGroupReorderingEnabled={isToolGroupReorderingEnabled} isInDesktopOnlyMode={isInDesktopOnlyMode} />
+          </ScrollGroup>;
         case 'toolGroupButton':
           if (!isToolGroupReorderingEnabled) {
-            return <ToolGroupButton  key={key} mediaQueryClassName={mediaQueryClassName} {...item} />;
-          } else if (!handledToolGroupButtons) {
+            return <ToolGroupButton key={key} mediaQueryClassName={mediaQueryClassName} {...item} />;
+          }
+          if (!handledToolGroupButtons) {
             handledToolGroupButtons = true;
+            const toolGroupButtonsItems = items.filter(({ type }) => (type === 'toolGroupButton'));
             return <ToolGroupButtonsScroll key={key} toolGroupButtonsItems={toolGroupButtonsItems} />;
           }
           return null;
@@ -82,7 +88,7 @@ class HeaderItems extends React.PureComponent {
   }
 }
 
-export default props => {
+const connectedComponent = (props) => {
   const isMobile = useMedia(
     // Media queries
     ['(max-width: 640px)'],
@@ -95,3 +101,5 @@ export default props => {
     <HeaderItems {...props} isMobile={isMobile} />
   );
 };
+
+export default connectedComponent;

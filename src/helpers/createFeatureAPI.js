@@ -2,12 +2,17 @@ import core from 'core';
 import hotkeys from 'src/apis/hotkeys';
 import localStorageManager from 'helpers/localStorageManager';
 import touchEventManager from 'helpers/TouchEventManager';
-import hotkeysManager, { Keys, concatKeys } from 'helpers/hotkeysManager';
+import hotkeysManager, { concatKeys, Keys } from 'helpers/hotkeysManager';
 import Feature from 'constants/feature';
 import { PRIORITY_TWO } from 'constants/actionPriority';
 import actions from 'actions';
 import enableTools from 'src/apis/enableTools';
 import disableTools from 'src/apis/disableTools';
+import setToolMode from 'src/apis/setToolMode';
+import selectors from 'selectors';
+import TabManager from 'helpers/TabManager';
+import getHashParameters from './getHashParameters';
+import DataElements from 'constants/dataElement';
 
 // a higher order function that creates the enableFeatures and disableFeatures APIs
 export default (enable, store) => (features, priority = PRIORITY_TWO) => {
@@ -25,6 +30,7 @@ export default (enable, store) => (features, priority = PRIORITY_TWO) => {
         'annotationPopup',
         'linkButton',
         'noteState',
+        DataElements.NOTE_MULTI_SELECT_MODE_BUTTON,
       ],
       fn: () => {
         if (enable) {
@@ -36,9 +42,10 @@ export default (enable, store) => (features, priority = PRIORITY_TWO) => {
     },
     [Feature.Measurement]: {
       dataElements: [
-        "toolbarGroup-Measure",
+        'toolbarGroup-Measure',
         'measurementOverlay',
         'distanceToolGroupButton',
+        'arcMeasurementToolGroupButton',
         'perimeterToolGroupButton',
         'areaToolGroupButton',
         'rectangleAreaToolGroupButton',
@@ -111,16 +118,23 @@ export default (enable, store) => (features, priority = PRIORITY_TWO) => {
       },
     },
     [Feature.Redaction]: {
-      dataElements: ['redactionButton'],
+      dataElements: [
+        'redactionToolGroupButton',
+        'redactionPanel',
+        'redactionPanelToggle',
+        'pageRedactionToolGroupButton',
+      ],
       fn: () => {
         if (enable && !core.isFullPDFEnabled()) {
-          console.warn(
-            'Full api is not enabled, applying redactions is disabled',
-          );
+          console.warn('Full api is not enabled, applying redactions is disabled');
         } else {
-          core.setToolMode('AnnotationEdit');
+          core.enableRedaction(enable);
+          const currentToolbarGroup = selectors.getCurrentToolbarGroup(store.getState());
+          if (!enable && currentToolbarGroup === 'toolbarGroup-Redact') {
+            setToolMode('AnnotationEdit');
+          }
         }
-      },
+      }
     },
     [Feature.TextSelection]: {
       dataElements: ['textPopup', 'textSelectButton'],
@@ -227,26 +241,103 @@ export default (enable, store) => (features, priority = PRIORITY_TWO) => {
         'outlineControls',
         'addNewOutlineButtonContainer',
         'addNewOutlineButton',
-        'outlineReorderButtonGroup',
-        'outlineControls',
-        'editOutlineButton',
         'outlineEditPopup',
-        'renameOutlineButton',
-        'deleteOutlineButton',
+        'outlineRenameButton',
+        'outlineSetDestinationButton',
+        'outlineDeleteButton',
       ],
+      fn: () => {
+        store.dispatch(actions.setIsOutlineEditing(enable));
+      }
     },
     [Feature.NotesShowLastUpdatedDate]: {
       fn: () => {
         store.dispatch(actions.setNotesShowLastUpdatedDate(enable));
       }
-    }
+    },
+    [Feature.MultiTab]: {
+      fn: () => {
+        if (enable) {
+          const state = store.getState();
+          // if already in multi-tab mode do not recreate TabManager
+          if (selectors.getIsMultiTab(state) && selectors.getTabManager(state)) {
+            return;
+          }
+          const doc = core.getDocument();
+          let docArr = [];
+          if (doc) {
+            docArr.push(doc);
+          } else {
+            let initialDoc = getHashParameters('d', '');
+            initialDoc = initialDoc ? JSON.parse(initialDoc) : '';
+            if (initialDoc) {
+              if (Array.isArray(initialDoc)) {
+                docArr = docArr.concat(initialDoc);
+              } else {
+                docArr.push(initialDoc);
+              }
+            }
+          }
+          const tabManager = new TabManager(docArr, [], store);
+          store.dispatch(actions.setMultiTab(true));
+          store.dispatch(actions.setTabManager(tabManager));
+        } else {
+          store.dispatch(actions.setMultiTab(false));
+          store.dispatch(actions.setTabManager(null));
+          store.dispatch(actions.setTabs([]));
+          store.dispatch(actions.setActiveTab(0));
+        }
+      },
+    },
+    [Feature.ChangeView]: {
+      dataElements: [
+        'changeViewToolGroupButton',
+      ]
+    },
+    [Feature.ContentEdit]: {
+      dataElements: [
+        'toolbarGroup-EditText',
+        'addParagraphToolGroupButton',
+        'addImageContentToolGroupButton',
+        'contentEditButton',
+        'searchAndReplace',
+      ],
+    },
+    [Feature.MultiViewerMode]: {
+      fn: () => {
+        store.dispatch(actions.setIsMultiViewerMode(enable));
+      }
+    },
+    [Feature.Initials]: {
+      dataElements: [
+        'signatureOptionsDropdown',
+        'savedSignatureAndInitialsTabs',
+      ],
+      fn: () => {
+        const state = store.getState();
+        const signatures = selectors.getDisplayedSignatures(state);
+        if (signatures?.length > 0) {
+          store.dispatch(actions.setInitialsOffset(signatures.length));
+        }
+        store.dispatch(actions.setInitialsMode(enable));
+      }
+    },
+    [Feature.SavedSignaturesTab]: {
+      dataElements: [DataElements.SAVED_SIGNATURES_TAB],
+      fn: () => {
+        store.dispatch(actions.setSavedSignaturesTabEnabled(enable));
+        if (!enable) {
+          store.dispatch(actions.setSelectedTab('signatureModal', 'inkSignaturePanelButton'));
+        }
+      }
+    },
   };
 
   if (!Array.isArray(features)) {
     features = [features];
   }
 
-  features.forEach(feature => {
+  features.forEach((feature) => {
     const { dataElements = [], fn = () => { } } = map[feature];
 
     if (enable) {

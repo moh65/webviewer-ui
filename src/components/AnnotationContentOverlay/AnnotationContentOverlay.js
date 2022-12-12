@@ -20,11 +20,10 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 const MAX_CHARACTERS = 100;
 
 const AnnotationContentOverlay = () => {
-  const [isDisabled, isOverlayOpen] = useSelector(state =>
-    [
-      selectors.isElementDisabled(state, 'annotationContentOverlay'),
-      selectors.isElementOpen(state, 'annotationContentOverlay'),
-    ]
+  const [isDisabled, isOverlayOpen] = useSelector((state) => [
+    selectors.isElementDisabled(state, 'annotationContentOverlay'),
+    selectors.isElementOpen(state, 'annotationContentOverlay'),
+  ]
 
   );
   const [t] = useTranslation();
@@ -40,10 +39,10 @@ const AnnotationContentOverlay = () => {
     top: 0,
   });
   const dispatch = useDispatch();
+
   // Clients have the option to customize how the tooltip is rendered
   // by passing a handler
-  const customHandler = useSelector(state =>
-    selectors.getAnnotationContentOverlayHandler(state),
+  const customHandler = useSelector((state) => selectors.getAnnotationContentOverlayHandler(state),
   );
   const isUsingCustomHandler = customHandler !== null;
   const overlayRef = useRef(null);
@@ -65,13 +64,16 @@ const AnnotationContentOverlay = () => {
       }
 
       if (top <= 0) {
-        top = 0
+        top = 0;
       }
 
       return { left, top };
-    }
+    };
 
-    const onMouseHover = e => {
+    const onMouseHover = (e) => {
+      if (e.buttons !== 0) {
+        return;
+      }
       const viewElement = core.getViewerElement();
       let annotation = core
         .getAnnotationManager()
@@ -80,7 +82,7 @@ const AnnotationContentOverlay = () => {
       if (annotation && viewElement.contains(e.target)) {
         // if hovered annot is grouped, pick the "primary" annot to match Adobe's behavior
         const groupedAnnots = core.getAnnotationManager().getGroupAnnotations(annotation);
-        const ungroupedAnnots = groupedAnnots.filter(annot => !annot.isGrouped());
+        const ungroupedAnnots = groupedAnnots.filter((annot) => !annot.isGrouped());
         annotation = ungroupedAnnots.length > 0 ? ungroupedAnnots[0] : annotation;
 
         //customization
@@ -104,7 +106,6 @@ const AnnotationContentOverlay = () => {
             setOverlayPosition({ left, top });
           }
         }
-
         dispatch(actions.openElement('annotationContentOverlay'));
       } else {
         setAnnotation(null);
@@ -203,8 +204,9 @@ const AnnotationContentOverlay = () => {
       <FormFieldPlaceHolderOverlay
         annotation={annotation}
         overlayPosition={overlayPosition}
-        overlayRef={overlayRef} />
-    )
+        overlayRef={overlayRef}
+      />
+    );
   }
 
   if (isOverlayOpen) {

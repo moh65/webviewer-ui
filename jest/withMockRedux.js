@@ -1,6 +1,6 @@
-import { createStore } from "redux";
-import { Provider } from "react-redux";
-import React from "react";
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import React from 'react';
 
 // mock initial state.
 // UI Buttons are redux connected, and they need a state or the
@@ -9,6 +9,14 @@ const initialState = {
   viewer: {
     disabledElements: {},
     customElementOverrides: {},
+    panelWidths: {
+      redactionPanel: 330,
+    },
+    currentLanguage: 'en',
+    openElements: {},
+  },
+  search: {
+    redactionSearchPatterns: {},
   }
 };
 

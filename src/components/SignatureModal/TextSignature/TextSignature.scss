@@ -2,26 +2,38 @@
 @import '../../../constants/modal';
 
 .text-signature {
-  display: flex;
-  flex-direction: column;
-  width: 450px;
-  height: 220px;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
 
-  @include mobile {
-    width: 100%;
-    height: 162px;
-  }
   canvas {
     display: none;
   }
 
   &-input {
     outline: none;
-    border-radius: 4px;
-    border: 1px solid var(--focus-border);
-    box-shadow: none;
-    padding: 5px;
     width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--modal-stroke-and-border);
+    border-radius: 0;
+    text-align: center;
+    height: 85px;
+
+    @include small-browser-height {
+      font-size: 42px !important;
+      height: 50px;
+
+    }
+
+    @include tiny-browser-height {
+      font-size: 34px !important;
+    }
+  }
+
+  &-input:focus {
+    border: none;
+    border-bottom: 1px solid var(--modal-stroke-and-border);
   }
 
   &-inner-container {
@@ -33,26 +45,28 @@
   &-text {
     display: flex;
     align-items: center;
-    background: var(--faded-component-background);
+    background: var(--signature-draw-background);
     white-space: nowrap;
     border-radius: 4px;
     padding: 0 8px;
     margin-top: 10px;
     overflow-y: auto;
     flex-grow: 1;
+    visibility: hidden;
+    position: fixed;
 
     &:hover {
       cursor: pointer;
     }
 
-    // &.active {
-    //   border: 1px solid var(--focus-border);
-    // }
-
     .text-container {
-      // background: green;
       margin: auto;
       padding: 0 20px;
     }
+  }
+
+  label {
+    margin-top: 60px;
+    width: 100%;
   }
 }

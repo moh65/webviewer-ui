@@ -6,7 +6,22 @@ import { Basic } from './NoteTextPreview.stories';
 
 const BasicNoteTextPreview = withI18n(Basic);
 const TestNoteTextPreview = withProviders(NoteTextPreview);
-const sampleText = `Space: the final frontier. These are the voyages of the starship Enterprise. Its continuing mission: to explore strange new worlds. To seek out new life and new civilizations. To boldly go where no one has gone before!`
+const sampleText = 'Space: the final frontier. These are the voyages of the starship Enterprise. Its continuing mission: to explore strange new worlds. To seek out new life and new civilizations. To boldly go where no one has gone before!';
+// Mock the ref element so we render some text
+export const setMockRefElement = (node) => {
+  const mockRef = {
+    get current() {
+      // jest dom elements have no width,
+      // so mocking a browser situation
+      return node;
+    },
+    // we need a setter here because it gets called when you
+    // pass a ref to <component ref={ref} />
+    set current(_value) { },
+  };
+
+  jest.spyOn(React, 'useRef').mockReturnValue(mockRef);
+};
 
 describe('NoteTextPreview', () => {
   describe('Component', () => {

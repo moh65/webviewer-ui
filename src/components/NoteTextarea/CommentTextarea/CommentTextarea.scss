@@ -1,0 +1,127 @@
+@import '../../../constants/styles';
+@import '../../../constants/note';
+
+.comment-textarea {
+  position: relative;
+  width: 100%;
+
+  .ql-toolbar {
+    display: none;
+  }
+
+  .ql-container {
+    border: none;
+
+    .ql-editor {
+      width: 100%;
+      padding: 12px 28px 12px 7px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      height: 40px;
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px;
+      color: var(--text-color);
+      background: var(--component-background);
+      resize: none;
+      overflow: hidden;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border: 1px solid var(--focus-border);
+      }
+
+      &.ql-blank::before {
+        left: 8px;
+        list-style-type: none;
+        font-style: normal;
+        color: var(--placeholder-text);
+      }
+
+      p {
+        margin: 0;
+        word-break: break-all;
+      }
+
+      ul>li::before {
+        content: none !important;
+      }
+    }
+
+    &.ql-snow {
+      border: none;
+    }
+  }
+
+  .add-attachment {
+    position: absolute;
+    bottom: 9px;
+    right: 2px;
+    width: 24px;
+    height: 24px;
+
+    &:hover {
+      background-color: var(--blue-1);
+    }
+
+    .Icon {
+      padding: 3px;
+    }
+  }
+}
+
+.ql-editor ul>li::before {
+  content: none !important;
+}
+
+.mention {
+
+  &__control {
+    background: var(--component-background);
+    font-size: 14px;
+    font-weight: normal;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  &__highlighter {
+    overflow: hidden;
+    padding: 5px;
+  }
+
+  &__input {
+    border: none;
+  }
+
+
+  &__suggestions {
+    background-color: var(--component-background)!important;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+
+    &__list {
+      font-size: 14px;
+    }
+
+    &__item {
+      padding: 8px;
+      background-color: var(--component-background);
+
+      .email {
+        margin-top: 2px;
+        font-size: 12px;
+        color: var(--faded-text);
+      }
+
+      &--focused {
+        background-color: var(--popup-button-hover);
+        cursor: pointer;
+      }
+
+      &__highlight {
+        background-color: #face0080;
+        font-weight: normal;
+      }
+    }
+  }
+}

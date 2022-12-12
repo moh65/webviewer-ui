@@ -1,18 +1,12 @@
 import React from 'react';
-import PageReplacementModal from './PageReplacementModal'
+import PageReplacementModal from './PageReplacementModal';
 import { createStore } from 'redux';
-import { Provider } from "react-redux";
+import { Provider } from 'react-redux';
 
 export default {
   title: 'Components/PageReplacementModal',
   component: PageReplacementModal,
 };
-
-window.Core = {
-  SupportedFileFormats: {
-    CLIENT: []
-  }
-}
 
 const initialState = {
   viewer: {
@@ -25,13 +19,13 @@ const initialState = {
   }
 };
 
-function rootReducer(state = initialState, action) {
+function rootReducer(state = initialState) {
   return state;
 }
 
 const store = createStore(rootReducer);
 
-export function Basic() {
+export function ReplaceURL() {
   function closeModal() {
     console.log('closeModal');
   }
@@ -43,9 +37,7 @@ export function Basic() {
 
   return (
     <Provider store={store}>
-      <div className='Overlay FlyoutMenu'>
-        <PageReplacementModal  {...props}/>
-      </div>
+      <PageReplacementModal {...props} />
     </Provider>
   );
 }
@@ -61,11 +53,11 @@ const initialStateTwo = {
   }
 };
 
-function rootReducerTwo(state = initialStateTwo, action) {
+function rootReducerTwo(state = initialStateTwo) {
   return state;
 }
 const storeTwo = createStore(rootReducerTwo);
-export function BasicUpload() {
+export function ReplaceUpload() {
   function closeModal() {
     console.log('closeModal');
   }
@@ -76,9 +68,7 @@ export function BasicUpload() {
   };
   return (
     <Provider store={storeTwo}>
-      <div className='Overlay FlyoutMenu'>
-        <PageReplacementModal  {...props}/>
-      </div>
+      <PageReplacementModal {...props} />
     </Provider>
   );
 }
@@ -94,11 +84,11 @@ const initialStateThree = {
   }
 };
 
-function rootReducerThree(state = initialStateThree, action) {
+function rootReducerThree(state = initialStateThree) {
   return state;
 }
 const storeThree = createStore(rootReducerThree);
-export function BasicCustom() {
+export function ReplaceCustomFile() {
   function closeModal() {
     console.log('closeModal');
   }
@@ -119,8 +109,8 @@ export function BasicCustom() {
   };
   return (
     <Provider store={storeThree}>
-      <div className='Overlay FlyoutMenu'>
-        <PageReplacementModal  {...props}/>
+      <div style={{ 'box-sizing': 'border-box' }}>
+        <PageReplacementModal {...props} />
       </div>
     </Provider>
   );

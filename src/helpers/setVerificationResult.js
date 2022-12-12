@@ -46,10 +46,10 @@ import actions from 'actions';
  * Invalid.
  * @ignore
  */
-export default async (certificates, dispatch) => {
+export default async (certificates, trustLists, dispatch) => {
   const doc = core.getDocument();
   if (doc) {
-    const verificationResult = await getVerificationResult(doc, certificates);
+    const verificationResult = await getVerificationResult(doc, certificates, trustLists);
     dispatch(actions.setVerificationResult(verificationResult));
     return verificationResult;
   }
@@ -64,12 +64,14 @@ export default async (certificates, dispatch) => {
  * @param {Array<File | string>} certificates The certificate files to be used
  * for verification. Can be passed as a File object, or a URL in the form
  * of a string, in which a GET call will be made to retrieve the certificate
- *
+ * @param {
+ *   Array<Blob | ArrayBuffer | Int8Array | Uint8Array | Uint8ClampedArray>
+ * } trustLists The Trust Lists to load for verification.
  * @returns {object} An object mapping the field name of each signature widget
  * to their verification results
  * @ignore
  */
-const getVerificationResult = async (doc, certificates) => {
+const getVerificationResult = async (doc, certificates, trustLists) => {
   const { PDFNet } = window;
   const { VerificationResult } = PDFNet;
   const {
@@ -106,7 +108,7 @@ const getVerificationResult = async (doc, certificates) => {
       ) {
         const fileReader = new FileReader();
         const arrayBufferPromise = new Promise((resolve, reject) => {
-          fileReader.addEventListener('load', async e => {
+          fileReader.addEventListener('load', async (e) => {
             resolve(new Uint8Array(e.target.result));
           });
           fileReader.addEventListener('error', () => {
@@ -142,6 +144,39 @@ const getVerificationResult = async (doc, certificates) => {
       }
     }
 
+    for (const trustList of trustLists) {
+      const trustListDataStructure = trustList.constructor.name;
+      const supportedDataStructures = [
+        'ArrayBuffer',
+        'Int8Array',
+        'Uint8Array',
+        'Uint8ClampedArray',
+      ];
+      let fdfDocBuffer;
+      if (trustListDataStructure === 'Blob') {
+        fdfDocBuffer = await trustList.arrayBuffer();
+      } else if (supportedDataStructures.includes(trustListDataStructure)) {
+        fdfDocBuffer = trustList;
+      } else {
+        console.error(
+          'The provided TrustList is an unsupported data-structure. '
+          + 'Please ensure the TrustList is formatted as one of the following '
+          + `data-structures: ${[...supportedDataStructures, 'Blob'].join('|')}`
+        );
+        continue;
+      }
+      try {
+        const fdf = await PDFNet.FDFDoc.createFromMemoryBuffer(fdfDocBuffer);
+        await opts.loadTrustList(fdf);
+      } catch (error) {
+        console.error(
+          `Error encountered when trying to load certificate: ${error}. `
+          + 'Certificate will not be used as part of the verification process.'
+        );
+        continue;
+      }
+    }
+
     const fieldIterator = await doc.getFieldIteratorBegin();
     for (; (await fieldIterator.hasNext()); fieldIterator.next()) {
       const field = await fieldIterator.current();
@@ -170,25 +205,46 @@ const getVerificationResult = async (doc, certificates) => {
 
         const signed = await digitalSigField.hasCryptographicSignature();
         if (signed) {
-          const signerCert = await digitalSigField.getSignerCertFromCMS();
-          const retrievedIssuerField = await signerCert.getIssuerField();
-          const processedIssuerField = await processX501DistinguishedName(retrievedIssuerField) || {};
-          signer = (
-            processedIssuerField['e_commonName']
-            || await digitalSigField.getSignatureName()
-            || await digitalSigField.getContactInfo()
-          );
-          signTime = await digitalSigField.getSigningTime();
-
-          if (await signTime.isValid()) {
-            signTime = formatPDFNetDate(signTime);
-          } else {
-            signTime = null;
+          const subFilter = await digitalSigField.getSubFilter();
+          if (subFilter === PDFNet.DigitalSignatureField.SubFilterType.e_adbe_pkcs7_detached) {
+            const signerCert = await digitalSigField.getSignerCertFromCMS();
+            /**
+             * @note "Issuer" refers to the Certificate Authority that issued the
+             * certificate
+             * "Subject" refers to the organization/person that the Certificate
+             * Auhority issued this certificate to
+             *
+             * It is likely that future UI iterations will leverage Issuer
+             * information, so the code has been commented out for now, but will
+             * be uncommented in future feature implementations
+             */
+            // const retrievedIssuerField = await signerCert.getIssuerField();
+            // const processedIssuerField = await processX501DistinguishedName(retrievedIssuerField) || {};
+            const retrievedSubjectField = await signerCert.getSubjectField();
+            const processedSubjectField = await processX501DistinguishedName(retrievedSubjectField) || {};
+            signer = processedSubjectField['e_commonName'];
           }
+          // Getter functions cannot be called on Digital Signature fields using
+          // e_ETSI_RFC3161
+          if (subFilter !== PDFNet.DigitalSignatureField.SubFilterType.e_ETSI_RFC3161) {
+            if (!signer) {
+              signer = (
+                await digitalSigField.getSignatureName()
+                || await digitalSigField.getContactInfo()
+              );
+            }
+            signTime = await digitalSigField.getSigningTime();
 
-          contactInfo = await digitalSigField.getContactInfo();
-          location = await digitalSigField.getLocation();
-          reason = await digitalSigField.getReason();
+            if (await signTime.isValid()) {
+              signTime = formatPDFNetDate(signTime);
+            } else {
+              signTime = null;
+            }
+
+            contactInfo = await digitalSigField.getContactInfo();
+            location = await digitalSigField.getLocation();
+            reason = await digitalSigField.getReason();
+          }
 
           documentPermission = await digitalSigField.getDocumentPermissions();
           isCertification = await digitalSigField.isCertification();
@@ -201,7 +257,7 @@ const getVerificationResult = async (doc, certificates) => {
         const permissionStatus = await result.getPermissionsStatus();
         const digestAlgorithm = await result.getDigestAlgorithm();
         const disallowedChanges = await Promise.all(
-          (await result.getDisallowedChanges()).map(async change => ({
+          (await result.getDisallowedChanges()).map(async (change) => ({
             objnum: await change.getObjNum(),
             type: await change.getTypeAsString(),
           }))
@@ -232,12 +288,37 @@ const getVerificationResult = async (doc, certificates) => {
             const processedSubjectField = await processX501DistinguishedName(retrievedSubjectField);
             Object.assign(subjectField, processedSubjectField);
             const lastX509Cert = certPath[certPath.length - 1];
-            const notBeforeEpochTime = await lastX509Cert.getNotBeforeEpochTime();
-            const notAfterEpochTime = await lastX509Cert.getNotAfterEpochTime();
-            validAtTimeOfSigning = (
-              notAfterEpochTime >= epochTrustVerificationTime
-              && epochTrustVerificationTime >= notBeforeEpochTime
-            );
+            /**
+             * @todo @colim @rdjericpdftron 2022-05-30
+             * Using the pdftron::PDF::VerificationOptions::LoadTrustList API
+             * in combination with
+             * pdftron::Crypto::X509Certificate::GetNotBeforeEpochTime
+             * or
+             * pdftron::Crypto::X509Certificate::GetNotAfterEpochTime
+             * Results in the following fatal error being thrown:
+             *
+             * calendar_point::to_std_timepoint() does not support years after
+             * 2037 on this system
+             *
+             * @rdjericpdftron Mentions that this should be addressed in a
+             * future release of PDFNet when the Botan library has been patched
+             */
+            try {
+              const notBeforeEpochTime = await lastX509Cert.getNotBeforeEpochTime();
+              const notAfterEpochTime = await lastX509Cert.getNotAfterEpochTime();
+              validAtTimeOfSigning = (
+                notAfterEpochTime >= epochTrustVerificationTime
+                && epochTrustVerificationTime >= notBeforeEpochTime
+              );
+            } catch (dateBugError) {
+              if (dateBugError.includes('calendar_point::to_std_timepoint() does not support years after')) {
+                console.warn(
+                  'The following error is a known issue with Botan, and aims to be addressed in a future release of '
+                  + 'PDFNet. This currently does not impact PDFTron\'s Digital Signature Verification capabilities.'
+                );
+                console.warn(dateBugError);
+              }
+            }
           }
         }
 
@@ -312,7 +393,7 @@ const getVerificationResult = async (doc, certificates) => {
  * @returns {string} Human readable formatted date and time
  * @ignore
  */
-const formatPDFNetDate = date => {
+const formatPDFNetDate = (date) => {
   const { year, month, day, hour, minute, second } = date;
 
   return `${year}-${month}-${day}, ${hour}:${minute}:${second}`;
@@ -325,7 +406,7 @@ const formatPDFNetDate = date => {
  * @returns {Date} The converted epoch time
  * @ignore
  */
-const formatDate = epochTime => {
+const formatDate = (epochTime) => {
   const date = new Date(0);
   // Values greater than 59 are converted into their parent values
   // (i.e. seconds -> minutes -> hours -> day etc.)
@@ -357,7 +438,7 @@ const formatDate = epochTime => {
  * they map to
  * @ignore
  */
-const processX501DistinguishedName = async x501DistinguishedNameObject => {
+const processX501DistinguishedName = async (x501DistinguishedNameObject) => {
   const processedObject = {};
   const allAttributeAndValues = await x501DistinguishedNameObject.getAllAttributesAndValues();
   for (const x501AttributeTypeAndValue of allAttributeAndValues) {
@@ -390,7 +471,7 @@ const processX501DistinguishedName = async x501DistinguishedNameObject => {
  * @returns {string} The human readable enum that the array represents
  * @ignore
  */
-const translateObjectIdentifierBotanOID = objectIdentifierOIDenum => {
+const translateObjectIdentifierBotanOID = (objectIdentifierOIDenum) => {
   const botanArrayToEnum = {
     '[2,5,4,3]': 'e_commonName',
     '[2,5,4,4]': 'e_surname',

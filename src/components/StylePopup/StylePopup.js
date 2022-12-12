@@ -1,37 +1,46 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import i18next from "i18next";
+import i18next from 'i18next';
 
 import ColorPaletteHeader from 'components/ColorPaletteHeader';
 import ColorPalette from 'components/ColorPalette';
 import ColorPalettePicker from 'components/ColorPalettePicker';
 import Slider from 'components/Slider';
-import MeasurementOption from 'components/MeasurementOption';
 import StyleOption from 'components/StyleOption';
+import Icon from 'components/Icon';
+import TextStylePicker from 'components/TextStylePicker';
+import LabelTextEditor from 'components/LabelTextEditor';
+import LineStyleOptions from 'components/LineStyleOptions';
+import Choice from 'components/Choice/Choice';
 
 import { circleRadius } from 'constants/slider';
 import DataElements from 'constants/dataElement';
+import { workerTypes } from 'constants/types';
 import selectors from 'selectors';
 import actions from 'actions';
 import pickBy from 'lodash/pickBy';
 import useMedia from 'hooks/useMedia';
 import classNames from 'classnames';
+import { isMobile } from 'helpers/device';
+import getMeasurementTools from 'helpers/getMeasurementTools';
+import core from 'core';
 
 import './StylePopup.scss';
-import Icon from "components/Icon";
-import TextStylePicker from "components/TextStylePicker";
-import { isMobile } from "helpers/device";
 
 class StylePopup extends React.PureComponent {
   static propTypes = {
     style: PropTypes.object.isRequired,
     onStyleChange: PropTypes.func.isRequired,
     onPropertyChange: PropTypes.func.isRequired,
+    onSliderChange: PropTypes.func.isRequired,
     onRichTextStyleChange: PropTypes.func,
+    onLineStyleChange: PropTypes.func,
     isFreeText: PropTypes.bool,
+    isEllipse: PropTypes.bool,
+    isMeasure: PropTypes.bool,
     colorMapKey: PropTypes.string.isRequired,
-    currentPalette: PropTypes.oneOf(['TextColor', 'StrokeColor', 'FillColor']),
+    currentStyleTab: PropTypes.oneOf(['TextColor', 'StrokeColor', 'FillColor']),
     isColorPaletteDisabled: PropTypes.bool,
     isOpacitySliderDisabled: PropTypes.bool,
     isStrokeThicknessSliderDisabled: PropTypes.bool,
@@ -41,20 +50,66 @@ class StylePopup extends React.PureComponent {
     hideSnapModeCheckbox: PropTypes.bool,
     closeElement: PropTypes.func,
     openElement: PropTypes.func,
-    freeTextProperties: PropTypes.object,
+    onSnapModeChange: PropTypes.func,
+    properties: PropTypes.object,
+    isRedaction: PropTypes.bool,
+    fonts: PropTypes.array,
+    isSnapModeEnabled: PropTypes.bool
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      document: core.getDocument(),
+      documentType: core.getDocument()?.getType()
+    };
+  }
+
+  componentDidMount() {
+    core.addEventListener('documentLoaded', this.onDocumentLoaded);
+  }
+
+  componentWillUnmount() {
+    core.removeEventListener('documentLoaded', this.onDocumentLoaded);
+  }
+
+  onDocumentLoaded = () => {
+    this.setState({
+      document: core.getDocument(),
+      documentType: core.getDocument().getType()
+    });
+  };
+
+  onSnappingChange = (event) => {
+    if (!core.isFullPDFEnabled()) {
+      return;
+    }
+
+    const enableSnapping = event.target.checked;
+    const mode = enableSnapping ? core.getDocumentViewer().SnapMode.e_DefaultSnapMode | core.getDocumentViewer().SnapMode.POINT_ON_LINE : null;
+    const measurementTools = getMeasurementTools();
+
+    measurementTools.forEach((tool) => {
+      tool.setSnapMode?.(mode);
+    });
+    if (this.props.onSnapModeChange) {
+      this.props.onSnapModeChange(enableSnapping);
+    }
   };
 
   renderSliders = () => {
     const {
       style: { Opacity, StrokeThickness, FontSize },
       onStyleChange,
-      onPropertyChange,
+      onSliderChange,
       isFreeText,
+      isMeasure = false,
       // TODO: Actually disable these elements
       isOpacitySliderDisabled,
       isStrokeThicknessSliderDisabled,
       isFontSizeSliderDisabled,
-      currentPalette,
+      currentStyleTab,
     } = this.props;
     const lineStart = circleRadius;
     const sliderProps = {};
@@ -64,10 +119,16 @@ class StylePopup extends React.PureComponent {
         property: 'Opacity',
         displayProperty: 'opacity',
         value: Opacity,
-        getDisplayValue: Opacity => `${Math.round(Opacity * 100)}%`,
+        getDisplayValue: (Opacity) => `${Math.round(Opacity * 100)}%`,
         dataElement: DataElements.OPACITY_SLIDER,
         getCirclePosition: (lineLength, Opacity) => Opacity * lineLength + lineStart,
-        convertRelativeCirclePositionToValue: circlePosition => circlePosition,
+        convertRelativeCirclePositionToValue: (circlePosition) => circlePosition,
+        withInputField: true,
+        inputFieldType: 'number',
+        min: 0,
+        max: 100,
+        step: 1,
+        getLocalValue: (opacity) => parseInt(opacity) / 100,
       };
     }
     if (!isStrokeThicknessSliderDisabled) {
@@ -75,15 +136,39 @@ class StylePopup extends React.PureComponent {
         property: 'StrokeThickness',
         displayProperty: 'thickness',
         value: StrokeThickness,
-        getDisplayValue: StrokeThickness => `${Math.round(StrokeThickness)}pt`,
+        getDisplayValue: (strokeThickness) => {
+          const placeOfDecimal = Math.floor(strokeThickness) !== strokeThickness ? strokeThickness.toString().split('.')[1].length || 0 : 0;
+          if (StrokeThickness === 0 || StrokeThickness >= 1 && (placeOfDecimal > 2 || placeOfDecimal === 0)) {
+            return `${Math.round(strokeThickness)}pt`;
+          }
+          return `${parseFloat(strokeThickness).toFixed(2)}pt`;
+        },
         dataElement: DataElements.STROKE_THICKNESS_SLIDER,
-        // FreeText Annotations can have the border thickness go down to 0. For others the minimum is 1.
-        getCirclePosition: (lineLength, StrokeThickness) =>
-          (isFreeText
-            ? (StrokeThickness / 20) * lineLength + lineStart
-            : ((StrokeThickness - 1) / 19) * lineLength + lineStart),
-        convertRelativeCirclePositionToValue: circlePosition =>
-          (isFreeText ? circlePosition * 20 : circlePosition * 19 + 1),
+        getCirclePosition: (lineLength, strokeThickness) => (strokeThickness / 20) * lineLength + lineStart,
+        convertRelativeCirclePositionToValue: (circlePosition) => {
+          if (circlePosition >= 1 / 20) {
+            return circlePosition * 20;
+          }
+          if (circlePosition >= 0.75 / 20 && circlePosition < 1 / 20) {
+            return 0.75;
+          }
+          if (circlePosition >= 0.5 / 20 && circlePosition < 0.75 / 20) {
+            return 0.5;
+          }
+          if (circlePosition >= 0.25 / 20 && circlePosition < 0.5 / 20) {
+            return 0.25;
+          }
+          if (circlePosition >= 0.08 / 20 && circlePosition < 0.25 / 20) {
+            return 0.1;
+          }
+          return isFreeText ? 0 : 0.1;
+        },
+        withInputField: true,
+        inputFieldType: 'number',
+        min: isFreeText ? 0 : 0.1,
+        max: 20,
+        step: 1,
+        getLocalValue: (strokeThickness) => parseFloat(strokeThickness).toFixed(2)
       };
     }
     if (!isFontSizeSliderDisabled) {
@@ -91,30 +176,32 @@ class StylePopup extends React.PureComponent {
         property: 'FontSize',
         displayProperty: 'text',
         value: FontSize,
-        getDisplayValue: FontSize => `${Math.round(parseInt(FontSize, 10))}pt`,
+        getDisplayValue: (FontSize) => `${Math.round(parseInt(FontSize, 10))}pt`,
         dataElement: DataElements.FONT_SIZE_SLIDER,
-        getCirclePosition: (lineLength, FontSize) =>
-          ((parseInt(FontSize, 10) - 5) / 40) * lineLength + lineStart,
-        convertRelativeCirclePositionToValue: circlePosition =>
-          `${circlePosition * 40 + 5}pt`,
+        getCirclePosition: (lineLength, FontSize) => ((parseInt(FontSize, 10) - 5) / 40) * lineLength + lineStart,
+        convertRelativeCirclePositionToValue: (circlePosition) => `${circlePosition * 40 + 5}pt`,
       };
     }
 
     // default sliders
     let sliders = { Opacity, StrokeThickness, FontSize };
-    if (currentPalette === 'TextColor') {
+    if (currentStyleTab === 'TextColor') {
       sliders = { Opacity, FontSize };
-    } else if (currentPalette === 'StrokeColor') {
+    } else if (currentStyleTab === 'StrokeColor') {
       sliders = { Opacity, StrokeThickness };
-    } else if (currentPalette === 'FillColor') {
+    } else if (currentStyleTab === 'FillColor') {
       sliders = { Opacity };
+    }
+
+    if (isMeasure) {
+      sliders.FontSize = FontSize;
     }
 
     if (isOpacitySliderDisabled) {
       delete sliders.Opacity;
     }
 
-    if (isStrokeThicknessSliderDisabled) {
+    if (isStrokeThicknessSliderDisabled || this.props.colorMapKey === 'markInsertText' || this.props.colorMapKey === 'markReplaceText') {
       delete sliders.StrokeThickness;
     }
 
@@ -123,21 +210,18 @@ class StylePopup extends React.PureComponent {
     }
 
     // we still want to render a slider if the value is 0
-    sliders = pickBy(sliders, slider => slider !== null && slider !== undefined);
+    sliders = pickBy(sliders, (slider) => slider !== null && slider !== undefined);
 
-    const sliderComponents = Object.keys(sliders).map(key => {
+    const sliderComponents = Object.keys(sliders).map((key) => {
       const props = sliderProps[key];
 
-      return <Slider {...props} key={key} onStyleChange={onStyleChange} onSliderChange={onPropertyChange}/>;
+      return <Slider {...props} key={key} onStyleChange={onStyleChange} onSliderChange={onSliderChange} />;
     });
 
     return (
       <React.Fragment>
         {sliderComponents.length > 0 && (
-          <div
-            className="sliders-container"
-            onMouseDown={e => e.preventDefault()}
-          >
+          <div className="sliders-container">
             {sliderComponents}
           </div>
         )}
@@ -150,7 +234,7 @@ class StylePopup extends React.PureComponent {
     const {
       toolName,
       isColorPaletteDisabled,
-      currentPalette,
+      currentStyleTab,
       style,
       colorMapKey,
       onStyleChange,
@@ -158,98 +242,153 @@ class StylePopup extends React.PureComponent {
       disableSeparator,
       hideSnapModeCheckbox,
       isFreeText,
-      isTextContainerActive,
-      isColorContainerActive,
+      isEllipse,
+      isTextStyleContainerActive,
+      isColorsContainerActive,
+      isLabelTextContainerActive,
+      isLabelTextContainerDisabled,
       openElement,
       closeElement,
-      freeTextProperties,
+      properties,
       onPropertyChange,
       onRichTextStyleChange,
+      isRedaction,
+      fonts,
+      showLineStyleOptions,
+      onLineStyleChange,
+      isSnapModeEnabled
     } = this.props;
+
+    // We do not have sliders to show up for redaction annots
+    if (isRedaction) {
+      style.Opacity = null;
+      style.StrokeThickness = null;
+    }
 
     const { Scale, Precision, Style } = style;
 
-    const openTextStyle = () => {
-      if (!isTextContainerActive) {
-        openElement(DataElements.FREE_TEXT_STYLE_TEXT_CONTAINER);
-        isMobile() && closeElement(DataElements.FREE_TEXT_STYLE_COLOR_CONTAINER);
-      } else {
-        closeElement(DataElements.FREE_TEXT_STYLE_TEXT_CONTAINER);
-      }
+    const textMenuItems = {
+      [DataElements.STYLE_POPUP_TEXT_STYLE_CONTAINER]: isTextStyleContainerActive,
+      [DataElements.STYLE_POPUP_COLORS_CONTAINER]: isColorsContainerActive,
+      [DataElements.STYLE_POPUP_LABEL_TEXT_CONTAINER]: isLabelTextContainerActive
     };
 
-    const openColorStyle = () => {
-      if (!isColorContainerActive) {
-        openElement(DataElements.FREE_TEXT_STYLE_COLOR_CONTAINER);
-        isMobile() && closeElement(DataElements.FREE_TEXT_STYLE_TEXT_CONTAINER);
+    const openTextMenuItem = (dataElement) => {
+      if (!textMenuItems[dataElement]) {
+        openElement(dataElement);
+        if (isMobile()) {
+          for (const element in textMenuItems) {
+            if (element !== dataElement) {
+              closeElement(element);
+            }
+          }
+        }
       } else {
-        closeElement(DataElements.FREE_TEXT_STYLE_COLOR_CONTAINER);
+        closeElement(dataElement);
       }
     };
+    const openLabelText = () => openTextMenuItem(DataElements.STYLE_POPUP_LABEL_TEXT_CONTAINER);
+    const openTextStyle = () => openTextMenuItem(DataElements.STYLE_POPUP_TEXT_STYLE_CONTAINER);
+    const openColors = () => openTextMenuItem(DataElements.STYLE_POPUP_COLORS_CONTAINER);
 
     const className = classNames({
       Popup: true,
       StylePopup: true,
     });
+
+    const showTextStyle = (currentStyleTab === 'TextColor' && (isFreeText || isRedaction));
+    const showColorsMenu = (currentStyleTab === 'TextColor' && (isFreeText || isRedaction));
+    const showColorPicker = !(showColorsMenu && !isColorsContainerActive);
+    const showLabelText = (currentStyleTab === 'TextColor' && isRedaction);
+    const showSliders = isColorPaletteDisabled || showColorPicker;
+    const hideStylePicker = (currentStyleTab !== 'StrokeColor' && (isFreeText || isRedaction));
+    const wasDocumentSwappedToClientSide = (
+      this.state.documentType === workerTypes.WEBVIEWER_SERVER &&
+      !this.state.document.isWebViewerServerDocument()
+    );
+    const isEligibleDocumentForSnapping = this.state.documentType === workerTypes.PDF || wasDocumentSwappedToClientSide;
+
+    const showMeasurementSnappingOption = (
+      Scale &&
+      Precision &&
+      isEligibleDocumentForSnapping &&
+      !hideSnapModeCheckbox
+    );
+
     return (
       <div className={className} data-element="stylePopup">
-        {currentPalette && !isColorPaletteDisabled && (
+        {currentStyleTab && !isColorPaletteDisabled && (
           <>
             <ColorPaletteHeader
-              colorPalette={currentPalette}
+              colorPalette={currentStyleTab}
               colorMapKey={colorMapKey}
               style={style}
               toolName={toolName}
               disableSeparator={disableSeparator}
             />
-            {isFreeText && currentPalette === "TextColor" ? (
+            {showLabelText && !isLabelTextContainerDisabled && (
               <>
-                <div className="collapsible-menu" onClick={openTextStyle} onTouchStart={openTextStyle} role={"toolbar"}>
+                <div className="collapsible-menu" onClick={openLabelText} onTouchStart={openLabelText} role={'toolbar'}>
+                  <div className="menu-title">
+                    {i18next.t('option.stylePopup.labelText')}
+                  </div>
+                  <Icon glyph={`icon-chevron-${isLabelTextContainerActive ? 'up' : 'down'}`} />
+                </div>
+                {isLabelTextContainerActive && (
+                  <div className="menu-items">
+                    <LabelTextEditor
+                      properties={properties}
+                      onPropertyChange={onPropertyChange}
+                    />
+                  </div>
+                )}
+                <div className="divider" />
+              </>
+            )}
+            {showTextStyle && (
+              <>
+                <div className="collapsible-menu" onClick={openTextStyle} onTouchStart={openTextStyle} role={'toolbar'}>
                   <div className="menu-title">
                     {i18next.t('option.stylePopup.textStyle')}
                   </div>
-                  <Icon glyph={`icon-chevron-${isTextContainerActive ? "up" : "down"}`}/>
+                  <Icon glyph={`icon-chevron-${isTextStyleContainerActive ? 'up' : 'down'}`} />
                 </div>
-                <div className={`menu-items ${!isTextContainerActive && "closed"}`}>
-                  <TextStylePicker onPropertyChange={onPropertyChange} onRichTextStyleChange={onRichTextStyleChange} properties={freeTextProperties} />
-                </div>
-
-                <div className="divider"/>
-
-                <div className="collapsible-menu" onClick={openColorStyle} onTouchStart={openColorStyle} role={"toolbar"}>
-                  <div className="menu-title">
-                    {i18next.t('option.stylePopup.colorStyle')}
+                {isTextStyleContainerActive && (
+                  <div className="menu-items">
+                    <TextStylePicker
+                      fonts={fonts}
+                      onPropertyChange={onPropertyChange}
+                      onRichTextStyleChange={onRichTextStyleChange}
+                      properties={properties}
+                      isRedaction={isRedaction}
+                    />
                   </div>
-                  <Icon glyph={`icon-chevron-${isColorContainerActive ? "up" : "down"}`}/>
-                </div>
-                <div className={`menu-items ${!isColorContainerActive && "closed"}`}>
-                  <ColorPalette
-                    color={style[currentPalette]}
-                    property={currentPalette}
-                    onStyleChange={onStyleChange}
-                    colorMapKey={colorMapKey}
-                    useMobileMinMaxWidth
-                  />
-                  <ColorPalettePicker
-                    color={style[currentPalette]}
-                    property={currentPalette}
-                    onStyleChange={onStyleChange}
-                    enableEdit
-                  />
+                )}
+                <div className="divider" />
+              </>
+            )}
+            {showColorsMenu && (
+              <>
+                <div className="collapsible-menu" onClick={openColors} onTouchStart={openColors} role={'toolbar'}>
+                  <div className="menu-title">
+                    {i18next.t('option.stylePopup.colors')}
+                  </div>
+                  <Icon glyph={`icon-chevron-${isColorsContainerActive ? 'up' : 'down'}`} />
                 </div>
               </>
-            ) : (
+            )}
+            {showColorPicker && (
               <>
                 <ColorPalette
-                  color={style[currentPalette]}
-                  property={currentPalette}
+                  color={style[currentStyleTab]}
+                  property={currentStyleTab}
                   onStyleChange={onStyleChange}
                   colorMapKey={colorMapKey}
                   useMobileMinMaxWidth
                 />
                 <ColorPalettePicker
-                  color={style[currentPalette]}
-                  property={currentPalette}
+                  color={style[currentStyleTab]}
+                  property={currentStyleTab}
                   onStyleChange={onStyleChange}
                   enableEdit
                 />
@@ -257,46 +396,66 @@ class StylePopup extends React.PureComponent {
             )}
           </>
         )}
-        {(!isFreeText || currentPalette !== "TextColor" || isColorContainerActive) && this.renderSliders()}
-        {Scale && Precision && (
-          <>
-            <MeasurementOption
-              scale={Scale}
-              precision={Precision}
-              hideSnapModeCheckbox={hideSnapModeCheckbox}
-              onStyleChange={onStyleChange}
+        {showSliders && this.renderSliders()}
+        {showMeasurementSnappingOption && (
+          <div className="snapping-option">
+            <Choice
+              dataElement="measurementSnappingOption"
+              id="measurement-snapping"
+              type="checkbox"
+              label={i18next.t('option.shared.enableSnapping')}
+              checked={isSnapModeEnabled}
+              onChange={this.onSnappingChange}
             />
-          </>
+          </div>
         )}
-        {!isStyleOptionDisabled && colorMapKey === 'rectangle' && <StyleOption onStyleChange={onStyleChange} borderStyle={Style} />}
+        {showLineStyleOptions && (
+          <LineStyleOptions
+            properties={properties}
+            onLineStyleChange={onLineStyleChange}
+          />
+        )}
+        {!isStyleOptionDisabled &&
+          !showLineStyleOptions &&
+          !hideStylePicker &&
+          currentStyleTab === 'StrokeColor' &&
+          <StyleOption
+            borderStyle={Style}
+            properties={properties}
+            isEllipse={isEllipse}
+            onLineStyleChange={onLineStyleChange}/>}
       </div>
     );
   }
 }
 
-const mapStateToProps = (state, { colorMapKey, isFontSizeSliderDisabled }) => ({
-  currentPalette: selectors.getCurrentPalette(state, colorMapKey),
+const mapStateToProps = (state, { colorMapKey, isFreeText, isRedaction }) => ({
+  currentStyleTab: selectors.getcurrentStyleTab(state, colorMapKey),
   isStylePopupDisabled: selectors.isElementDisabled(state, DataElements.STYLE_POPUP),
   isColorPaletteDisabled: selectors.isElementDisabled(state, DataElements.COLOR_PALETTE),
   isOpacitySliderDisabled: selectors.isElementDisabled(state, DataElements.OPACITY_SLIDER),
   isStrokeThicknessSliderDisabled: selectors.isElementDisabled(state, DataElements.STROKE_THICKNESS_SLIDER),
-  isFontSizeSliderDisabled: isFontSizeSliderDisabled || selectors.isElementDisabled(state, DataElements.FONT_SIZE_SLIDER),
+  isFontSizeSliderDisabled: selectors.isElementDisabled(state, DataElements.FONT_SIZE_SLIDER) || isFreeText || isRedaction,
   isStyleOptionDisabled: selectors.isElementDisabled(state, DataElements.STYLE_OPTION),
-  isTextStyleOpen: selectors.isElementDisabled(state, DataElements.STYLE_OPTION),
-  isTextContainerActive: selectors.isElementOpen(state, DataElements.FREE_TEXT_STYLE_TEXT_CONTAINER),
-  isColorContainerActive: selectors.isElementOpen(state, DataElements.FREE_TEXT_STYLE_COLOR_CONTAINER),
+  isTextStyleContainerActive: selectors.isElementOpen(state, DataElements.STYLE_POPUP_TEXT_STYLE_CONTAINER),
+  isColorsContainerActive: selectors.isElementOpen(state, DataElements.STYLE_POPUP_COLORS_CONTAINER),
+  isLabelTextContainerActive: selectors.isElementOpen(state, DataElements.STYLE_POPUP_LABEL_TEXT_CONTAINER),
+  isLabelTextContainerDisabled: selectors.isElementDisabled(state, DataElements.STYLE_POPUP_LABEL_TEXT_CONTAINER),
+  fonts: selectors.getFonts(state),
+  isSnapModeEnabled: selectors.isSnapModeEnabled(state)
 });
 
 const mapDispatchToProps = {
   closeElement: actions.closeElement,
   openElement: actions.openElement,
+  onSnapModeChange: actions.setEnableSnapMode
 };
 const ConnectedStylePopup = connect(
   mapStateToProps,
   mapDispatchToProps,
 )(StylePopup);
 
-export default props => {
+const connectedComponent = (props) => {
   const isMobile = useMedia(
     // Media queries
     ['(max-width: 640px)'],
@@ -309,3 +468,5 @@ export default props => {
     <ConnectedStylePopup {...props} isMobile={isMobile} />
   );
 };
+
+export default connectedComponent;

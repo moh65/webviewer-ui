@@ -1,7 +1,9 @@
 import core from 'core';
 
-export default (customInput, pageLabels) => {
-  const totalPages = core.getTotalPages();
+export default (customInput, pageLabels, totalPages = core.getTotalPages(), onError = () => {}) => {
+  // By default we use total pages of loaded doc. But we could also use this for a doc
+  // that is not loaded (like in page replacement) so we want the option to pass it as a param
+
   const pagesToPrint = [];
 
   // no input, assume every page
@@ -13,16 +15,16 @@ export default (customInput, pageLabels) => {
   }
 
   const pageGroups = customInput.split(',');
-  pageGroups.forEach(pageGroup => {
+  pageGroups.forEach((pageGroup) => {
     const range = pageGroup.split('-');
     const isSinglePage = range.length === 1;
     const isRangeOfPages = range.length === 2;
 
     if (isSinglePage) {
-      const page = getPageNumber(range[0], pageLabels);
+      const page = getPageNumber(range[0], pageLabels, onError);
       pagesToPrint.push(page);
     } else if (isRangeOfPages) {
-      addRangeOfPagesTo(pagesToPrint, range, pageLabels);
+      addRangeOfPagesTo(pagesToPrint, range, pageLabels, onError);
     }
   });
 
@@ -35,15 +37,15 @@ export default (customInput, pageLabels) => {
     .sort((a, b) => a - b);
 };
 
-const addRangeOfPagesTo = (pagesToPrint, range, pageLabels) => {
-  const start = getPageNumber(range[0], pageLabels);
+const addRangeOfPagesTo = (pagesToPrint, range, pageLabels, onError) => {
+  const start = getPageNumber(range[0], pageLabels, onError);
   let end;
 
   if (range[1] === '') {
     // range like 4- means page 4 to the end of the document
     end = core.getTotalPages();
   } else {
-    end = getPageNumber(range[1], pageLabels);
+    end = getPageNumber(range[1], pageLabels, onError);
   }
 
   for (let i = start; i <= end; i++) {
@@ -51,11 +53,12 @@ const addRangeOfPagesTo = (pagesToPrint, range, pageLabels) => {
   }
 };
 
-const getPageNumber = (character, pageLabels) => {
+const getPageNumber = (character, pageLabels, onError) => {
   const pageIndex = pageLabels.indexOf(character);
   let pageNumber;
 
   if (pageIndex === -1) {
+    onError && onError(character);
     console.warn(`${character} is not a valid page label`);
   } else {
     pageNumber = pageIndex + 1;

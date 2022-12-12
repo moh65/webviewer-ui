@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStore } from 'redux';
-import { Provider } from "react-redux";
-import SearchOverlay from './SearchOverlay.js';
+import { Provider } from 'react-redux';
+import SearchOverlay from './SearchOverlay';
 
 export default {
   title: 'Components/SearchOverlay',
@@ -9,11 +9,11 @@ export default {
 };
 
 const initialState = {
-  viewer:{
+  viewer: {
     disabledElements: {},
   }
 };
-function rootReducer(state = initialState, action) {
+function rootReducer(state = initialState) {
   return state;
 }
 
@@ -36,6 +36,8 @@ export function Basic() {
   const [isCaseSensitive, setCaseSensitive] = React.useState(false);
   const [isWholeWord, setWholeWord] = React.useState(false);
   const [isWildcard, setWildcard] = React.useState(false);
+  const [searchStatus, setSearchStatus] = React.useState('SEARCH_NOT_INITIATED');
+  const [replaceValue, setReplaceValue] = React.useState('');
   const props = {
     searchValue,
     setSearchValue,
@@ -46,6 +48,8 @@ export function Basic() {
     isWildcard,
     setWildcard,
     executeSearch,
+    setSearchStatus,
+    setReplaceValue,
     selectNextResult,
     selectPreviousResult
   };
@@ -57,5 +61,3 @@ export function Basic() {
     </Provider>
   );
 }
-
-

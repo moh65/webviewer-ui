@@ -1,10 +1,11 @@
 import React from 'react';
 import { createStore, combineReducers } from 'redux';
-import { Provider as ReduxProvider } from "react-redux";
+import { Provider as ReduxProvider } from 'react-redux';
 import AnnotationStylePopup from './AnnotationStylePopup';
 import viewerReducer from 'reducers/viewerReducer';
 import initialState from 'src/redux/initialState';
 import getAnnotationStyles from 'helpers/getAnnotationStyles';
+import { mapAnnotationToKey } from 'constants/map';
 
 export default {
   title: 'Components/AnnotationStylePopup',
@@ -26,6 +27,10 @@ export default {
   }
 };
 
+// Mock some state to show the style popups
+initialState.viewer.openElements.stylePopupTextStyleContainer = true;
+initialState.viewer.openElements.stylePopupColorsContainer = true;
+
 const reducer = combineReducers({
   viewer: viewerReducer(initialState.viewer),
 });
@@ -34,23 +39,26 @@ const store = createStore(reducer);
 const BasicTemplate = (args) => {
   return (
     <ReduxProvider store={store}>
-      <div id='app'>
-        <AnnotationStylePopup {...args} />
-      </div>
+      <AnnotationStylePopup {...args} />
     </ReduxProvider>
   );
 };
 
 // using line annotation as "basic" test because it's has one of the most simple UI for
-const lineAnnot = new window.Core.Annotations.LineAnnotation();
+const lineAnnot = new window.Annotations.LineAnnotation();
+
 export const Basic = BasicTemplate.bind({});
 Basic.args = {
-	annotation: lineAnnot,
-	style: getAnnotationStyles(lineAnnot),
-	closeElement: () => {},
+  annotations: [lineAnnot],
+  style: getAnnotationStyles(lineAnnot),
+  closeElement: () => { },
+  properties: {
+    StrokeStyle: 'solid'
+  },
+  colorMapKey: mapAnnotationToKey(lineAnnot),
 };
 
-const distanceMeasurementAnnot = new window.Core.Annotations.LineAnnotation();
+const distanceMeasurementAnnot = new window.Annotations.LineAnnotation();
 distanceMeasurementAnnot['Measure'] = {
   'scale': '1 in = 1 in',
   'axis': [
@@ -93,33 +101,65 @@ distanceMeasurementAnnot['Measure'] = {
     },
   ],
 };
+
+const noop = () => {};
 distanceMeasurementAnnot['IT'] = 'LineDimension';
 distanceMeasurementAnnot['DisplayUnits'] = ['in'];
-distanceMeasurementAnnot['Scale'] = [[1, 'in'],[1, 'in']];
+distanceMeasurementAnnot['Scale'] = [[1, 'in'], [1, 'in']];
 distanceMeasurementAnnot['Precision'] = 0.01;
+distanceMeasurementAnnot['ToolName'] = 'AnnotationCreateDistanceMeasurement';
+distanceMeasurementAnnot['setStartStyle'] = noop;
+distanceMeasurementAnnot['setEndStyle'] = noop;
 
 export const DistanceMeasurement = BasicTemplate.bind({});
+const measurementProperties = {
+  StartLineStyle: distanceMeasurementAnnot.getStartStyle(),
+  EndLineStyle: distanceMeasurementAnnot.getEndStyle(),
+  StrokeStyle: 'solid'
+};
+
 DistanceMeasurement.args = {
-	annotation: distanceMeasurementAnnot,
-	style: getAnnotationStyles(distanceMeasurementAnnot),
-	closeElement: () => {},
+  annotations: [distanceMeasurementAnnot],
+  style: getAnnotationStyles(distanceMeasurementAnnot),
+  properties: measurementProperties,
+  colorMapKey: mapAnnotationToKey(distanceMeasurementAnnot),
+  showLineStyleOptions: true,
 };
 
-const freeTextAnnot = new window.Core.Annotations.FreeTextAnnotation();
+const freeTextAnnot = new window.Annotations.FreeTextAnnotation();
 export const FreeText = BasicTemplate.bind({});
-FreeText.args = {
-	annotation: freeTextAnnot,
-	style: getAnnotationStyles(freeTextAnnot),
-	closeElement: () => {},
+const richTextStyles = freeTextAnnot.getRichTextStyle();
+const freeTextProperties = {
+  Font: freeTextAnnot.Font,
+  FontSize: freeTextAnnot.FontSize,
+  TextAlign: freeTextAnnot.TextAlign,
+  TextVerticalAlign: freeTextAnnot.TextVerticalAlign,
+  bold: richTextStyles?.[0]?.['font-weight'] === 'bold' ?? false,
+  italic: richTextStyles?.[0]?.['font-style'] === 'italic' ?? false,
+  underline: richTextStyles?.[0]?.['text-decoration']?.includes('underline') || richTextStyles?.[0]?.['text-decoration']?.includes('word'),
+  strikeout: richTextStyles?.[0]?.['text-decoration']?.includes('line-through') ?? false,
+  StrokeStyle: 'solid',
 };
 
-const widgetPlaceHolderAnnot = new window.Core.Annotations.RectangleAnnotation();
-widgetPlaceHolderAnnot.setCustomData('trn-form-field-type', 'TextFormField');
-widgetPlaceHolderAnnot
+FreeText.args = {
+  annotations: [freeTextAnnot],
+  style: getAnnotationStyles(freeTextAnnot),
+  properties: freeTextProperties,
+  colorMapKey: mapAnnotationToKey(freeTextAnnot),
+  isFreeText: true,
+};
+
+const widgetPlaceHolderAnnot = new window.Annotations.RectangleAnnotation();
+widgetPlaceHolderAnnot.isFormFieldPlaceholder = () => true;
+widgetPlaceHolderAnnot.getCustomData = () => 'TextFormField';
 
 export const WidgetPlaceHolder = BasicTemplate.bind({});
 WidgetPlaceHolder.args = {
-	annotation: widgetPlaceHolderAnnot,
-	style: getAnnotationStyles(widgetPlaceHolderAnnot),
-	closeElement: () => {},
+  annotations: [widgetPlaceHolderAnnot],
+  style: getAnnotationStyles(widgetPlaceHolderAnnot),
+  closeElement: () => { },
+  properties: {
+    StrokeStyle: 'solid'
+  },
+  colorMapKey: mapAnnotationToKey(widgetPlaceHolderAnnot),
 };

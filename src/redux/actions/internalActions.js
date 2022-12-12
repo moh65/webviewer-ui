@@ -1,5 +1,5 @@
 import getFilteredDataElements from 'helpers/getFilteredDataElements';
-import { isIOS, isAndroid } from 'helpers/device';
+import { isAndroid, isIOS } from 'helpers/device';
 import fireEvent from 'helpers/fireEvent';
 import Events from 'constants/events';
 import selectors from 'selectors';
@@ -82,7 +82,7 @@ export const enableElements = (dataElements, priority) => (
 
   if (!core.isCreateRedactionEnabled()) {
     filteredDataElements = filteredDataElements.filter(
-      ele => ele !== 'redactionButton',
+      (ele) => ele !== 'redactionButton',
     );
   }
 
@@ -108,6 +108,18 @@ export const setIsMultipleViewerMerging = (isMultipleViewerMerging = false) => (
   type: 'SET_MULTI_VIEWER_MERGING',
   payload: { isMultipleViewerMerging },
 });
+export const updateCalibrationInfo = ({ isCalibration = true, tempScale = '', previousToolName, isFractionalUnit = false, defaultUnit = '' }) => ({
+  type: 'UPDATE_CALIBRATION_INFO',
+  payload: { isCalibration, tempScale, previousToolName, isFractionalUnit, defaultUnit }
+});
+export const setIsAddingNewScale = (isAddingNewScale = false) => ({
+  type: 'SET_IS_ADDING_NEW_SCALE',
+  payload: { isAddingNewScale }
+});
+export const updateDeleteScale = (deleteScale = '') => ({
+  type: 'UPDATE_DELETE_SCALE',
+  payload: { deleteScale }
+});
 export const setEnableNotesPanelVirtualizedList = (enableNotesPanelVirtualizedList = true) => ({
   type: 'SET_ENABLE_NOTE_PANEL_VIRTUALIZED_LIST',
   payload: { enableNotesPanelVirtualizedList },
@@ -128,7 +140,7 @@ export const setEnableToolGroupReordering = (enableToolGroupReordering = true) =
   type: 'ENABLE_TOOL_GROUP_REORDERING',
   payload: { enableToolGroupReordering },
 });
-export const setActiveToolNameAndStyle = toolObject => (dispatch, getState) => {
+export const setActiveToolNameAndStyle = (toolObject) => (dispatch, getState) => {
   const state = getState();
   let name;
 
@@ -162,7 +174,7 @@ export const setCustomColors = (customColors = []) => ({
   type: 'SET_CUSTOM_COLORS',
   payload: { customColors },
 });
-export const setActiveToolGroup = toolGroup => (dispatch, getState) => {
+export const setActiveToolGroup = (toolGroup) => (dispatch, getState) => {
   const currentActiveToolGroup = selectors.getActiveToolGroup(getState());
   const toolbarGroup = selectors.getCurrentToolbarGroup(getState());
 
@@ -175,7 +187,13 @@ export const setActiveToolGroup = toolGroup => (dispatch, getState) => {
     payload: { toolGroup, toolbarGroup },
   });
 };
-export const setNotePopupId = id => ({
+
+export const setSelectedScale = (selectedScale) => ({
+  type: 'SET_SELECTED_SCALE',
+  payload: { selectedScale }
+});
+
+export const setNotePopupId = (id) => ({
   type: 'SET_NOTE_POPUP_ID',
   payload: { id },
 });
@@ -187,46 +205,50 @@ export const finishNoteEditing = () => ({
   type: 'SET_NOTE_EDITING',
   payload: { isNoteEditing: false },
 });
-export const setFitMode = fitMode => ({
+export const setFitMode = (fitMode) => ({
   type: 'SET_FIT_MODE',
   payload: { fitMode },
 });
-export const setZoom = zoom => ({ type: 'SET_ZOOM', payload: { zoom } });
-export const setRotation = rotation => ({
+export const setZoom = (zoom, documentViewerKey = 1) => ({ type: 'SET_ZOOM', payload: { zoom, documentViewerKey } });
+export const setRotation = (rotation) => ({
   type: 'SET_ROTATION',
   payload: { rotation },
 });
-export const setDisplayMode = displayMode => ({
+export const setDisplayMode = (displayMode) => ({
   type: 'SET_DISPLAY_MODE',
   payload: { displayMode },
 });
-export const setCurrentPage = currentPage => ({
+export const setCurrentPage = (currentPage) => ({
   type: 'SET_CURRENT_PAGE',
   payload: { currentPage },
 });
-export const setFullScreen = isFullScreen => ({
+export const setFullScreen = (isFullScreen) => ({
   type: 'SET_FULL_SCREEN',
   payload: { isFullScreen },
 });
-export const setReadOnly = isReadOnly => ({
+export const setReadOnly = (isReadOnly) => ({
   type: 'SET_READ_ONLY',
   payload: { isReadOnly },
 });
-export const registerTool = tool => ({
+export const registerTool = (tool) => ({
   type: 'REGISTER_TOOL',
   payload: { ...tool },
 });
-export const unregisterTool = toolName => ({
+export const unregisterTool = (toolName) => ({
   type: 'UNREGISTER_TOOL',
   payload: { toolName },
 });
-export const setToolButtonObjects = toolButtonObjects => ({
+export const setToolButtonObjects = (toolButtonObjects) => ({
   type: 'SET_TOOL_BUTTON_OBJECTS',
   payload: { toolButtonObjects },
 });
 export const setHeaderItems = (header, headerItems) => ({
   type: 'SET_HEADER_ITEMS',
   payload: { header, headerItems },
+});
+export const setCustomHeadersAdditionalProperties = (customHeader, additionalProperties) => ({
+  type: 'SET_CUSTOM_HEADERS_ADDITIONAL_PROPERTIES',
+  payload: { customHeader, additionalProperties },
 });
 export const setPopupItems = (dataElement, items) => ({
   type: 'SET_POPUP_ITEMS',
@@ -235,33 +257,30 @@ export const setPopupItems = (dataElement, items) => ({
     items,
   },
 });
-export const setMenuOverlayItems = items => ({
+export const setMenuOverlayItems = (items) => ({
   type: 'SET_MENUOVERLAY_ITEMS',
   payload: {
     items,
   },
 });
-export const setColorPalette = (colorMapKey, colorPalette) => ({
-  type: 'SET_COLOR_PALETTE',
-  payload: { colorMapKey, colorPalette },
-});
 export const setActivePalette = (colorMapKey, colorPalette) => ({
   type: 'SET_ACTIVE_PALETTE',
   payload: { colorMapKey, colorPalette },
 });
+
 export const setIconColor = (colorMapKey, color) => ({
   type: 'SET_ICON_COLOR',
   payload: { colorMapKey, color },
 });
-export const setColorMap = colorMap => ({
+export const setColorMap = (colorMap) => ({
   type: 'SET_COLOR_MAP',
   payload: { colorMap },
 });
-export const setLeftPanelWidth = width => ({
+export const setLeftPanelWidth = (width) => ({
   type: 'SET_LEFT_PANEL_WIDTH',
   payload: { width },
 });
-export const disableReplyForAnnotations = func => ({
+export const disableReplyForAnnotations = (func) => ({
   type: 'SET_REPLY_DISABLED_FUNC',
   payload: { func },
 });
@@ -269,31 +288,123 @@ export const setMouseWheelZoom = (enableMouseWheelZoom = true) => ({
   type: 'SET_MOUSE_WHEEL_ZOOM',
   payload: { enableMouseWheelZoom },
 });
-export const setReaderMode = isReaderMode => ({
+export const setReaderMode = (isReaderMode) => ({
   type: 'SET_READER_MODE',
   payload: { isReaderMode },
 });
 export const setThumbnailSelectingPages = (isSelecting = true) => ({
-  type: "SET_THUMBNAIL_PAGE_SELECT",
+  type: 'SET_THUMBNAIL_PAGE_SELECT',
   payload: { isSelecting },
 });
-export const setPageManipulationOverlayItems = items => ({
+export const setPageManipulationOverlayItems = (items) => ({
   type: 'SET_PAGE_MANIPULATION_OVERLAY_ITEMS',
   payload: {
     items,
   },
 });
+export const setMultiPageManipulationControlsItems = (items) => ({
+  type: 'SET_MULTI_PAGE_MANIPULATION_CONTROLS_ITEMS',
+  payload: {
+    items,
+  },
+});
+export const setMultiPageManipulationControlsItemsSmall = (items) => ({
+  type: 'SET_MULTI_PAGE_MANIPULATION_CONTROLS_ITEMS_SMALL',
+  payload: {
+    items,
+  },
+});
+export const setMultiPageManipulationControlsItemsLarge = (items) => ({
+  type: 'SET_MULTI_PAGE_MANIPULATION_CONTROLS_ITEMS_LARGE',
+  payload: {
+    items,
+  },
+});
+export const setPageManipulationOverlayAlternativePosition = (position) => ({
+  type: 'SET_PAGE_MANIPULATION_OVERLAY_ALTERNATIVE_POSITION',
+  payload: { position },
+});
+export const setPageManipulationOverlayOpenByRightClick = (value) => ({
+  type: 'SET_PAGE_MANIPULATION_OVERLAY_OPEN_BY_RIGHT_CLICK',
+  payload: value,
+});
+export const setThumbnailControlMenuItems = (items) => ({
+  type: 'SET_THUMBNAIL_CONTROL_MENU_ITEMS',
+  payload: {
+    items,
+  },
+});
+export const setTabManager = (TabManager) => ({
+  type: 'SET_TAB_MANAGER',
+  payload: { TabManager },
+});
+export const setMultiTab = (isMultiTab = true) => ({
+  type: 'SET_IS_MULTI_TAB',
+  payload: { isMultiTab },
+});
+export const setTabs = (tabs) => ({
+  type: 'SET_TABS',
+  payload: { tabs },
+});
+export const setActiveTab = (activeTab) => ({
+  type: 'SET_ACTIVE_TAB',
+  payload: { activeTab },
+});
+export const setFonts = (fonts = []) => ({
+  type: 'SET_FONTS',
+  payload: { fonts },
+});
+export const setIsMultiViewerMode = (isMultiViewerMode) => ({
+  type: 'SET_IS_MULTI_VIEWER_MODE',
+  payload: { isMultiViewerMode },
+});
+export const setActiveDocumentViewerKey = (activeDocumentViewerKey) => ({
+  type: 'SET_ACTIVE_DOCUMENT_VIEWER_KEY',
+  payload: { activeDocumentViewerKey },
+});
+export const setIsComparisonOverlayEnabled = (isComparisonOverlayEnabled) => ({
+  type: 'SET_COMPARISON_OVERLAY_ENABLED',
+  payload: { isComparisonOverlayEnabled },
+});
+export const setIsCompareStarted = (isCompareStarted) => ({
+  type: 'SET_IS_COMPARE_STARTED',
+  payload: { isCompareStarted },
+});
+export const setSyncViewer = (syncViewer) => ({
+  type: 'SET_SYNC_VIEWERS',
+  payload: { syncViewer },
+});
+export const setSavedSignaturesTabEnabled = (enabled = true) => ({
+  type: 'SET_SAVED_SIGNATURES_TAB_ENABLED',
+  payload: { enabled }
+});
+export const setInitialsOffset = (initalsOffset) => ({
+  type: 'SET_INITIALS_OFFSET',
+  payload: { initalsOffset },
+});
 
 // document
-export const setTotalPages = totalPages => ({
+export const setTotalPages = (totalPages, documentViewerKey = 1) => ({
   type: 'SET_TOTAL_PAGES',
-  payload: { totalPages },
+  payload: { totalPages, documentViewerKey },
 });
-export const setOutlines = outlines => ({
+export const setOutlines = (outlines) => ({
   type: 'SET_OUTLINES',
   payload: { outlines },
 });
-export const setBookmarks = bookmarks => ({
+export const setIsOutlineEditing = (isOutlineEditingEnabled = true) => ({
+  type: 'SET_OUTLINE_EDITING',
+  payload: { isOutlineEditingEnabled },
+});
+export const setAutoExpandOutlines = (autoExpandOutlines = false) => ({
+  type: 'SET_AUTO_EXPAND_OUTLINES',
+  payload: { autoExpandOutlines },
+});
+export const setAnnotationNumbering = (isAnnotationNumberingEnabled = false) => ({
+  type: 'SET_ANNOTATION_NUMBERING',
+  payload: { isAnnotationNumberingEnabled },
+});
+export const setBookmarks = (bookmarks) => ({
   type: 'SET_BOOKMARKS',
   payload: { bookmarks },
 });
@@ -314,7 +425,7 @@ export const editBookmark = (pageIndex, text) => (dispatch, getState) => {
   const bookmarks = selectors.getBookmarks(getState());
   fireEvent(Events.USER_BOOKMARKS_CHANGED, bookmarks);
 };
-export const removeBookmark = pageIndex => (dispatch, getState) => {
+export const removeBookmark = (pageIndex) => (dispatch, getState) => {
   dispatch({
     type: 'REMOVE_BOOKMARK',
     payload: { pageIndex },
@@ -322,23 +433,27 @@ export const removeBookmark = pageIndex => (dispatch, getState) => {
   const bookmarks = selectors.getBookmarks(getState());
   fireEvent(Events.USER_BOOKMARKS_CHANGED, bookmarks);
 };
-export const setLayers = layers => ({
+export const setBookmarkIconShortcutVisibility = (bookmarkIconShortcutVisibility) => ({
+  type: 'SET_BOOKMARK_ICON_SHORTCUT_VISIBILITY',
+  payload: { bookmarkIconShortcutVisibility },
+});
+export const setLayers = (layers) => ({
   type: 'SET_LAYERS',
   payload: { layers },
 });
-export const setPasswordAttempts = attempt => ({
+export const setPasswordAttempts = (attempt) => ({
   type: 'SET_PASSWORD_ATTEMPTS',
   payload: { attempt },
 });
-export const setPrintQuality = quality => ({
+export const setPrintQuality = (quality) => ({
   type: 'SET_PRINT_QUALITY',
   payload: { quality },
 });
-export const setDefaultPrintOptions = options => ({
+export const setDefaultPrintOptions = (options) => ({
   type: 'SET_DEFAULT_PRINT_OPTIONS',
   payload: { options },
 });
-export const setLoadingProgress = percent => ({
+export const setLoadingProgress = (percent) => ({
   type: 'SET_LOADING_PROGRESS',
   payload: { progress: percent },
 });
@@ -346,17 +461,17 @@ export const resetLoadingProgress = () => ({
   type: 'SET_LOADING_PROGRESS',
   payload: { progress: 0 },
 });
-export const setVerificationResult = result => ({
+export const setVerificationResult = (result) => ({
   type: 'SET_VERIFICATION_RESULT',
   payload: { result },
 });
 
 // user
-export const setUserName = userName => ({
+export const setUserName = (userName) => ({
   type: 'SET_USER_NAME',
   payload: { userName },
 });
-export const setAdminUser = isAdminUser => ({
+export const setAdminUser = (isAdminUser) => ({
   type: 'SET_ADMIN_USER',
   payload: { isAdminUser },
 });
@@ -370,52 +485,120 @@ export const searchTextFull = (searchValue, options) => ({
   type: 'SEARCH_TEXT_FULL',
   payload: { searchValue, options },
 });
-export const addSearchListener = func => ({
+export const addSearchListener = (func) => ({
   type: 'ADD_SEARCH_LISTENER',
   payload: { func },
 });
-export const removeSearchListener = func => ({
+export const removeSearchListener = (func) => ({
   type: 'REMOVE_SEARCH_LISTENER',
   payload: { func },
 });
-export const setSearchValue = value => ({
+export const setSearchValue = (value) => ({
   type: 'SET_SEARCH_VALUE',
   payload: { value },
 });
-export const setCaseSensitive = isCaseSensitive => ({
+export const setReplaceValue = (replaceText) => ({
+  type: 'SET_REPLACE_VALUE',
+  payload: { replaceText },
+});
+export const setNextResultValue = (nextResult, nextResultIndex) => ({
+  type: 'SET_NEXT_RESULT',
+  payload: { nextResult, nextResultIndex },
+});
+export const setCaseSensitive = (isCaseSensitive) => ({
   type: 'SET_CASE_SENSITIVE',
   payload: { isCaseSensitive },
 });
-export const setWholeWord = isWholeWord => ({
+export const setWholeWord = (isWholeWord) => ({
   type: 'SET_WHOLE_WORD',
   payload: { isWholeWord },
 });
-export const setWildcard = isWildcard => ({
+export const setWildcard = (isWildcard) => ({
   type: 'SET_WILD_CARD',
   payload: { isWildcard },
 });
 
 export const resetSearch = () => ({ type: 'RESET_SEARCH', payload: {} });
 
-export const setNoteTransformFunction = noteTransformFunction => ({
+export const setNoteTransformFunction = (noteTransformFunction) => ({
   type: 'SET_NOTE_TRANSFORM_FUNCTION',
   payload: { noteTransformFunction },
 });
-export const setCustomNoteSelectionFunction = customNoteFunction => ({
+export const setCustomNoteSelectionFunction = (customNoteFunction) => ({
   type: 'SET_CUSTOM_NOTE_SELECTION_FUNCTION',
   payload: { customNoteFunction },
 });
-export const setEnableSnapMode = enable => ({
+export const setCustomApplyRedactionsHandler = (customApplyRedactionsHandler) => ({
+  type: 'SET_CUSTOM_APPLY_REDACTIONS_HANDLER',
+  payload: { customApplyRedactionsHandler },
+});
+
+export const setCustomMultiViewerSyncHandler = (customMultiViewerSyncHandler) => ({
+  type: 'SET_CUSTOM_MULTI_VIEWER_SYNC_HANDLER',
+  payload: { customMultiViewerSyncHandler },
+});
+
+export const setCustomMultiViewerAcceptedFileFormats = (customMultiViewerAcceptedFileFormats) => ({
+  type: 'SET_CUSTOM_MULTI_VIEWER_ACCEPTED_FILE_FORMATS',
+  payload: { customMultiViewerAcceptedFileFormats },
+});
+
+export const setEnableSnapMode = (enable) => ({
   type: 'SET_ENABLE_SNAP_MODE',
   payload: { enable },
 });
 
-export const setLanguage = language => ({
+export const setLanguage = (language) => ({
   type: 'SET_LANGUAGE',
   payload: { language },
 });
 
-export const setProcessingSearchResults = isProcessingSearchResults => ({
+export const setHideContentEditWarning = (hideWarning) => ({
+  type: 'SET_HIDE_CONTENT_EDIT_WARNING',
+  payload: { hideWarning },
+});
+
+export const setCurrentContentBeingEdited = ({ content, annotation }) => ({
+  type: 'SET_CURRENT_CONTENT_BEING_EDITED',
+  payload: { content, annotation },
+});
+
+export const updateCurrentContentBeingEdited = (content) => ({
+  type: 'UPDATE_CURRENT_CONTENT_BEING_EDITED',
+  payload: { content },
+});
+
+export const clearCurrentContentBeingEdited = () => ({
+  type: 'CLEAR_CURRENT_CONTENT_BEING_EDITED',
+  payload: {},
+});
+
+export const setProcessingSearchResults = (isProcessingSearchResults) => ({
   type: 'SET_PROCESSING_SEARCH_RESULTS',
   payload: { isProcessingSearchResults },
+});
+
+export const triggerResetAudioPlaybackPosition = (shouldResetAudioPlaybackPosition) => ({
+  type: 'SET_RESET_AUDIO_PLAYBACK_POSITION',
+  payload: { shouldResetAudioPlaybackPosition },
+});
+
+export const setActiveSoundAnnotation = (activeSoundAnnotation) => ({
+  type: 'SET_ACTIVE_SOUND_ANNOTATION',
+  payload: { activeSoundAnnotation },
+});
+
+export const setAnnotationFilters = (annotationFilters) => ({
+  type: 'SET_ANNOTATION_FILTERS',
+  payload: { annotationFilters }
+});
+
+export const setContentEditor = (contentEditor) => ({
+  type: 'SET_CONTENT_EDITOR',
+  payload: { contentEditor }
+});
+
+export const setInitialsMode = (isEnabled) => ({
+  type: 'SET_INITIALS_MODE',
+  payload: { isEnabled }
 });

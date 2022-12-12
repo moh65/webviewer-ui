@@ -16,12 +16,14 @@ const ColorPalettePicker = ({
   colorToBeDeleted,
   setColorToBeDeleted,
   enableEdit,
+  disableTitle = false,
+  colorsAreHex = false,
 }) => {
   useEffect(() => {
-    if (!customColors.includes(getHexColor(color))) {
+    if (!customColors.includes(colorsAreHex ? color : getHexColor(color))) {
       setColorToBeDeleted('');
     } else {
-      setColorToBeDeleted(getHexColor(color));
+      setColorToBeDeleted(colorsAreHex ? color : getHexColor(color));
     }
   }, [color]);
 
@@ -36,37 +38,36 @@ const ColorPalettePicker = ({
   return (
     <div>
       <div className="colorPicker">
-        <div className="colorPickerController">
+        {!disableTitle && <div className="colorPickerController">
           <span>{t('annotation.custom')}</span>
-        </div>
+        </div>}
         <div className="colorPickerColors ColorPalette">
-          {customColors.map((bg, i) =>
-            (
-              <button
-                key={bg}
-                className="cell-container"
-                onClick={() => handleColorOnClick(bg)}
-                aria-label={`${t('option.colorPalette.colorLabel')} ${i + 1}`}
+          {customColors.map((bg, i) => (
+            <button
+              key={bg}
+              className="cell-container"
+              onClick={() => handleColorOnClick(bg)}
+              aria-label={`${t('option.colorPalette.colorLabel')} ${i + 1}`}
+            >
+              <div
+                className={classNames({
+                  'cell-outer': true,
+                  active: colorsAreHex ? color?.toLowerCase() === bg.toLowerCase() :
+                      color?.toHexString?.()?.toLowerCase() === bg.toLowerCase(),
+                })}
               >
                 <div
                   className={classNames({
-                    'cell-outer': true,
-                    active:
-                      color?.toHexString?.()?.toLowerCase() === bg,
+                    cell: true,
+                    border: bg.toLowerCase() === '#ffffff' || bg === 'transparency',
                   })}
+                  style={{ backgroundColor: bg }}
                 >
-                  <div
-                    className={classNames({
-                      cell: true,
-                      border: bg === '#ffffff' || bg === 'transparency',
-                    })}
-                    style={{ backgroundColor: bg }}
-                  >
-                    {bg === 'transparency' && transparentIcon}
-                  </div>
+                  {bg === 'transparency' && undefined}
                 </div>
-              </button>
-            ),
+              </div>
+            </button>
+          ),
           )}
           {enableEdit && (
             <button className="cell-container">
@@ -81,7 +82,7 @@ const ColorPalettePicker = ({
             <button
               className="cell-container"
               id="removeCustomColor"
-              disabled={colorToBeDeleted ? false : true}
+              disabled={!colorToBeDeleted}
               onClick={openDeleteModal}
             >
               <div className="cell-outer">

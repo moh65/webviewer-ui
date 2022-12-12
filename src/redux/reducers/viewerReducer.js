@@ -1,9 +1,87 @@
 import localStorageManager from 'helpers/localStorageManager';
 
-export default initialState => (state = initialState, action) => {
+export default (initialState) => (state = initialState, action) => {
   const { type, payload } = action;
 
   switch (type) {
+    case 'SET_INITIALS_OFFSET':
+      return {
+        ...state,
+        initalsOffset: payload.initalsOffset,
+      };
+    case 'SET_SAVED_SIGNATURES_TAB_ENABLED':
+      return {
+        ...state,
+        savedSignatureTabEnabled: payload.enabled,
+      };
+    case 'SET_SYNC_VIEWERS':
+      return {
+        ...state,
+        syncViewer: payload.syncViewer,
+      };
+    case 'SET_IS_COMPARE_STARTED':
+      return {
+        ...state,
+        isCompareStarted: payload.isCompareStarted,
+      };
+    case 'SET_COMPARE_PANEL_WIDTH':
+      return {
+        ...state,
+        panelWidths: {
+          ...state.panelWidths,
+          comparePanel: payload.width,
+        }
+      };
+    case 'SET_COMPARISON_OVERLAY_ENABLED':
+      return {
+        ...state,
+        isComparisonOverlayEnabled: payload.isComparisonOverlayEnabled,
+      };
+    case 'SET_ACTIVE_DOCUMENT_VIEWER_KEY':
+      return {
+        ...state,
+        activeDocumentViewerKey: payload.activeDocumentViewerKey,
+      };
+    case 'SET_IS_MULTI_VIEWER_MODE':
+      return {
+        ...state,
+        isMultiViewerMode: payload.isMultiViewerMode,
+      };
+    case 'SET_PRESET_CROP_DIMENSIONS':
+      return {
+        ...state,
+        presetCropDimensions: payload.presetCropDimensions,
+      };
+    case 'SET_PRESET_NEW_PAGE_DIMENSIONS':
+      return {
+        ...state,
+        presetNewPageDimensions: payload.presetNewPageDimensions,
+      };
+    case 'SET_DATE_TIME_FORMATS':
+      return {
+        ...state,
+        dateTimeFormats: payload.dateTimeFormats,
+      };
+    case 'SET_THUMBNAIL_SELECTION_MODE':
+      return {
+        ...state,
+        thumbnailSelectionMode: payload.thumbnailSelectionMode,
+      };
+    case 'SET_FONTS':
+      return {
+        ...state,
+        fonts: payload.fonts,
+      };
+    case 'SET_ACTIVE_TAB':
+      return {
+        ...state,
+        activeTab: payload.activeTab,
+      };
+    case 'SET_TABS':
+      return {
+        ...state,
+        tabs: payload.tabs,
+      };
     case 'SET_IS_MULTI_TAB':
       return {
         ...state,
@@ -17,7 +95,7 @@ export default initialState => (state = initialState, action) => {
     case 'SET_THUMBNAIL_PAGE_SELECT':
       return {
         ...state,
-        thumbnailSelectingPages: payload.isSelecting
+        thumbnailSelectingPages: payload.isSelecting,
       };
     case 'SET_HIGH_CONTRAST_MODE':
       return {
@@ -27,12 +105,18 @@ export default initialState => (state = initialState, action) => {
     case 'SET_CAN_UNDO':
       return {
         ...state,
-        canUndo: payload.canUndo,
+        canUndo: {
+          ...state.canUndo,
+          [payload.documentViewerKey]: payload.canUndo
+        },
       };
     case 'SET_CAN_REDO':
       return {
         ...state,
-        canRedo: payload.canRedo,
+        canRedo: {
+          ...state.canRedo,
+          [payload.documentViewerKey]: payload.canRedo
+        }
       };
     case 'SET_LAST_PICKED_TOOL_FOR_GROUP':
       return {
@@ -40,7 +124,7 @@ export default initialState => (state = initialState, action) => {
         lastPickedToolForGroup: {
           ...state.lastPickedToolForGroup,
           [payload.group]: payload.toolName,
-        }
+        },
       };
     case 'SET_TOOLBAR_GROUP':
       return {
@@ -57,6 +141,11 @@ export default initialState => (state = initialState, action) => {
         ...state,
         selectedDisplayedSignatureIndex: payload.index,
       };
+    case 'SET_SELECTED_DISPLAYED_INITIALS_INDEX':
+      return {
+        ...state,
+        selectedDisplayedInitialsIndex: payload.index,
+      };
     case 'SET_STANDARD_STAMPS':
       return {
         ...state,
@@ -72,13 +161,18 @@ export default initialState => (state = initialState, action) => {
         ...state,
         savedSignatures: payload.savedSignatures,
       };
+    case 'SET_SAVED_INITIALS':
+      return {
+        ...state,
+        savedInitials: payload.savedInitials,
+      };
     case 'SET_LEFT_PANEL_WIDTH':
       return {
         ...state,
         panelWidths: {
           ...state.panelWidths,
           leftPanel: payload.width,
-        }
+        },
       };
     case 'SET_SEARCH_PANEL_WIDTH':
       return {
@@ -86,7 +180,7 @@ export default initialState => (state = initialState, action) => {
         panelWidths: {
           ...state.panelWidths,
           searchPanel: payload.width,
-        }
+        },
       };
     case 'SET_NOTES_PANEL_WIDTH':
       return {
@@ -94,7 +188,36 @@ export default initialState => (state = initialState, action) => {
         panelWidths: {
           ...state.panelWidths,
           notesPanel: payload.width,
-        }
+        },
+      };
+    case 'SET_REDACTION_PANEL_WIDTH':
+      return {
+        ...state,
+        panelWidths: {
+          ...state.panelWidths,
+          redactionPanel: payload.width,
+        },
+      };
+    case 'SET_TEXT_EDITING_PANEL_WIDTH':
+      return {
+        ...state,
+        panelWidths: {
+          ...state.panelWidths,
+          textEditingPanel: payload.width,
+        },
+      };
+    case 'SET_WV3D_PROPERTIES_PANEL_WIDTH':
+      return {
+        ...state,
+        panelWidths: {
+          ...state.panelWidths,
+          wv3dPropertiesPanel: payload.width,
+        },
+      };
+    case 'SET_SELECTED_SCALE':
+      return {
+        ...state,
+        selectedScale: payload.selectedScale
       };
     case 'SET_DOCUMENT_CONTAINER_WIDTH':
       return {
@@ -121,7 +244,7 @@ export default initialState => (state = initialState, action) => {
       };
     case 'DISABLE_ELEMENTS': {
       const disabledElements = {};
-      payload.dataElements.forEach(dataElement => {
+      payload.dataElements.forEach((dataElement) => {
         disabledElements[dataElement] = {};
         disabledElements[dataElement].disabled = true;
         disabledElements[dataElement].priority = payload.priority;
@@ -145,7 +268,7 @@ export default initialState => (state = initialState, action) => {
       };
     case 'ENABLE_ELEMENTS': {
       const disabledElements = {};
-      payload.dataElements.forEach(dataElement => {
+      payload.dataElements.forEach((dataElement) => {
         disabledElements[dataElement] = {};
         disabledElements[dataElement].disabled = false;
         disabledElements[dataElement].priority = payload.priority;
@@ -185,7 +308,7 @@ export default initialState => (state = initialState, action) => {
       if (localStorageManager.isLocalStorageEnabled()) {
         window.localStorage.setItem('customColors', JSON.stringify(payload.customColors));
       } else {
-        console.error("localStorage is disabled, customColors cannot be restored");
+        console.error('localStorage is disabled, customColors cannot be restored');
       }
       return { ...state, customColors: payload.customColors };
     case 'SET_ACTIVE_TOOL_NAME_AND_STYLES':
@@ -207,6 +330,14 @@ export default initialState => (state = initialState, action) => {
       };
     case 'SET_OUTLINE_CONTROL_VISIBILITY':
       return { ...state, outlineControlVisibility: payload.outlineControlVisibility };
+    case 'SET_AUTO_EXPAND_OUTLINES':
+      return { ...state, autoExpandOutlines: payload.autoExpandOutlines };
+    case 'SET_ANNOTATION_NUMBERING':
+      return { ...state, isAnnotationNumberingEnabled: payload.isAnnotationNumberingEnabled };
+    case 'SET_BOOKMARK_ICON_SHORTCUT_VISIBILITY':
+      return { ...state, bookmarkIconShortcutVisibility: payload.bookmarkIconShortcutVisibility };
+    case 'SET_OUTLINE_EDITING':
+      return { ...state, isOutlineEditingEnabled: payload.isOutlineEditingEnabled };
     case 'SET_NOTE_POPUP_ID':
       return { ...state, notePopupId: payload.id };
     case 'SET_NOTE_EDITING':
@@ -214,7 +345,13 @@ export default initialState => (state = initialState, action) => {
     case 'SET_FIT_MODE':
       return { ...state, fitMode: payload.fitMode };
     case 'SET_ZOOM':
-      return { ...state, zoom: payload.zoom };
+      return {
+        ...state,
+        zoomLevels: {
+          ...state.zoomLevels,
+          [payload.documentViewerKey]: payload.zoom,
+        }
+      };
     case 'SET_ROTATION':
       return { ...state, rotation: payload.rotation };
     case 'SET_DISPLAY_MODE':
@@ -233,6 +370,11 @@ export default initialState => (state = initialState, action) => {
       return {
         ...state,
         headers: { ...state.headers, [payload.header]: payload.headerItems },
+      };
+    case 'SET_CUSTOM_HEADERS_ADDITIONAL_PROPERTIES':
+      return {
+        ...state,
+        customHeadersAdditionalProperties: { ...state.headers, [payload.customHeader]: payload.additionalProperties },
       };
     case 'SET_POPUP_ITEMS':
       return {
@@ -273,13 +415,9 @@ export default initialState => (state = initialState, action) => {
           ...state.toolButtonObjects,
           [toolName]: {
             ...state.toolButtonObjects[toolName],
-            dataElement:
-              buttonName || state.toolButtonObjects[toolName].dataElement,
+            dataElement: buttonName || state.toolButtonObjects[toolName].dataElement,
             title: tooltip || state.toolButtonObjects[toolName].title,
-            group:
-              buttonGroup !== undefined
-                ? buttonGroup
-                : state.toolButtonObjects[toolName].group,
+            group: buttonGroup !== undefined ? buttonGroup : state.toolButtonObjects[toolName].group,
             img: buttonImage || state.toolButtonObjects[toolName].img,
           },
         },
@@ -322,7 +460,7 @@ export default initialState => (state = initialState, action) => {
           ...state.colorMap,
           [colorMapKey]: {
             ...state.colorMap[colorMapKey],
-            currentPalette: colorPalette,
+            currentStyleTab: colorPalette,
           },
         },
       };
@@ -347,6 +485,8 @@ export default initialState => (state = initialState, action) => {
     case 'SET_COLOR_MAP':
       return { ...state, colorMap: payload.colorMap };
     case 'SET_WARNING_MESSAGE':
+      return { ...state, warning: payload };
+    case 'DISABLE_DELETE_TAB_WARNING':
       return { ...state, warning: payload };
     case 'SET_ERROR_MESSAGE':
       return { ...state, errorMessage: payload.message };
@@ -413,7 +553,10 @@ export default initialState => (state = initialState, action) => {
     //customization
 
     case 'SET_CUSTOM_ELEMENT_OVERRIDES':
-      return { ...state, customElementOverrides: { ...state.customElementOverrides, [payload.dataElement]: payload.overrides } };
+      return {
+        ...state,
+        customElementOverrides: { ...state.customElementOverrides, [payload.dataElement]: payload.overrides },
+      };
     case 'SET_PAGE_REPLACEMENT_FILE_LIST':
       return { ...state, pageReplacementFileList: payload.list };
 
@@ -421,10 +564,25 @@ export default initialState => (state = initialState, action) => {
       return { ...state, noteTransformFunction: payload.noteTransformFunction };
     case 'SET_CUSTOM_NOTE_SELECTION_FUNCTION':
       return { ...state, customNoteFunction: payload.customNoteFunction };
+    case 'SET_CUSTOM_APPLY_REDACTIONS_HANDLER':
+      return { ...state, customApplyRedactionsHandler: payload.customApplyRedactionsHandler };
     case 'SET_ANNOTATION_CONTENT_OVERLAY_HANDLER':
       return { ...state, annotationContentOverlayHandler: payload.annotationContentOverlayHandler };
     case 'SET_CUSTOM_MODAL': {
       const existingDataElementFiltered = state.customModals.filter(function (modal) {
+        return modal.dataElement !== payload.dataElement;
+      });
+      return {
+        ...state,
+        customModals: [...existingDataElementFiltered, payload],
+      };
+    }
+    case 'SET_CUSTOM_MULTI_VIEWER_SYNC_HANDLER':
+      return { ...state, customMultiViewerSyncHandler: payload.customMultiViewerSyncHandler };
+    case 'SET_CUSTOM_MULTI_VIEWER_ACCEPTED_FILE_FORMATS':
+      return { ...state, customMultiViewerAcceptedFileFormats: payload.customMultiViewerAcceptedFileFormats };
+    case 'ADD_CUSTOM_MODAL': {
+      const existingDataElementFiltered = state.customModals.filter(function(modal) {
         return modal.dataElement !== payload.dataElement;
       });
       return {
@@ -446,8 +604,23 @@ export default initialState => (state = initialState, action) => {
     case 'SET_SUBMIT_COMMENT_MODE':
       return {
         ...state,
-        enableNoteSubmissionWithEnter: payload.enableNoteSubmissionWithEnter
-      }
+        enableNoteSubmissionWithEnter: payload.enableNoteSubmissionWithEnter,
+      };
+    case 'SET_NOTES_PANEL_TEXT_COLLAPSING':
+      return {
+        ...state,
+        isNotesPanelTextCollapsingEnabled: payload.enableNotesPanelTextCollapsing,
+      };
+    case 'SET_NOTES_PANEL_REPLIES_COLLAPSING':
+      return {
+        ...state,
+        isNotesPanelRepliesCollapsingEnabled: payload.enableNotesPanelRepliesCollapsing,
+      };
+    case 'SET_COMMENT_THREAD_EXPANSION':
+      return {
+        ...state,
+        isCommentThreadExpansionEnabled: payload.enableCommentThreadExpansion,
+      };
     case 'ADD_TRUSTED_CERTIFICATES':
       /**
        * To mimic the behavior of the Core implementation, where certificates
@@ -456,10 +629,18 @@ export default initialState => (state = initialState, action) => {
        */
       return {
         ...state,
-        certificates: [
-          ...state.certificates,
-          ...payload.certificates,
-        ]
+        certificates: [...state.certificates, ...payload.certificates],
+      };
+    case 'ADD_TRUST_LIST':
+      /**
+       * The Core implementation only allows a single Trust List to be passed
+       * as a parameter, but in order to allow flexibility of future potential
+       * requirements where a developer may want to add multiple Trust Lists,
+       * we are storing an Array of Trust Lists
+       */
+      return {
+        ...state,
+        trustLists: [...state.trustLists, payload.trustList],
       };
     case 'SET_VERIFICATION_RESULT':
       return { ...state, verificationResult: payload.result };
@@ -479,47 +660,98 @@ export default initialState => (state = initialState, action) => {
     case 'SET_FADE_PAGE_NAVIGATION_COMPONENT':
       return {
         ...state,
-        fadePageNavigationComponent: payload.fadePageNavigationComponent
-      }
+        fadePageNavigationComponent: payload.fadePageNavigationComponent,
+      };
     case 'SET_HIDE_CONTENT_EDIT_WARNING':
       if (localStorageManager.isLocalStorageEnabled()) {
         window.localStorage.setItem('hideContentEditWarning', JSON.stringify(payload.hideWarning));
       } else {
-        console.error("localStorage is disabled, hideContentEditWarning cannot be restored");
+        console.error('localStorage is disabled, hideContentEditWarning cannot be restored');
       }
       return { ...state, hideContentEditWarning: payload.hideWarning };
     case 'SET_CURRENT_CONTENT_BEING_EDITED':
       return {
         ...state,
-        currentContentBeingEdited: payload
+        currentContentBeingEdited: payload,
       };
     case 'UPDATE_CURRENT_CONTENT_BEING_EDITED':
       return {
         ...state,
         currentContentBeingEdited: {
           ...state.currentContentBeingEdited,
-          content: payload.content
+          content: payload.content,
+        },
+      };
+    case 'UPDATE_CALIBRATION_INFO':
+      return {
+        ...state,
+        calibrationInfo: {
+          isCalibration: payload.isCalibration,
+          tempScale: payload.tempScale,
+          previousToolName: payload.previousToolName || state.calibrationInfo.previousToolName,
+          isFractionalUnit: payload.isFractionalUnit,
+          defaultUnit: payload.defaultUnit
         }
+      };
+    case 'SET_IS_ADDING_NEW_SCALE':
+      return {
+        ...state,
+        isAddingNewScale: payload.isAddingNewScale,
+      };
+    case 'UPDATE_DELETE_SCALE':
+      return {
+        ...state,
+        deleteScale: payload.deleteScale,
       };
     case 'CLEAR_CURRENT_CONTENT_BEING_EDITED':
       return {
         ...state,
-        currentContentBeingEdited: null
+        currentContentBeingEdited: null,
       };
     case 'SET_ENABLE_DESKTOP_ONLY_MODE':
       return {
         ...state,
-        isInDesktopOnlyMode: payload.enableDesktopOnlyMode
+        isInDesktopOnlyMode: payload.enableDesktopOnlyMode,
       };
     case 'PAGE_DELETION_CONFIRMATION_MODAL_POPUP':
       return {
         ...state,
-        pageDeletionConfirmationModalEnabled: payload.pageDeletionConfirmationModalEnabled
+        pageDeletionConfirmationModalEnabled: payload.pageDeletionConfirmationModalEnabled,
       };
     case 'SET_PAGE_MANIPULATION_OVERLAY_ITEMS':
       return {
         ...state,
         pageManipulationOverlay: payload.items,
+      };
+    case 'SET_MULTI_PAGE_MANIPULATION_CONTROLS_ITEMS':
+      return {
+        ...state,
+        multiPageManipulationControls: payload.items,
+      };
+    case 'SET_MULTI_PAGE_MANIPULATION_CONTROLS_ITEMS_SMALL':
+      return {
+        ...state,
+        multiPageManipulationControlsSmall: payload.items,
+      };
+    case 'SET_MULTI_PAGE_MANIPULATION_CONTROLS_ITEMS_LARGE':
+      return {
+        ...state,
+        multiPageManipulationControlsLarge: payload.items,
+      };
+    case 'SET_PAGE_MANIPULATION_OVERLAY_ALTERNATIVE_POSITION':
+      return {
+        ...state,
+        pageManipulationOverlayAlternativePosition: payload?.position,
+      };
+    case 'SET_PAGE_MANIPULATION_OVERLAY_OPEN_BY_RIGHT_CLICK':
+      return {
+        ...state,
+        pageManipulationOverlayOpenByRightClick: payload,
+      };
+    case 'SET_THUMBNAIL_CONTROL_MENU_ITEMS':
+      return {
+        ...state,
+        thumbnailControlMenu: payload.items,
       };
     case 'SET_WATERMARK_MODAL_OPTIONS':
       return { ...state, watermarkModalOptions: payload.watermarkModalOptions };
@@ -527,6 +759,46 @@ export default initialState => (state = initialState, action) => {
       return { ...state, shouldResetAudioPlaybackPosition: payload.shouldResetAudioPlaybackPosition };
     case 'SET_ACTIVE_SOUND_ANNOTATION':
       return { ...state, activeSoundAnnotation: payload.activeSoundAnnotation };
+    case 'SET_ANNOTATION_FILTERS':
+      return { ...state, annotationFilters: payload.annotationFilters };
+    case 'SET_ZOOM_STEP_FACTORS':
+      return { ...state, zoomStepFactors: payload.zoomStepFactors };
+    case 'SET_CONTENT_EDITOR':
+      return { ...state, contentEditor: payload.contentEditor };
+    case 'SET_NOTES_PANEL_CUSTOM_HEADER_OPTIONS':
+      return { ...state, notesPanelCustomHeaderOptions: payload.notesPanelCustomHeaderOptions };
+    case 'SET_NOTES_PANEL_CUSTOM_EMPTY_PANEL':
+      return { ...state, notesPanelCustomEmptyPanel: payload.notesPanelCustomEmptyPanel };
+    case 'ADD_MEASUREMENT_SCALE_PRESET': {
+      const updatedState = { ...state };
+      const addIndex = payload.index || updatedState.measurementScalePreset[payload.measurementSystem].length;
+      updatedState.measurementScalePreset[payload.measurementSystem].splice(addIndex, 0, payload.newPreset);
+      return updatedState;
+    }
+    case 'REMOVE_MEASUREMENT_SCALE_PRESET': {
+      const updatedState = { ...state };
+      updatedState.measurementScalePreset[payload.measurementSystem].splice(payload.index, 1);
+      return updatedState;
+    }
+    case 'SET_IS_MULTIPLE_SCALE_MODE':
+      return {
+        ...state,
+        isMultipleScalesMode: payload.isMultipleScalesMode,
+      };
+    case 'SET_SIGNATURE_MODE':
+      return {
+        ...state,
+        signatureMode: payload.signatureMode,
+      };
+    case 'SET_INITIALS_MODE':
+      return {
+        ...state,
+        isInitialsModeEnabled: payload.isEnabled,
+      };
+    case 'SET_REPLY_ATTACHMENT_PREVIEW':
+      return { ...state, replyAttachmentPreviewEnabled: payload.replyAttachmentPreviewEnabled };
+    case 'SET_REPLY_ATTACHMENT_HANDLER':
+      return { ...state, replyAttachmentHandler: payload.replyAttachmentHandler };
     default:
       return state;
   }

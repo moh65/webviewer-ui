@@ -1,6 +1,7 @@
 /**
  * Displays the custom error message
  * @method UI.showWarningMessage
+ * @param {(string|object)} options Warning string message to display or an object for controlling the warning popup
  * @param {string} options.confirmBtnText The text that will be rendered in the confirm button
  * @param {string} options.title The title of the modal
  * @param {string} options.message The text that will rendered in the body of the modal
@@ -26,6 +27,6 @@ WebViewer(...)
  */
 import actions from 'actions';
 
-export default store => options => {
+export default (store) => (options) => {
   store.dispatch(actions.showWarningMessage(options));
 };

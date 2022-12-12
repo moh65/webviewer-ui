@@ -7,7 +7,7 @@ import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 import { workerTypes } from 'constants/types';
 import { getSortStrategies } from 'constants/sortStrategies';
 import { mapAnnotationToKey, getDataWithKey } from 'constants/map';
-import { isSafari, isChromeOniOS } from 'helpers/device';
+import { isSafari, isChromeOniOS, isFirefoxOniOS } from 'helpers/device';
 import core from 'core';
 
 let pendingCanvases = [];
@@ -40,7 +40,7 @@ export const print = async (dispatch, isEmbedPrintSupported, sortStrategy, color
   if (bbURLPromise) {
     const printPage = window.open('', '_blank');
     printPage.document.write(i18n.t('message.preparingToPrint'));
-    bbURLPromise.then(result => {
+    bbURLPromise.then((result) => {
       printPage.location.href = result.url;
     });
   } else if (isEmbedPrintSupported && documentType === workerTypes.PDF) {
@@ -73,10 +73,10 @@ export const print = async (dispatch, isEmbedPrintSupported, sortStrategy, color
       language,
     );
     Promise.all(createPages)
-      .then(pages => {
+      .then((pages) => {
         printPages(pages);
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
       });
   } else {
@@ -84,55 +84,54 @@ export const print = async (dispatch, isEmbedPrintSupported, sortStrategy, color
   }
 };
 
-const printPdf = () =>
-  core.exportAnnotations().then(xfdfString => {
-    const printDocument = true;
-    return core
-      .getDocument()
-      .getFileData({ xfdfString, printDocument })
-      .then(data => {
-        const arr = new Uint8Array(data);
-        const blob = new Blob([arr], { type: 'application/pdf' });
+const printPdf = () => core.exportAnnotations().then((xfdfString) => {
+  const printDocument = true;
+  return core
+    .getDocument()
+    .getFileData({ xfdfString, printDocument })
+    .then((data) => {
+      const arr = new Uint8Array(data);
+      const blob = new Blob([arr], { type: 'application/pdf' });
 
-        const printHandler = document.getElementById('print-handler');
-        printHandler.src = URL.createObjectURL(blob);
+      const printHandler = document.getElementById('print-handler');
+      printHandler.src = URL.createObjectURL(blob);
 
-        return new Promise(resolve => {
-          const loadListener = function() {
-            printHandler.contentWindow.print();
-            printHandler.removeEventListener('load', loadListener);
+      return new Promise((resolve) => {
+        const loadListener = function() {
+          printHandler.contentWindow.print();
+          printHandler.removeEventListener('load', loadListener);
 
-            resolve();
-          };
+          resolve();
+        };
 
-          printHandler.addEventListener('load', loadListener);
-        });
+        printHandler.addEventListener('load', loadListener);
       });
-  });
+    });
+});
 
-export const creatingPages = (pagesToPrint, includeComments, includeAnnotations, maintainPageOrientation, printQuality, sortStrategy, clrMap, dateFormat, onProgress, isPrintCurrentView, language) => {
+export const creatingPages = (pagesToPrint, includeComments, includeAnnotations, maintainPageOrientation, printQuality, sortStrategy, clrMap, dateFormat, onProgress, isPrintCurrentView, language, createCanvases = false) => {
   const createdPages = [];
   pendingCanvases = [];
   PRINT_QUALITY = printQuality;
   colorMap = clrMap;
 
-  pagesToPrint.forEach(pageNumber => {
-    const printableAnnotationNotes = getPrintableAnnotationNotes(pageNumber);
-    createdPages.push(creatingImage(pageNumber, includeAnnotations, maintainPageOrientation, isPrintCurrentView));
+  pagesToPrint.forEach((pageNumber) => {
+    createdPages.push(creatingImage(pageNumber, includeAnnotations, maintainPageOrientation, isPrintCurrentView, createCanvases));
 
     if (onProgress) {
-      createdPages[createdPages.length - 1].then(htmlElement => {
+      createdPages[createdPages.length - 1].then((htmlElement) => {
         onProgress(pageNumber, htmlElement);
       });
     }
 
+    const printableAnnotationNotes = getPrintableAnnotationNotes(pageNumber);
     if (includeComments && printableAnnotationNotes) {
       const sortedNotes = getSortStrategies()[sortStrategy].getSortedNotes(printableAnnotationNotes);
       if (sortedNotes.length) {
         createdPages.push(creatingNotesPage(sortedNotes, pageNumber, dateFormat, language));
       }
       if (onProgress) {
-        createdPages[createdPages.length - 1].then(htmlElement => {
+        createdPages[createdPages.length - 1].then((htmlElement) => {
           onProgress(pageNumber, htmlElement);
         });
       }
@@ -142,135 +141,296 @@ export const creatingPages = (pagesToPrint, includeComments, includeAnnotations,
   return createdPages;
 };
 
-export const printPages = pages => {
+export const printPages = (pages) => {
   const printHandler = document.getElementById('print-handler');
   printHandler.innerHTML = '';
 
   const fragment = document.createDocumentFragment();
-  pages.forEach(page => {
+  pages.forEach((page) => {
     fragment.appendChild(page);
   });
 
   printHandler.appendChild(fragment);
 
-  if (isSafari && !isChromeOniOS) {
+  if (isSafari && !(isChromeOniOS || isFirefoxOniOS)) {
     // Print for Safari browser. Makes Safari 11 consistently work.
     document.execCommand('print');
   } else {
+    // It looks like both Chrome and Firefox (on iOS) use the top window as target for window.print instead of the frame where it was triggered,
+    // so we need to teleport the print handler div to the top parent and inject some CSS to make it print nicely.
+    // This can be removed when Chrome and Firefox for iOS respect the origin frame as the actual target for window.print
+    if (isChromeOniOS || isFirefoxOniOS) {
+      if (window.parent.document.getElementById('print-handler')) {
+        window.parent.document.getElementById('print-handler').remove();
+      }
+      window.parent.document.body.appendChild(printHandler.cloneNode(true));
+
+      if (!window.parent.document.getElementById('print-handler-css')) {
+        const style = window.parent.document.createElement('style');
+        style.id = 'print-handler-css';
+
+        style.textContent = `
+          #print-handler {
+            display: none;
+          }
+
+          @media print {
+            * {
+              display: none! important;
+            }
+
+            html {
+              height: 100%;
+              display: block! important;
+            }
+
+            body {
+              height: 100%;
+              display: block! important;
+              overflow: visible !important;
+              padding: 0;
+            }
+
+            #print-handler {
+              display: block !important;
+              height: 100%;
+              padding: 0;
+              top: 0;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              position: absolute;
+            }
+
+            #print-handler img {
+              display: block !important;
+              max-width: 100%;
+              max-height: 100%;
+              height: 100%;
+              width: 100%;
+              object-fit: contain;
+              page-break-after: always;
+              padding: 0;
+              margin: 0;
+            }
+
+            #print-handler .page__container {
+              box-sizing: border-box;
+              display: flex !important;
+              flex-direction: column;
+              padding: 10px;
+              min-height: 100%;
+              min-width: 100%;
+              font-size: 10px;
+            }
+
+            #print-handler .page__container .page__header {
+              display: block !important;
+              align-self: flex-start;
+              font-size: 2rem;
+              margin-bottom: 2rem;
+              padding-bottom: 0.6rem;
+              border-bottom: 0.1rem solid black;
+            }
+
+            #print-handler .page__container .note {
+              display: flex !important;
+              flex-direction: column;
+              padding: 0.6rem;
+              border: 0.1rem lightgray solid;
+              border-radius: 0.4rem;
+              margin-bottom: 0.5rem;
+            }
+
+            #print-handler .page__container .note .note__info {
+              display: block !important;
+              font-size: 1.3rem;
+              margin-bottom: 0.1rem;
+            }
+
+            #print-handler .page__container .note .note__info--with-icon {
+              display: flex !important;
+            }
+
+            #print-handler .page__container .note .note__info--with-icon .note__icon {
+              display: block !important;
+              width: 1.65rem;
+              height: 1.65rem;
+              margin-top: -0.1rem;
+              margin-right: 0.2rem;
+            }
+
+            #print-handler .page__container .note .note__info--with-icon .note__icon path:not([fill=none]) {
+              display: block !important;
+              fill: currentColor;
+            }
+
+            #print-handler .page__container .note .note__root .note__content {
+              display: block !important;
+              margin-left: 0.3rem;
+            }
+
+            #print-handler .page__container .note .note__root {
+              display: block !important;
+            }
+
+            #print-handler .page__container .note .note__info--with-icon .note__icon svg {
+              display: block !important;
+            }
+
+            #print-handler .page__container .note .note__reply {
+              display: block !important;
+              margin: 0.5rem 0 0 2rem;
+            }
+
+            #print-handler .page__container .note .note__content {
+              display: block !important;
+              font-size: 1.2rem;
+              margin-top: 0.1rem;
+            }
+
+            #app {
+              overflow: visible !important;
+            }
+
+            .App {
+              display: none !important;
+            }
+
+            html, body, #app {
+              max-width: none !important;
+            }
+          }
+      `;
+
+        window.parent.document.head.appendChild(style);
+      }
+    }
+
     window.print();
   }
 };
 
 export const cancelPrint = () => {
   const doc = core.getDocument();
-  pendingCanvases.forEach(id => doc.cancelLoadCanvas(id));
+  pendingCanvases.forEach((id) => doc.cancelLoadCanvas(id));
 };
 
-const getPrintableAnnotationNotes = pageNumber =>
-  core
-    .getAnnotationsList()
-    .filter(
-      annotation =>
-        annotation.Listable &&
+export const getPrintableAnnotationNotes = (pageNumber) => core
+  .getAnnotationsList()
+  .filter(
+    (annotation) => annotation.Listable &&
         annotation.PageNumber === pageNumber &&
         !annotation.isReply() &&
         !annotation.isGrouped() &&
         annotation.Printable,
-    );
+  );
 
-const creatingImage = (pageNumber, includeAnnotations, maintainPageOrientation, isPrintCurrentView) =>
-  new Promise(resolve => {
-    const pageIndex = pageNumber - 1;
-    let zoom = 1;
-    let renderRect;
-    const printRotation = getPrintRotation(pageIndex, maintainPageOrientation);
-    const onCanvasLoaded = async canvas => {
-      pendingCanvases = pendingCanvases.filter(pendingCanvas => pendingCanvas !== id);
-      positionCanvas(canvas, pageIndex);
-      let printableAnnotInfo = [];
-      if (!includeAnnotations) {
-        // according to Adobe, even if we exclude annotations, it will still draw widget annotations
-        const annotatationsToPrint = core.getAnnotationsList().filter(annotation => {
-          return annotation.PageNumber === pageNumber && !(annotation instanceof window.Annotations.WidgetAnnotation);
-        });
-        // store the previous Printable value so that we can set it back later
-        printableAnnotInfo = annotatationsToPrint.map(annotation => ({
-          annotation, printable: annotation.Printable
-        }));
-        // set annotations to false so that it won't show up in the printed page
-        annotatationsToPrint.forEach(annotation => {
-          annotation.Printable = false;
-        });
-      }
-      await drawAnnotationsOnCanvas(canvas, pageNumber);
-
-      printableAnnotInfo.forEach(info => {
-        info.annotation.Printable = info.printable;
+const creatingImage = (pageNumber, includeAnnotations, maintainPageOrientation, isPrintCurrentView, createCanvases = false) => new Promise((resolve) => {
+  const pageIndex = pageNumber - 1;
+  let zoom = 1;
+  let renderRect;
+  const printRotation = getPrintRotation(pageIndex, maintainPageOrientation);
+  const onCanvasLoaded = async (canvas) => {
+    pendingCanvases = pendingCanvases.filter((pendingCanvas) => pendingCanvas !== id);
+    positionCanvas(canvas, pageIndex);
+    let printableAnnotInfo = [];
+    if (!includeAnnotations) {
+      // according to Adobe, even if we exclude annotations, it will still draw widget annotations
+      const annotatationsToPrint = core.getAnnotationsList().filter((annotation) => {
+        return annotation.PageNumber === pageNumber && !(annotation instanceof window.Annotations.WidgetAnnotation);
       });
-
-      const img = document.createElement('img');
-      img.src = canvas.toDataURL();
-      img.onload = () => {
-        resolve(img);
-      };
-    };
-
-    if (isPrintCurrentView) {
-      const displayMode = core.getDisplayModeObject();
-      const containerElement = core.getScrollViewElement();
-      const documentElement = core.getViewerElement();
-      const headerElement = document.querySelector('.Header');
-      const headerItemsElements = document.querySelector('.HeaderToolsContainer');
-
-      const headerHeight = headerElement?.clientHeight + headerItemsElements?.clientHeight;
-      const coordinates = [];
-      coordinates[0] = displayMode.windowToPageNoRotate({
-        x: Math.max(containerElement.scrollLeft, documentElement.offsetLeft),
-        y: Math.max(containerElement.scrollTop + headerHeight, 0)
-      }, pageNumber);
-      coordinates[1] = displayMode.windowToPageNoRotate({
-        x: Math.min(window.innerWidth, documentElement.offsetLeft + documentElement.offsetWidth) + containerElement.scrollLeft,
-        y: window.innerHeight + containerElement.scrollTop
-      }, pageNumber);
-      const x1 = Math.min(coordinates[0].x, coordinates[1].x);
-      const y1 = Math.min(coordinates[0].y, coordinates[1].y);
-      const x2 = Math.max(coordinates[0].x, coordinates[1].x);
-      const y2 = Math.max(coordinates[0].y, coordinates[1].y);
-
-      zoom = core.getZoom();
-      renderRect = { x1, y1, x2, y2 };
+        // store the previous Printable value so that we can set it back later
+      printableAnnotInfo = annotatationsToPrint.map((annotation) => ({
+        annotation, printable: annotation.Printable
+      }));
+      // set annotations to false so that it won't show up in the printed page
+      annotatationsToPrint.forEach((annotation) => {
+        annotation.Printable = false;
+      });
     }
 
-    const id = core.getDocument().loadCanvas({
-      pageNumber,
-      zoom,
-      pageRotation: printRotation,
-      drawComplete: onCanvasLoaded,
-      multiplier: PRINT_QUALITY,
-      'print': true,
-      renderRect
-    });
-    pendingCanvases.push(id);
-  });
+    if (core.getDocumentViewer().isGrayscaleModeEnabled()) {
+      const ctx = canvas.getContext('2d');
+      ctx.globalCompositeOperation = 'color';
+      ctx.fillStyle = 'white';
+      ctx.globalAlpha = 1;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'source-over';
+    }
 
-const creatingNotesPage = (annotations, pageNumber, dateFormat, language) =>
-  new Promise(resolve => {
-    const container = document.createElement('div');
-    container.className = 'page__container';
+    await drawAnnotationsOnCanvas(canvas, pageNumber);
 
-    const header = document.createElement('div');
-    header.className = 'page__header';
-    header.innerHTML = `${i18n.t('option.shared.page')} ${pageNumber}`;
-
-    container.appendChild(header);
-    annotations.forEach(annotation => {
-      const note = getNote(annotation, dateFormat, language);
-
-      container.appendChild(note);
+    printableAnnotInfo.forEach((info) => {
+      info.annotation.Printable = info.printable;
     });
 
-    resolve(container);
+    if (createCanvases) {
+      resolve(canvas.toDataURL());
+    }
+
+    const img = document.createElement('img');
+    img.src = canvas.toDataURL();
+    img.onload = () => {
+      resolve(img);
+    };
+  };
+
+  if (isPrintCurrentView) {
+    const displayMode = core.getDisplayModeObject();
+    const containerElement = core.getScrollViewElement();
+    const documentElement = core.getViewerElement();
+    const headerElement = document.querySelector('.Header');
+    const headerItemsElements = document.querySelector('.HeaderToolsContainer');
+
+    const headerHeight = headerElement?.clientHeight + headerItemsElements?.clientHeight;
+    const coordinates = [];
+    coordinates[0] = displayMode.windowToPageNoRotate({
+      x: Math.max(containerElement.scrollLeft, documentElement.offsetLeft),
+      y: Math.max(containerElement.scrollTop + headerHeight, 0)
+    }, pageNumber);
+    coordinates[1] = displayMode.windowToPageNoRotate({
+      x: Math.min(window.innerWidth, documentElement.offsetLeft + documentElement.offsetWidth) + containerElement.scrollLeft,
+      y: window.innerHeight + containerElement.scrollTop
+    }, pageNumber);
+    const x1 = Math.min(coordinates[0].x, coordinates[1].x);
+    const y1 = Math.min(coordinates[0].y, coordinates[1].y);
+    const x2 = Math.max(coordinates[0].x, coordinates[1].x);
+    const y2 = Math.max(coordinates[0].y, coordinates[1].y);
+
+    zoom = core.getZoom();
+    renderRect = { x1, y1, x2, y2 };
+  }
+
+  const id = core.getDocument().loadCanvas({
+    pageNumber,
+    zoom,
+    pageRotation: printRotation,
+    drawComplete: onCanvasLoaded,
+    multiplier: PRINT_QUALITY,
+    'print': true,
+    renderRect
   });
+  pendingCanvases.push(id);
+});
+
+export const creatingNotesPage = (annotations, pageNumber, dateFormat, language) => new Promise((resolve) => {
+  const container = document.createElement('div');
+  container.className = 'page__container';
+
+  const header = document.createElement('div');
+  header.className = 'page__header';
+  header.innerHTML = `${i18n.t('option.shared.page')} ${pageNumber}`;
+
+  container.appendChild(header);
+  annotations.forEach((annotation) => {
+    const note = getNote(annotation, dateFormat, language);
+
+    container.appendChild(note);
+  });
+
+  resolve(container);
+});
 
 const getPrintRotation = (pageIndex, maintainPageOrientation) => {
   if (!maintainPageOrientation) {
@@ -287,7 +447,7 @@ const getPrintRotation = (pageIndex, maintainPageOrientation) => {
     return printRotation;
   }
 
-  return 0;
+  return core.getRotation(pageIndex + 1);
 };
 
 const positionCanvas = (canvas, pageIndex) => {
@@ -319,7 +479,6 @@ const positionCanvas = (canvas, pageIndex) => {
         ctx.rotate((270 * Math.PI) / 180);
         break;
     }
-
   } else if (!window.utils.isPdfjs) {
     switch (documentRotation) {
       case 1:
@@ -337,9 +496,14 @@ const positionCanvas = (canvas, pageIndex) => {
 };
 
 const drawAnnotationsOnCanvas = (canvas, pageNumber) => {
+  if (core.getDocumentViewer().isGrayscaleAnnotationsModeEnabled()) {
+    const ctx = canvas.getContext('2d');
+    ctx.filter = 'grayscale(1)';
+  }
+
   const widgetAnnotations = core
     .getAnnotationsList()
-    .filter(annotation => annotation.PageNumber === pageNumber && annotation instanceof window.Annotations.WidgetAnnotation);
+    .filter((annotation) => annotation.PageNumber === pageNumber && annotation instanceof window.Annotations.WidgetAnnotation);
   // just draw markup annotations
   if (widgetAnnotations.length === 0) {
     return core.drawAnnotations(pageNumber, canvas);
@@ -361,7 +525,7 @@ const drawAnnotationsOnCanvas = (canvas, pageNumber) => {
   });
 };
 
-const getDocumentRotation = pageIndex => {
+const getDocumentRotation = (pageIndex) => {
   const pageNumber = pageIndex + 1;
   const completeRotation = core.getCompleteRotation(pageNumber);
   const viewerRotation = core.getRotation(pageNumber);
@@ -387,7 +551,7 @@ const getNote = (annotation, dateFormat, language) => {
   noteRoot.appendChild(getNoteContent(annotation));
 
   note.appendChild(noteRoot);
-  annotation.getReplies().forEach(reply => {
+  annotation.getReplies().forEach((reply) => {
     const noteReply = document.createElement('div');
     noteReply.className = 'note__reply';
     noteReply.appendChild(getNoteInfo(reply, dateFormat, language));
@@ -399,7 +563,7 @@ const getNote = (annotation, dateFormat, language) => {
   return note;
 };
 
-const getNoteIcon = annotation => {
+const getNoteIcon = (annotation) => {
   const key = mapAnnotationToKey(annotation);
   const iconColor = colorMap[key] && colorMap[key].iconColor;
   const icon = getDataWithKey(key).icon;
@@ -414,6 +578,7 @@ const getNoteIcon = annotation => {
     if (icon) {
       const isInlineSvg = icon.indexOf('<svg') === 0;
       /* eslint-disable global-require */
+      // eslint-disable-next-line import/no-dynamic-require
       innerHTML = isInlineSvg ? icon : require(`../../assets/icons/${icon}.svg`);
     } else {
       innerHTML = annotation.Subject;
@@ -453,7 +618,7 @@ const getNoteInfo = (annotation, dateFormat, language) => {
   return info;
 };
 
-const getNoteContent = annotation => {
+const getNoteContent = (annotation) => {
   const contentElement = document.createElement('div');
   const contentText = annotation.getContents();
 
@@ -466,7 +631,7 @@ const getNoteContent = annotation => {
   return contentElement;
 };
 
-const createWidgetContainer = pageIndex => {
+const createWidgetContainer = (pageIndex) => {
   const { width, height } = core.getPageInfo(pageIndex + 1);
   const widgetContainer = document.createElement('div');
 

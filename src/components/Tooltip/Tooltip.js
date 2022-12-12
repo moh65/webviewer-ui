@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect, useLayoutEffect, forwardRef, useImp
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import hotkeysManager from 'helpers/hotkeysManager';
+import { useSelector } from 'react-redux';
+import selectors from 'selectors';
 
 import { isMac, isWindows, isIOS, isAndroid } from 'helpers/device';
 
@@ -19,6 +22,7 @@ const Tooltip = forwardRef(({ content = '', children, hideShortcut, forcePositio
   const timeoutRef = useRef(null);
   const childRef = useRef(null);
   useImperativeHandle(ref, () => childRef.current);
+  const isDisabled = useSelector((state) => selectors.isElementDisabled(state, 'tooltip'));
 
   const tooltipRef = useRef(null);
   const [show, setShow] = useState(false);
@@ -29,7 +33,7 @@ const Tooltip = forwardRef(({ content = '', children, hideShortcut, forcePositio
   });
   const [location, setLocation] = useState('bottom');
   const [t] = useTranslation();
-  const delayShow = 700;
+  const delayShow = 300;
   const opacityTimeout = 50;
 
   useEffect(() => {
@@ -49,6 +53,33 @@ const Tooltip = forwardRef(({ content = '', children, hideShortcut, forcePositio
     if (hideOnClick) {
       childRef.current?.addEventListener('click', hideTooltip);
     }
+    if (childRef.current['ariaLabel'] !== 'action.close') {
+      childRef.current?.addEventListener('focus', showToolTip);
+      childRef.current?.addEventListener('blur', hideTooltip);
+    }
+
+    const observer = new MutationObserver((mutations) => {
+      // hide tooltip when button get disabled, disable buttons don't have "mouseleave" events
+      const lastMutation = mutations[mutations.length - 1];
+      if (lastMutation && lastMutation.attributeName === 'disabled' && lastMutation.target.disabled) {
+        hideTooltip();
+      }
+    });
+
+    observer.observe(childRef.current, { attributes: true, childList: false, characterData: false });
+
+    return () => {
+      hideTooltip();
+      observer.disconnect();
+
+      childRef.current?.removeEventListener('mouseenter', showToolTip);
+      childRef.current?.removeEventListener('mouseleave', hideTooltip);
+      if (hideOnClick) {
+        childRef.current?.removeEventListener('click', hideTooltip);
+      }
+      childRef.current?.removeEventListener('focus', showToolTip);
+      childRef.current?.removeEventListener('blur', hideTooltip);
+    };
   }, [childRef, hideOnClick]);
 
   useLayoutEffect(() => {
@@ -85,19 +116,18 @@ const Tooltip = forwardRef(({ content = '', children, hideShortcut, forcePositio
 
       // starting from placing the tooltip at the bottom location
       // if the tooltip can't fit into the window, try placing it counterclockwise until we can find a location to fit it
-      const bestLocation = Object.keys(locationTopLeftMap).find(location => {
+      const bestLocation = Object.keys(locationTopLeftMap).find((location) => {
         if (forcePosition) {
           return location === forcePosition;
-        } else {
-          const { top: newTop, left: newLeft } = locationTopLeftMap[location];
+        }
+        const { top: newTop, left: newLeft } = locationTopLeftMap[location];
 
-          return (
-            newTop > 0
+        return (
+          newTop > 0
             && newTop + tooltipRect.height < window.innerHeight
             && newLeft > 0
             && newLeft + tooltipRect.width < window.innerWidth
-          );
-        }
+        );
       }) || 'bottom';
       const { top: tooltipTop, left: tooltipLeft } = locationTopLeftMap[
         bestLocation
@@ -131,25 +161,33 @@ const Tooltip = forwardRef(({ content = '', children, hideShortcut, forcePositio
   if (isWindows && shortcutKey === 'redo') {
     shortcutKey = 'redo_windows';
   }
-  const hasShortcut = t(`shortcut.${shortcutKey}`).indexOf('.') === -1;
+  const isActive = hotkeysManager.isActive(shortcutKey);
+
+  let hasShortcut = t(`shortcut.${shortcutKey}`).indexOf('.') === -1;
   let shortcut = t(`shortcut.${shortcutKey}`);
   if (isMac) {
     shortcut = shortcut.replace('Ctrl', 'Cmd');
   }
 
+  if (!isActive) {
+    hasShortcut = false;
+  }
+
   return (
     <React.Fragment>
       {child}
-      {show
-        && translatedContent
-        && !isUsingMobileDevices
-        && ReactDOM.createPortal(
+      {show &&
+        translatedContent &&
+        !isUsingMobileDevices &&
+        !isDisabled &&
+        ReactDOM.createPortal(
           <div
             className={`tooltip--${location}`}
             style={{ opacity, ...position }}
             ref={tooltipRef}
+            data-element="tooltip"
           >
-            <div className={`tooltip__content`}>
+            <div className={'tooltip__content'}>
               {translatedContent}
               {hasShortcut && !hideShortcut && (
                 <span className="tooltip__shortcut">{shortcut}</span>
@@ -162,6 +200,7 @@ const Tooltip = forwardRef(({ content = '', children, hideShortcut, forcePositio
   );
 });
 
+Tooltip.displayName = 'Tooltip';
 Tooltip.propTypes = propTypes;
 
 export default Tooltip;

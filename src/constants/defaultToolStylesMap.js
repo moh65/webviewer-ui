@@ -74,6 +74,30 @@ export default {
   AnnotationCreatePerimeterMeasurement4: {
     StrokeColor: { R: 0, G: 122, B: 59, A: 1 },
   },
+  AnnotationCreateArcMeasurement: {
+    StrokeColor: { R: 228, G: 66, B: 52, A: 1 },
+  },
+  AnnotationCreateArcMeasurement2: {
+    StrokeColor: { R: 78, G: 125, B: 233, A: 1 },
+  },
+  AnnotationCreateArcMeasurement3: {
+    StrokeColor: { R: 0, G: 0, B: 0, A: 1 },
+  },
+  AnnotationCreateArcMeasurement4: {
+    StrokeColor: { R: 0, G: 122, B: 59, A: 1 },
+  },
+  AnnotationCreateArc: {
+    StrokeColor: { R: 228, G: 66, B: 52, A: 1 },
+  },
+  AnnotationCreateArc2: {
+    StrokeColor: { R: 78, G: 125, B: 233, A: 1 },
+  },
+  AnnotationCreateArc3: {
+    StrokeColor: { R: 0, G: 0, B: 0, A: 1 },
+  },
+  AnnotationCreateArc4: {
+    StrokeColor: { R: 0, G: 122, B: 59, A: 1 },
+  },
   AnnotationCreateDistanceMeasurement: {
     StrokeColor: { R: 228, G: 66, B: 52, A: 1 },
   },
@@ -206,6 +230,30 @@ export default {
   AnnotationCreateFreeText4: {
     TextColor: { R: 0, G: 122, B: 59, A: 1 },
   },
+  AnnotationCreateMarkInsertText: {
+    StrokeColor: { R: 228, G: 66, B: 52, A: 1 },
+  },
+  AnnotationCreateMarkInsertText2: {
+    StrokeColor: { R: 78, G: 125, B: 233, A: 1 },
+  },
+  AnnotationCreateMarkInsertText3: {
+    StrokeColor: { R: 0, G: 0, B: 0, A: 1 },
+  },
+  AnnotationCreateMarkInsertText4: {
+    StrokeColor: { R: 0, G: 122, B: 59, A: 1 },
+  },
+  AnnotationCreateMarkReplaceText: {
+    StrokeColor: { R: 228, G: 66, B: 52, A: 1 },
+  },
+  AnnotationCreateMarkReplaceText2: {
+    StrokeColor: { R: 78, G: 125, B: 233, A: 1 },
+  },
+  AnnotationCreateMarkReplaceText3: {
+    StrokeColor: { R: 0, G: 0, B: 0, A: 1 },
+  },
+  AnnotationCreateMarkReplaceText4: {
+    StrokeColor: { R: 0, G: 122, B: 59, A: 1 },
+  },
   AnnotationCreateDateFreeText: {
     TextColor: { R: 228, G: 66, B: 52, A: 1 },
   },
@@ -336,6 +384,30 @@ export default {
     StrokeColor: { R: 78, G: 125, B: 233, A: 1 },
   },
   ComboBoxFormFieldCreateTool4: {
+    StrokeColor: { R: 0, G: 122, B: 59, A: 1 },
+  },
+  AnnotationCreateRedaction: {
+    StrokeColor: { R: 255, G: 0, B: 0, A: 1 }
+  },
+  AnnotationCreateRedaction2: {
+    StrokeColor: { R: 0, G: 0, B: 255, A: 1 }
+  },
+  AnnotationCreateRedaction3: {
+    StrokeColor: { R: 255, G: 255, B: 0, A: 1 }
+  },
+  AnnotationCreateRedaction4: {
+    StrokeColor: { R: 0, G: 128, B: 0, A: 1 }
+  },
+  AnnotationCreateChangeViewTool: {
+    StrokeColor: { R: 228, G: 66, B: 52, A: 1 },
+  },
+  AnnotationCreateChangeViewTool2: {
+    StrokeColor: { R: 78, G: 125, B: 233, A: 1 },
+  },
+  AnnotationCreateChangeViewTool3: {
+    StrokeColor: { R: 0, G: 0, B: 0, A: 1 },
+  },
+  AnnotationCreateChangeViewTool4: {
     StrokeColor: { R: 0, G: 122, B: 59, A: 1 },
   },
 };

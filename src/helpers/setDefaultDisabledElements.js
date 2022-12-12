@@ -6,7 +6,7 @@ import { PRIORITY_THREE, PRIORITY_TWO, PRIORITY_ONE } from 'constants/actionPrio
 import Feature from 'constants/feature';
 import actions from 'actions';
 
-export default store => {
+export default (store) => {
   const { dispatch, getState } = store;
   const state = getState();
 
@@ -59,6 +59,14 @@ export default store => {
   const measurementsDisabled = !getHashParameters('enableMeasurement', false);
   if (measurementsDisabled) {
     disableFeatures([Feature.Measurement]);
+  } else {
+    dispatch(
+      actions.disableElements(
+        [
+          'cloudyRectangleAreaToolGroupButton',
+        ]
+      )
+    );
   }
   //redaction-enable
   //customization
@@ -69,6 +77,11 @@ export default store => {
   const redactionsDisabled = false;
   if (redactionsDisabled) {
     disableFeatures([Feature.Redaction]);
+  }
+
+  const contentEditDisabled = !getHashParameters('enableContentEdit', false);
+  if (contentEditDisabled) {
+    disableFeatures([Feature.ContentEdit]);
   }
 
   const toolBarDisabled = !getHashParameters('toolbar', true);
@@ -105,7 +118,7 @@ export default store => {
     disableFeatures([Feature.OutlineEditing]);
   }
 
-  dispatch(actions.disableElements(['contentEditButton'], PRIORITY_TWO));
+  dispatch(actions.disableElements(['contentEditButton', 'searchAndReplace'], PRIORITY_TWO));
 
   dispatch(
     actions.disableElements(
@@ -119,9 +132,16 @@ export default store => {
         'readerPageTransitionButton',
         'mathSymbolsButton',
         'threeDToolGroupButton',
-        'attachmentPanelButton'
+        'attachmentPanelButton',
+        'signatureOptionsDropdown',
+        'savedSignatureAndInitialsTabs',
       ],
       PRIORITY_ONE,
     ),
   );
+
+  const enableChangeView = getHashParameters('ChangeView', false);
+  if (!enableChangeView) {
+    disableFeatures([Feature.ChangeView]);
+  }
 };

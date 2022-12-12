@@ -5,65 +5,56 @@
   position: static;
   display: flex;
   flex-direction: column;
-  padding: 0px;
+  padding-right: 8px;
   flex-wrap: nowrap;
   border: 0px;
   border-radius: 0px;
   background: transparent;
   visibility: visible !important;
-  padding-right: 18px;
   flex-grow: 0;
 
   .input-container {
     display: flex;
     position: relative;
-    flex: 1 0 auto;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: var(--text-color);
+    padding: 6px 2px 6px 6px;
+    background: var(--component-background);
 
     input {
       width: 100%;
-      padding-left: 8px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--text-color);
-      padding-bottom: 6px;
-      padding-right: 42px;
-      padding-top: 4px;
-
-      &:focus {
-        outline: none;
-        border: 1px solid var(--focus-border);
-      }
-
-      &::placeholder {
-        color: var(--placeholder-text);
-      }
+      padding-right: 26px;
+      height: 20px;
+      border: none;
+      background: transparent;
     }
 
-    .input-button {
+    input::placeholder {
+      color: var(--placeholder-text);
+    }
+
+    .clearSearch-button {
       @include button-reset;
       cursor: pointer;
-      background: var(--primary-button);
       border-radius: 4px;
-      width: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: absolute;
-      top: 0px;
-      bottom: 0px;
-      right: 0px;
-
-      .Icon {
-        width: 20px;
-        height: 20px;
-      }
+      width: 24px;
+      height: 24px;
 
       svg {
-        color: var(--primary-button-text);
+        color: var(--gray-7);
       }
-
       &:hover {
-        background: var(--primary-button-hover);
+        background: var(--blue-1);
       }
     }
   }
@@ -72,20 +63,17 @@
     height: 1px;
     width: 100%;
     background: var(--divider);
-    margin: 16px 0px;
+    margin: 10px 0px;
   }
 
   .options {
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
-    margin-left: -16px;
-    margin-top: 5px;
+    margin-top: 8px;
 
     // toolkit choice component
     > span {
-      margin-left: 16px;
-
+      margin-right: 8px;
       // label of toolkit choice component
       > label {
         white-space: nowrap;
@@ -93,6 +81,81 @@
     }
   }
 
+  .replace-options {
+    .replace-buttons {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      padding-top: 10px;
+      .spinner {
+        margin: 0;
+        position: absolute;
+        left: 30px;
+      }
+      .btn-replace {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--blue-5);
+        border: 1px solid var(--blue-5);
+        color: var(--gray-0);
+        padding: 6px 18px;
+        width: auto;
+        width: -webkit-fit-content;
+        width: -moz-fit-content;
+        width: fit-content;
+        border-radius: 4px;
+        height: 28px;
+        cursor: pointer;
+
+        &:disabled {
+          opacity: 0.5;
+        }
+      }
+
+      .btn-replace-all {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--blue-5);
+        padding: 6px 18px;
+        width: auto;
+        width: -webkit-fit-content;
+        width: -moz-fit-content;
+        width: fit-content;
+        height: 28px;
+        cursor: pointer;
+        margin-right: 5px;
+
+        &:disabled {
+          opacity: 0.5;
+        }
+      }
+    }
+
+  }
+
+  .extra-options {
+    margin-top: 5px;
+    button.Button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--blue-5);
+      width: auto;
+      cursor: pointer;
+      margin-right: 5px;
+      font-weight: 500;
+      height: 25px;
+
+      .Icon {
+        color: var(--blue-5);
+        width: 14px;
+        margin-top: 10px;
+        margin-left: 6px;
+      }
+    }
+  }
   .footer {
     display: flex;
     align-items: center;
@@ -100,11 +163,20 @@
     color: var(--faded-text);
     margin-bottom: 16px;
 
+    .spinner {
+      height:25px !important;
+      width:25px !important;
+      margin: 0px;
+    }
+
     .buttons {
       display: flex;
       flex-direction: row;
       align-self: flex-end;
+      justify-content: space-evenly;
       margin-left: auto;
+      width: 64px;
+      height: 28px;
 
       .button {
         @include button-reset;
@@ -114,26 +186,20 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-left: 8px;
         cursor: pointer;
 
-        border: 1px solid var(--primary-button);
         svg {
-          color: var(--primary-button);
+          color: var(--gray-7);
         }
 
         &:hover {
-          background: var(--primary-button-hover);
-          border: 1px solid var(--primary-button-hover);
-          svg {
-            color: var(--primary-button-text);
-          }
+          background-color: var(--blue-1)
         }
       }
 
       .arrow {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
       }
     }
   }

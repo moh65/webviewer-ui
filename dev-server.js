@@ -5,7 +5,7 @@ const webpack = require('webpack');
 const devMiddleware = require('webpack-dev-middleware');
 const hotMiddleware = require('webpack-hot-middleware');
 const ip = require('ip');
-const opn = require('opn');
+const open = require('open');
 const config = require('./webpack.config.dev');
 
 const app = express();
@@ -34,9 +34,12 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'src/index.html'));
 });
 
+const sampleURL = encodeURIComponent(JSON.stringify('https://pdftron.s3.amazonaws.com/downloads/pl/demo-annotated.pdf'));
+
 app.get('/sample-url', (req, res) => {
+
   res.redirect(
-    `/#d=https://pdftron.s3.amazonaws.com/downloads/pl/demo-annotated.pdf&a=1`,
+    `/#d=${sampleURL}&a=1`,
   );
 });
 
@@ -46,8 +49,8 @@ app.listen(3000, '0.0.0.0', err => {
   } else {
     // eslint-disable-next-line
     console.info(`Listening at localhost:3000 (http://${ip.address()}:3000)`);
-    opn(
-      'http://localhost:3000/#d=https://pdftron.s3.amazonaws.com/downloads/pl/demo-annotated.pdf&a=1',
+    open(
+      `http://localhost:3000/#d=${sampleURL}&a=1`,
     );
   }
 });

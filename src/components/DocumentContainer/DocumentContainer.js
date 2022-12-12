@@ -1,7 +1,12 @@
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
+import actions from 'actions';
+import selectors from 'selectors';
+import useMedia from 'hooks/useMedia';
 import { connect } from 'react-redux';
+import Measure from 'react-measure';
+import _ from 'lodash';
 
 import core from 'core';
 import { isIE, isIE11 } from 'helpers/device';
@@ -10,19 +15,16 @@ import loadDocument from 'helpers/loadDocument';
 import getNumberOfPagesToNavigate from 'helpers/getNumberOfPagesToNavigate';
 import touchEventManager from 'helpers/TouchEventManager';
 import setCurrentPage from 'helpers/setCurrentPage';
+import { getStep } from 'helpers/zoom';
 import { getMinZoomLevel, getMaxZoomLevel } from 'constants/zoomFactors';
 import MeasurementOverlay from 'components/MeasurementOverlay';
 import PageNavOverlay from 'components/PageNavOverlay';
 import ToolsOverlay from 'components/ToolsOverlay';
-import actions from 'actions';
-import selectors from 'selectors';
-import useMedia from 'hooks/useMedia';
 import ReaderModeViewer from 'components/ReaderModeViewer';
-
-import Measure from 'react-measure';
+import ScaleOverlayContainer from 'components/ScaleOverlay/ScaleOverlayContainer';
 
 import './DocumentContainer.scss';
-import _ from 'lodash';
+import DataElements from 'src/constants/dataElement';
 
 const PAGE_NAVIGATION_OVERLAY_FADEOUT = 4000;
 
@@ -46,8 +48,11 @@ class DocumentContainer extends React.PureComponent {
     isReaderMode: PropTypes.bool,
     setDocumentContainerWidth: PropTypes.func.isRequired,
     setDocumentContainerHeight: PropTypes.func.isRequired,
-    isInDesktopOnlyMode: PropTypes.bool
-  }
+    isInDesktopOnlyMode: PropTypes.bool,
+    isRedactionPanelOpen: PropTypes.bool,
+    isTextEditingPanelOpen: PropTypes.bool,
+    isWv3dPropertiesPanelOpen: PropTypes.bool,
+  };
 
   constructor(props) {
     super(props);
@@ -57,10 +62,13 @@ class DocumentContainer extends React.PureComponent {
     this.wheelToNavigatePages = _.throttle(this.wheelToNavigatePages.bind(this), 300, { trailing: false });
     this.wheelToZoom = _.throttle(this.wheelToZoom.bind(this), 30, { trailing: false });
     this.handleResize = _.throttle(this.handleResize.bind(this), 200);
-    this.debouncedHidePageNavigationOverlay = _.debounce(this.hidePageNavigationOverlay, PAGE_NAVIGATION_OVERLAY_FADEOUT);
+    this.debouncedHidePageNavigationOverlay = _.debounce(
+      this.hidePageNavigationOverlay,
+      PAGE_NAVIGATION_OVERLAY_FADEOUT,
+    );
     this.state = {
       showNavOverlay: true,
-    }
+    };
   }
 
   componentDidUpdate(prevProps) {
@@ -69,11 +77,11 @@ class DocumentContainer extends React.PureComponent {
     }
   }
 
-
   componentDidMount() {
     touchEventManager.initialize(this.document.current, this.container.current);
     core.setScrollViewElement(this.container.current);
     core.setViewerElement(this.document.current);
+    this.props.closeElements([DataElements.MULTITABS_EMPTY_PAGE]);
 
     if (isIE) {
       window.addEventListener('resize', this.handleWindowResize);
@@ -87,7 +95,6 @@ class DocumentContainer extends React.PureComponent {
     this.container.current.addEventListener('wheel', this.onWheel, { passive: false });
     this.updateContainerSize();
     core.addEventListener('documentLoaded', this.showAndFadeNavigationOverlay);
-
   }
 
   componentWillUnmount() {
@@ -103,55 +110,69 @@ class DocumentContainer extends React.PureComponent {
 
     this.container.current.removeEventListener('wheel', this.onWheel, { passive: false });
     core.removeEventListener('documentLoaded', this.showAndFadeNavigationOverlay);
-
+    this.props.closeElements([DataElements.MULTITABS_EMPTY_PAGE]);
   }
 
-  preventDefault = e => e.preventDefault();
+  preventDefault = (e) => e.preventDefault();
 
-  onDrop = e => {
+  onDrop = (e) => {
     e.preventDefault();
 
     const { files } = e.dataTransfer;
     if (files.length) {
       loadDocument(this.props.dispatch, files[0]);
     }
-  }
+  };
 
   handleWindowResize = () => {
     handleWindowResize(this.props, this.container.current);
-  }
+  };
 
-  onWheel = e => {
+  onWheel = (e) => {
     const { isMouseWheelZoomEnabled } = this.props;
     if (isMouseWheelZoomEnabled && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       this.wheelToZoom(e);
-    } else if (!core.isContinuousDisplayMode() && this.props.allowPageNavigation && !this.props.isReaderMode && core.isScrollableDisplayMode()) {
-      this.wheelToNavigatePages(e);
-      this.props.closeElements([
-        'annotationPopup',
-        'textPopup',
-        'annotationNoteConnectorLine',
-      ]);
+    } else if (
+      !core.isContinuousDisplayMode() &&
+      this.props.allowPageNavigation &&
+      !this.props.isReaderMode &&
+      core.isScrollableDisplayMode()
+    ) {
+      const { currentPage, totalPages } = this.props;
+      const { scrollTop, scrollHeight, clientHeight } = this.container.current;
+      const reachedTop = scrollTop === 0;
+      const reachedBottom = Math.abs(scrollTop + clientHeight - scrollHeight) <= 1;
+
+      // depending on the track pad used (see this on MacBooks), deltaY can be between -1 and 1 when doing horizontal scrolling which cause page to change
+      const scrollingUp = e.deltaY < 0 && Math.abs(e.deltaY) > Math.abs(e.deltaX);
+      const scrollingDown = e.deltaY > 0 && Math.abs(e.deltaY) > Math.abs(e.deltaX);
+
+      const shouldGoUp = scrollingUp && reachedTop && currentPage > 1;
+      const shouldGoDown = scrollingDown && reachedBottom && currentPage < totalPages;
+
+      const shouldPreventParentScrolling = (scrollHeight === clientHeight) && ((e.deltaY < 0 && currentPage > 1) || (e.deltaY > 0 && currentPage < totalPages));
+
+      if (shouldPreventParentScrolling) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      this.wheelToNavigatePages(e, shouldGoUp, shouldGoDown);
+      this.props.closeElements(['annotationPopup', 'textPopup', 'annotationNoteConnectorLine']);
     }
-  }
+  };
 
-  wheelToNavigatePages = e => {
-    const { currentPage, totalPages } = this.props;
-    const { scrollTop, scrollHeight, clientHeight } = this.container.current;
-    const reachedTop = scrollTop === 0;
-    const reachedBottom = Math.abs(scrollTop + clientHeight - scrollHeight) <= 1;
-
-    // depending on the track pad used (see this on MacBooks), deltaY can be between -1 and 1 when doing horizontal scrolling which cause page to change
-    const scrollingUp = e.deltaY < 0 && Math.abs(e.deltaY) > Math.abs(e.deltaX);
-    const scrollingDown = e.deltaY > 0 && Math.abs(e.deltaY) > Math.abs(e.deltaX);
-
-    if (scrollingUp && reachedTop && currentPage > 1) {
+  wheelToNavigatePages = (e, shouldGoUp, shouldGoDown) => {
+    if (shouldGoUp) {
       this.pageUp();
-    } else if (scrollingDown && reachedBottom && currentPage < totalPages) {
+    } else if (shouldGoDown) {
       this.pageDown();
     }
-  }
+
+    this.showPageNavigationOverlay();
+    this.debouncedHidePageNavigationOverlay();
+  };
 
   pageUp = () => {
     const { currentPage } = this.props;
@@ -159,55 +180,51 @@ class DocumentContainer extends React.PureComponent {
 
     setCurrentPage(currentPage - getNumberOfPagesToNavigate());
     this.container.current.scrollTop = scrollHeight - clientHeight;
-  }
+  };
 
   pageDown = () => {
     const { currentPage } = this.props;
 
     setCurrentPage(currentPage + getNumberOfPagesToNavigate());
-  }
+  };
 
-  wheelToZoom = e => {
+  wheelToZoom = (e) => {
     const currentZoomFactor = this.props.zoom;
     let newZoomFactor = currentZoomFactor;
-    let multiple;
-
     if (e.deltaY < 0) {
-      multiple = 1.25;
-      newZoomFactor = Math.min(currentZoomFactor * multiple, getMaxZoomLevel());
+      newZoomFactor = Math.min(
+        currentZoomFactor + getStep(currentZoomFactor),
+        getMaxZoomLevel()
+      );
     } else if (e.deltaY > 0) {
-      multiple = 0.8;
-      newZoomFactor = Math.max(currentZoomFactor * multiple, getMinZoomLevel());
+      newZoomFactor = Math.max(
+        currentZoomFactor - getStep(currentZoomFactor),
+        getMinZoomLevel()
+      );
     }
-
     core.zoomToMouse(newZoomFactor);
-  }
+  };
 
   handleScroll = () => {
-    this.props.closeElements([
-      'annotationPopup',
-      'textPopup',
-      'annotationNoteConnectorLine',
-      'formFieldEditPopup',
-    ]);
+    this.props.closeElements(['annotationPopup', 'textPopup', 'annotationNoteConnectorLine', 'formFieldEditPopup']);
 
     // Show overlay and then hide it, but the hide call is debounced
     this.showPageNavigationOverlay();
     this.debouncedHidePageNavigationOverlay();
-  }
+  };
 
   showAndFadeNavigationOverlay = () => {
     this.showPageNavigationOverlay();
     setTimeout(this.hidePageNavigationOverlay, PAGE_NAVIGATION_OVERLAY_FADEOUT);
-  }
+  };
 
   hidePageNavigationOverlay = () => {
-    this.setState({ showNavOverlay: false })
-  }
+    this.setState({ showNavOverlay: false });
+  };
 
   showPageNavigationOverlay = () => {
-    this.setState({ showNavOverlay: true })
-  }
+    this.setState({ showNavOverlay: true });
+  };
 
   pageNavOnMouseEnter = () => {
     this.showPageNavigationOverlay();
@@ -215,18 +232,16 @@ class DocumentContainer extends React.PureComponent {
 
   pageNavOnMouseLeave = () => {
     this.hidePageNavigationOverlay();
-  }
+  };
 
-  getClassName = props => {
-    const {
-      isSearchOverlayOpen,
-    } = props;
+  getClassName = (props) => {
+    const { isSearchOverlayOpen } = props;
 
     return classNames({
       DocumentContainer: true,
       'search-overlay': isSearchOverlayOpen,
     });
-  }
+  };
 
   handleResize() {
     this.updateContainerSize();
@@ -257,18 +272,18 @@ class DocumentContainer extends React.PureComponent {
       // background color is the one that causes this transition.
       // This effect is still happening in above case but if instead of clicking edit, user changes width of the notes panel
       // It is currently expected behaviour
-      // Note Update after fading page nav was added: 
+      // Note Update after fading page nav was added:
       // This also causes a doc container re-render as we fire the opacity transition when we fade the page nav
       // we must skip updating the scrollViewUpdated call as well or it causes re-renders on docs with different page sizes
       core.scrollViewUpdated();
     }
   }
 
-
   render() {
     const {
       leftPanelWidth,
       isLeftPanelOpen,
+      isMultiTabEmptyPageOpen,
       isMobile,
       documentContentContainerWidthStyle,
       totalPages,
@@ -278,10 +293,9 @@ class DocumentContainer extends React.PureComponent {
     const documentContainerClassName = isIE ? getClassNameInIE(this.props) : this.getClassName(this.props);
     const documentClassName = classNames({
       document: true,
-      hidden: this.props.isReaderMode
+      hidden: this.props.isReaderMode,
     });
     const showPageNav = totalPages > 1;
-
 
     return (
       <div
@@ -291,17 +305,15 @@ class DocumentContainer extends React.PureComponent {
           // Using transform makes a clunky animation because the panels are using transform already.
           marginLeft: `${isLeftPanelOpen ? leftPanelWidth : 0}px`,
         }}
-        className="document-content-container"
+        className={classNames({
+          'document-content-container': true,
+          'closed': isMultiTabEmptyPageOpen
+        })}
         onTransitionEnd={this.onTransitionEnd}
       >
-        <Measure
-          onResize={this.handleResize}
-        >
+        <Measure onResize={this.handleResize}>
           {({ measureRef }) => (
-            <div
-              className="measurement-container"
-              ref={measureRef}
-            >
+            <div className="measurement-container" ref={measureRef}>
               <div
                 style={{backgroundColor:'gray'}}
                 className={documentContainerClassName}
@@ -311,11 +323,9 @@ class DocumentContainer extends React.PureComponent {
               >
                 {/* tabIndex="-1" to keep document focused when in single page mode */}
                 <div className={documentClassName} ref={this.document} tabIndex="-1" />
-
               </div>
-              {this.props.isReaderMode && (
-                <ReaderModeViewer />
-              )}
+              {this.props.isReaderMode && <ReaderModeViewer />}
+              <ScaleOverlayContainer />
               <MeasurementOverlay />
               <div
                 className="footer"
@@ -324,15 +334,15 @@ class DocumentContainer extends React.PureComponent {
                   marginLeft: `${isLeftPanelOpen ? leftPanelWidth : 0}px`,
                 }}
               >
-                {showPageNav &&
+                {showPageNav && (
                   <PageNavOverlay
                     showNavOverlay={this.state.showNavOverlay}
                     onMouseEnter={this.pageNavOnMouseEnter}
                     onMouseLeave={this.pageNavOnMouseLeave}
                   />
-                }
+                )}
 
-                {(isMobile && !isInDesktopOnlyMode) && <ToolsOverlay />}
+                {isMobile && !isInDesktopOnlyMode && <ToolsOverlay />}
               </div>
             </div>
           )}
@@ -343,11 +353,12 @@ class DocumentContainer extends React.PureComponent {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   documentContentContainerWidthStyle: selectors.getDocumentContentContainerWidthStyle(state),
-  leftPanelWidth: selectors.getLeftPanelWidthWithReszieBar(state),
+  leftPanelWidth: selectors.getLeftPanelWidthWithResizeBar(state),
   isLeftPanelOpen: selectors.isElementOpen(state, 'leftPanel'),
   isRightPanelOpen: selectors.isElementOpen(state, 'searchPanel') || selectors.isElementOpen(state, 'notesPanel'),
+  isMultiTabEmptyPageOpen: selectors.getIsMultiTab(state) && selectors.getTabs(state).length === 0,
   isSearchOverlayOpen: selectors.isElementOpen(state, 'searchOverlay'),
   doesDocumentAutoLoad: selectors.doesDocumentAutoLoad(state),
   zoom: selectors.getZoom(state),
@@ -358,20 +369,23 @@ const mapStateToProps = state => ({
   allowPageNavigation: selectors.getAllowPageNavigation(state),
   isMouseWheelZoomEnabled: selectors.getEnableMouseWheelZoom(state),
   isReaderMode: selectors.isReaderMode(state),
-  isInDesktopOnlyMode: selectors.isInDesktopOnlyMode(state)
+  isInDesktopOnlyMode: selectors.isInDesktopOnlyMode(state),
+  isRedactionPanelOpen: selectors.isElementOpen(state, 'redactionPanel'),
+  isTextEditingPanelOpen: selectors.isElementOpen(state, 'textEditingPanel'),
+  isWv3dPropertiesPanelOpen: selectors.isElementOpen(state, 'wv3dPropertiesPanel'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   dispatch,
-  openElement: dataElement => dispatch(actions.openElement(dataElement)),
-  closeElements: dataElements => dispatch(actions.closeElements(dataElements)),
-  setDocumentContainerWidth: width => dispatch(actions.setDocumentContainerWidth(width)),
-  setDocumentContainerHeight: height => dispatch(actions.setDocumentContainerHeight(height)),
+  openElement: (dataElement) => dispatch(actions.openElement(dataElement)),
+  closeElements: (dataElements) => dispatch(actions.closeElements(dataElements)),
+  setDocumentContainerWidth: (width) => dispatch(actions.setDocumentContainerWidth(width)),
+  setDocumentContainerHeight: (height) => dispatch(actions.setDocumentContainerHeight(height)),
 });
 
 const ConnectedDocumentContainer = connect(mapStateToProps, mapDispatchToProps)(DocumentContainer);
 
-export default props => {
+const connectedComponent = (props) => {
   const isMobile = useMedia(
     // Media queries
     ['(max-width: 640px)'],
@@ -380,7 +394,7 @@ export default props => {
     false,
   );
 
-  return (
-    <ConnectedDocumentContainer {...props} isMobile={isMobile} />
-  );
+  return <ConnectedDocumentContainer {...props} isMobile={isMobile} />;
 };
+
+export default connectedComponent;

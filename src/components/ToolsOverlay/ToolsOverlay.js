@@ -30,7 +30,8 @@ class ToolsOverlay extends React.PureComponent {
     activeToolGroup: PropTypes.string,
     closeElements: PropTypes.func.isRequired,
     setActiveToolGroup: PropTypes.func.isRequired,
-    isInDesktopOnlyMode: PropTypes.bool
+    isInDesktopOnlyMode: PropTypes.bool,
+    showPresets: PropTypes.bool,
   };
 
   constructor() {
@@ -93,7 +94,7 @@ class ToolsOverlay extends React.PureComponent {
   setOverlayPosition = () => {
     const { activeToolGroup, activeHeaderItems } = this.props;
     const element = activeHeaderItems.find(
-      item => item.toolGroup === activeToolGroup,
+      (item) => item.toolGroup === activeToolGroup,
     );
 
     if (element) {
@@ -117,9 +118,9 @@ class ToolsOverlay extends React.PureComponent {
       toolNames,
       activeToolGroup,
       isToolStyleOpen,
-      isDesktop,
       isMobile,
-      isInDesktopOnlyMode
+      isInDesktopOnlyMode,
+      showPresets,
     } = this.props;
 
     const isVisible = (isOpen || true) && !isDisabled;
@@ -130,13 +131,15 @@ class ToolsOverlay extends React.PureComponent {
     const toolsWithNoStylingPresets = [
       'stampTools',
       'cropTools',
-      'redactionTools',
       'fileAttachmentTools',
       'radioButtonFieldTools',
-      'checkBoxFieldTools'
+      'checkBoxFieldTools',
+      'contentEditTools',
+      'addParagraphTools',
+      'calibrationTools',
+      'addImageContentTools'
     ];
     const noPresets = !activeToolGroup || toolsWithNoStylingPresets.includes(activeToolGroup);
-
     let Component = (
       <div
         className="tool-buttons-container"
@@ -165,7 +168,7 @@ class ToolsOverlay extends React.PureComponent {
           {t('Model3D.add3D')}
         </div>
       );
-    } else if (noPresets) {
+    } else if (noPresets || !showPresets) {
       Component = (
         <div className="no-presets">
           {tReady ? t('message.toolsOverlayNoPresets') : ''}
@@ -202,8 +205,8 @@ class ToolsOverlay extends React.PureComponent {
         >
           <div
             className={classNames({
-              "tools-container": true,
-              "is-styling-open": isToolStyleOpen
+              'tools-container': true,
+              'is-styling-open': isToolStyleOpen
             })}
           >
             {Component}
@@ -230,7 +233,7 @@ class ToolsOverlay extends React.PureComponent {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   isDisabled: selectors.isElementDisabled(state, 'toolsOverlay'),
   isOpen: selectors.isElementOpen(state, 'toolsOverlay'),
   isToolStyleOpen: selectors.isElementOpen(state, 'toolStylePopup'),
@@ -238,7 +241,8 @@ const mapStateToProps = state => ({
   activeHeaderItems: selectors.getToolsHeaderItems(state),
   activeToolGroup: selectors.getActiveToolGroup(state),
   activeToolName: selectors.getActiveToolName(state),
-  isInDesktopOnlyMode: selectors.isInDesktopOnlyMode(state)
+  isInDesktopOnlyMode: selectors.isInDesktopOnlyMode(state),
+  showPresets: selectors.shouldShowPresets(state),
 });
 
 const mapDispatchToProps = {
@@ -250,7 +254,7 @@ const mapDispatchToProps = {
 
 const ConnectedToolsOverlay = connect(mapStateToProps, mapDispatchToProps)(withTranslation()(ToolsOverlay));
 
-export default props => {
+const connectedComponent = (props) => {
   const isMobile = useMedia(
     // Media queries
     ['(max-width: 640px)'],
@@ -279,3 +283,5 @@ export default props => {
     <ConnectedToolsOverlay {...props} isMobile={isMobile} isTabletAndMobile={isTabletAndMobile} isDesktop={isDesktop} />
   );
 };
+
+export default connectedComponent;

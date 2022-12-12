@@ -49,12 +49,13 @@ import downloadPdf from 'helpers/downloadPdf';
 import { workerTypes } from 'constants/types';
 import core from 'core';
 
-export default store => async (options = { includeAnnotations: true }) => {
+export default (store) => async (options = { includeAnnotations: true }) => {
   const documentType = core.getDocument()?.getType();
-  const { PDF, WEBVIEWER_SERVER, OFFICE } = workerTypes;
+  const { PDF, WEBVIEWER_SERVER, OFFICE, IMAGE } = workerTypes;
 
   if (
     documentType !== PDF &&
+    documentType !== IMAGE &&
     documentType !== OFFICE &&
     documentType !== WEBVIEWER_SERVER
   ) {

@@ -58,7 +58,7 @@ const NoteTextarea = React.forwardRef((props, forwardedRef) => {
 
   const textareaProps = {
     ...props,
-    ref: el => {
+    ref: (el) => {
       textareaRef.current = el;
       forwardedRef(el);
     },

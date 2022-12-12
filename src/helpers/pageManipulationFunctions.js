@@ -1,59 +1,69 @@
-import extractPagesWithAnnotations from "helpers/extractPagesWithAnnotations";
+import extractPagesWithAnnotations from 'helpers/extractPagesWithAnnotations';
 import core from 'core';
 import { saveAs } from 'file-saver';
 import actions from 'actions';
 import i18next from 'i18next';
-import { workerTypes } from "constants/types";
+import { workerTypes } from 'constants/types';
+import { redactionTypeMap } from 'constants/redactionTypes';
 
-const getNewRotation = (curr, counter_clockwise = false) => {
-  const { e_0, e_90, e_180, e_270 } = window.Core.PageRotation;
+const getNewRotation = (curr, counterClockwise = false) => {
+  const { E_0, E_90, E_180, E_270 } = window.Core.PageRotation;
   switch (curr) {
-    case e_270:
-      return counter_clockwise ? e_180 : e_0;
-    case e_180:
-      return counter_clockwise ? e_90 : e_270;
-    case e_90:
-      return counter_clockwise ? e_0 : e_180;
+    case E_270:
+      return counterClockwise ? E_180 : E_0;
+    case E_180:
+      return counterClockwise ? E_90 : E_270;
+    case E_90:
+      return counterClockwise ? E_0 : E_180;
     default:
-      return counter_clockwise ? e_270 : e_90;
+      return counterClockwise ? E_270 : E_90;
   }
 };
 
-const rotateClockwise = pageNumbers => {
-  if (workerTypes.PDF !== core.getDocument()?.type) {
+const canRotateLoadedDocument = () => {
+  const doc = core.getDocument();
+  const docType = doc?.type;
+
+  return (
+    workerTypes.PDF === docType ||
+    workerTypes.IMAGE === docType ||
+    (docType === workerTypes.WEBVIEWER_SERVER && !doc.isWebViewerServerDocument())
+  );
+};
+
+const rotatePages = (pageNumbers, counterClockwise) => {
+  if (canRotateLoadedDocument()) {
+    const rotation = counterClockwise ? window.Core.PageRotation.E_270 : window.Core.PageRotation.E_90;
+    pageNumbers.forEach((index) => {
+      core.rotatePages([index], rotation);
+    });
+  } else {
     const docViewer = core.getDocumentViewer();
     const currentRotations = docViewer.getPageRotations();
     for (const page of pageNumbers) {
-      docViewer.setRotation(getNewRotation(currentRotations[page], false), page);
+      docViewer.setRotation(getNewRotation(currentRotations[page], counterClockwise), page);
     }
   }
-  pageNumbers.forEach(index => {
-    core.rotatePages([index], window.Core.PageRotation.e_90);
-  });
 };
 
-const rotateCounterClockwise = pageNumbers => {
-  if (workerTypes.PDF !== core.getDocument()?.type) {
-    const docViewer = core.getDocumentViewer();
-    const currentRotations = docViewer.getPageRotations();
-    for (const page of pageNumbers) {
-      docViewer.setRotation(getNewRotation(currentRotations[page], true), page);
-    }
-  }
-  pageNumbers.forEach(index => {
-    core.rotatePages([index], window.Core.PageRotation.e_270);
-  });
+const rotateClockwise = (pageNumbers) => {
+  rotatePages(pageNumbers, false);
 };
 
-const insertAbove = pageNumbers => {
+const rotateCounterClockwise = (pageNumbers) => {
+  rotatePages(pageNumbers, true);
+};
+
+const insertAbove = (pageNumbers) => {
   core.insertBlankPages(pageNumbers, core.getPageWidth(pageNumbers[0]), core.getPageHeight(pageNumbers[0]));
 };
 
-const insertBelow = pageNumbers => {
-  core.insertBlankPages(pageNumbers.map(i => i + 1), core.getPageWidth(pageNumbers[0]), core.getPageHeight(pageNumbers[0]));
+const insertBelow = (pageNumbers) => {
+  core.insertBlankPages(pageNumbers.map((i) => i + 1), core.getPageWidth(pageNumbers[0]), core.getPageHeight(pageNumbers[0]));
 };
 
-const replace = dispatch => {
+const replace = (dispatch) => {
+  dispatch(actions.closeElement('pageManipulationOverlay'));
   dispatch(actions.openElement('pageReplacementModal'));
 };
 
@@ -67,13 +77,12 @@ const extractPages = (pageNumbers, dispatch) => {
     message,
     title,
     confirmBtnText,
-    onConfirm: () =>
-      extractPagesWithAnnotations(pageNumbers).then(file => {
-        saveAs(file, 'extractedDocument.pdf');
-      }),
+    onConfirm: () => extractPagesWithAnnotations(pageNumbers).then((file) => {
+      saveAs(file, 'extractedDocument.pdf');
+    }),
     secondaryBtnText,
     onSecondary: () => {
-      extractPagesWithAnnotations(pageNumbers).then(file => {
+      extractPagesWithAnnotations(pageNumbers).then((file) => {
         saveAs(file, 'extractedDocument.pdf');
         core.removePages(pageNumbers).then(() => {
           dispatch(actions.setSelectedPageThumbnails([]));
@@ -86,7 +95,6 @@ const extractPages = (pageNumbers, dispatch) => {
 };
 
 const deletePages = (pageNumbers, dispatch, isModalEnabled = true) => {
-
   if (isModalEnabled) {
     let message = i18next.t('warning.deletePage.deleteMessage');
     const title = i18next.t('warning.deletePage.deleteTitle');
@@ -96,10 +104,9 @@ const deletePages = (pageNumbers, dispatch, isModalEnabled = true) => {
       message,
       title,
       confirmBtnText,
-      onConfirm: () =>
-        core.removePages(pageNumbers).then(() => {
-          dispatch(actions.setSelectedPageThumbnails([]));
-        }),
+      onConfirm: () => core.removePages(pageNumbers).then(() => {
+        dispatch(actions.setSelectedPageThumbnails([]));
+      }),
     };
 
     if (core.getDocumentViewer().getPageCount() === pageNumbers.length) {
@@ -121,11 +128,11 @@ const deletePages = (pageNumbers, dispatch, isModalEnabled = true) => {
   }
 };
 
-const movePagesToBottom = pageNumbers => {
+const movePagesToBottom = (pageNumbers) => {
   core.movePages(pageNumbers, core.getTotalPages() + 1);
 };
 
-const movePagesToTop = pageNumbers => {
+const movePagesToTop = (pageNumbers) => {
   core.movePages(pageNumbers, 0);
 };
 
@@ -149,6 +156,49 @@ const noPagesSelectedWarning = (pageNumbers, dispatch) => {
   return false;
 };
 
+const redactPages = (pageNumbers, redactionStyles) => {
+  core.applyRedactions(createPageRedactions(pageNumbers, redactionStyles));
+};
+
+const createPageRedactions = (pageNumbers, redactionStyles) => {
+  const annots = [];
+  for (const page of pageNumbers) {
+    const pageInfo = core.getPageInfo(page);
+    if (pageInfo) {
+      const redaction = new Annotations.RedactionAnnotation({
+        PageNumber: page,
+        Rect: new Annotations.Rect(0, 0, pageInfo.width, pageInfo.height),
+        ...redactionStyles
+      });
+      redaction.type = redactionTypeMap['FULL_PAGE'];
+      redaction.setCustomData('trn-redaction-type', redactionTypeMap['FULL_PAGE']);
+      redaction.Author = core.getCurrentUser();
+      annots.push(redaction);
+    }
+  }
+  core.getAnnotationManager().addAnnotations(annots);
+  core.getAnnotationManager().drawAnnotationsFromList(annots);
+  return annots;
+};
+
+const replacePages = async (sourceDoc, pagesToRemove, pagesToReplaceIntoDocument) => {
+  const documentLoadedInViewer = core.getDocument();
+  const pageCountOfLoadedDocument = documentLoadedInViewer.getPageCount();
+  const pagesToRemoveFromOriginal = pagesToRemove.sort((a, b) => a - b);
+
+  // If document to replace into has only one page, or we are replacing all pages
+  // then we can insert pages at the end, and then remove the pages to avoid an error of removing all pages
+  if (pageCountOfLoadedDocument === 1 || pagesToRemoveFromOriginal.length === pageCountOfLoadedDocument) {
+    await documentLoadedInViewer.insertPages(sourceDoc, pagesToReplaceIntoDocument);
+    await documentLoadedInViewer.removePages(pagesToRemoveFromOriginal);
+  } else {
+    // If document to replace into has > 1 page we need insert the new pages at the spot of the first removed page
+    // pagesToRemoveFromOriginal is sorted in ascending order. Interleaving pages would be complex.
+    await documentLoadedInViewer.removePages(pagesToRemoveFromOriginal);
+    await documentLoadedInViewer.insertPages(sourceDoc, pagesToReplaceIntoDocument, pagesToRemoveFromOriginal[0]);
+  }
+};
+
 export {
   rotateClockwise,
   rotateCounterClockwise,
@@ -160,4 +210,7 @@ export {
   movePagesToBottom,
   movePagesToTop,
   noPagesSelectedWarning,
+  redactPages,
+  createPageRedactions,
+  replacePages,
 };

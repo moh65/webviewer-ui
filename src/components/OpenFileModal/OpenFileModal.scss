@@ -1,0 +1,54 @@
+@import '../../constants/styles';
+@import '../../constants/modal';
+
+.OpenFileModal {
+  .container {
+    overflow-y: unset;
+    width: 600px;
+  }
+  .image-signature {
+    height: 240px !important;
+    width: 100%;
+  }
+  .error {
+    color: red;
+    margin: 5px;
+  }
+  .extension-dropdown {
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+
+    p {
+      width: 100%;
+      font-size: 13px;
+      line-height: 16px;
+      font-weight: 700;
+      order: 1;
+    }
+    .Dropdown__wrapper {
+      order: 2;
+      width: 100%;
+
+      .Dropdown {
+        width: 100% !important; // To ovveride the default with of dropdown
+      }
+
+      .Dropdown__items {
+        width: 100%;
+      }
+
+      .arrow {
+        flex: unset;
+        width: 12px;
+        height: 16px;
+        margin-top: 2px;
+      }
+
+      .Dropdown .picked-option .picked-option-text {
+        flex: none;
+        width: unset;
+      }
+    }
+  }
+}

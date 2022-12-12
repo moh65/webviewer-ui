@@ -1,12 +1,11 @@
 import React from 'react';
 import { render, fireEvent, queryByText } from '@testing-library/react';
-import { Basic as BasicStory } from "./Dropdown.stories";
+import { Basic as BasicStory } from './Dropdown.stories';
 
 // wrap component with i18n provider, so component can use useTranslation()
 const DropdownStory = withI18n(BasicStory);
 
 describe('Dropdown component', () => {
-
   it('Should select item correctly', () => {
     const { container } = render(<DropdownStory />);
 
@@ -31,7 +30,7 @@ describe('Dropdown component', () => {
     expect(dropdownItems).not.toHaveClass('hide');
 
     // click Status button and make sure active element is changed to Status
-    const statusButton = queryByText(dropdownItems,'Status');
+    const statusButton = queryByText(dropdownItems, 'Status');
     fireEvent.click(statusButton);
     activeButton = container.querySelector('.active');
     expect(activeButton).toHaveTextContent('Status');

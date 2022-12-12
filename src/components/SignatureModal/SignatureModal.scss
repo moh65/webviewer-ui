@@ -1,52 +1,74 @@
 @import '../../constants/styles';
 @import '../../constants/modal';
+@import "../../constants/tabs";
 
 .SignatureModal {
   @extend %modal;
 
-  .tab-list {
-    font-size: 14px; // hack for extra area in the tab list. 13px looks bad.
-  }
-
-  .ColorPalette {
-    margin-bottom: 8px;
-    width: auto;
-  }
-
   .container {
     @extend %modal-shared-container-style;
+    @extend %modal-shared-container-style-mobile;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: space-between;
+    width: 480px;
+    padding: 0px;
     border-radius: 4px;
-    box-shadow: 0px 0px 3px 0px var(--document-box-shadow);
-    padding: 8px 8px;
+    box-shadow: 0px 0px 3px var(--document-box-shadow);
     background: var(--component-background);
 
+    &.include-initials {
+      width: 664px;
+    }
+
+
     @include mobile {
-      width: 100%;
+      border-radius: 0;
+      height: 440px;
+    }
+
+    @include tiny-browser-height {
+      display: grid;
+      height: 100%;
       position: fixed;
-      left: 0;
-      bottom: 0;
-      padding-top: 24px;
-      padding-bottom: 16px;
-      padding-left: 24px;
-      padding-right: 24px;
+      top: 0;
+      grid-template-rows: 100px auto 70px;
+      justify-content: normal;
+    }
 
-      .swipe-indicator {
-        background: var(--divider);
-        border-radius: 2px;
-        height: 4px;
-        width: 38px;
-        position: absolute;
-        top: 12px;
-        margin-left: auto;
-        margin-right: auto;
-        left: 0;
-        right: 0;
+    .header-container {
+      box-shadow: inset 0px -1px 0px var(--modal-stroke-and-border);
+      padding: 20px 16px 16px 16px;
+    }
 
-        @include tablet-and-desktop {
-          display: none;
+    .header {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 24px;
+
+      p {
+        font-size: 16px;
+        font-weight: 700;
+        width: 89.286%;
+        margin: 0;
+        margin-right: 16px;
+      }
+
+      .signatureModalCloseButton {
+        position: static;
+        height: 32px;
+        width: 32px;
+
+        &:hover {
+          background: var(--view-header-button-hover);
+          border-radius: 4px;
+        }
+
+        &.selected {
+          background: var(--view-header-button-active);
+          cursor: default;
         }
       }
     }
@@ -56,160 +78,101 @@
       box-shadow: none;
     }
 
-    .divider-horizontal {
-      width: 100%;
-      height: 1px;
-      margin-bottom: 8px;
-      background: var(--divider);
-    }
+    @extend %tab-panel;
 
     .tab-panel {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      .ColorPalette {
-        display: grid;
-        grid-template-columns: repeat(3,1fr);
-      }
+      overflow-y: auto;
     }
 
     .tab-list {
-      display: flex;
-      margin-bottom: 16px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-      height: 28px;
-      color: var(--text-color);
-      margin: 8px 0;
-      width: 100%;
+      font-size: 14px; // hack for extra area in the tab list. 13px looks bad.
+      margin-top: 12px;
 
       .tab-options-button {
         @include button-reset;
-        // flex breaks ellipsis text overflow for some reason
-        // display: flex;
-        // justify-content: center;
-        // align-items: center;
-        text-align: center;
-        vertical-align: middle;
-        line-height: 24px;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        flex: 1;
-        border-radius: 0px;
-        cursor: pointer;
-
-        &:first-child {
-          border-bottom-left-radius: 4px;
-          border-top-left-radius: 4px;
-        }
-
-        &:last-child {
-          border-bottom-right-radius: 4px;
-          border-top-right-radius: 4px;
-        }
-
-        &:hover {
-          background: var(--popup-button-hover);
-        }
-
-        &.selected {
-          background: var(--popup-button-active);
-          cursor: default;
-        }
-      }
-
-      .tab-options-divider {
-        width: 1px;
-        background: var(--divider);
       }
     }
 
-    .ActionButton {
-      margin-right: -13px;
+    @extend %tab-list;
 
-      &:hover {
-        background: transparent;
+    .signature-style-options {
+      width: 90%;
+      display: flex;
 
-        svg {
-          color: $pdftron-blue;
+      .ColorPalette {
+        margin: 8px;
+        grid-template-columns: repeat(3, 1fr);
+        width: 100px;
+
+        :not(:last-child) {
+          margin-right: 8px;
+        }
+
+        .cell-container {
+          width: 28px;
+          height: 28px;
+
+          @include tiny-browser-height {
+            width: 22px;
+            height: 22px;
+          }
+
+          .cell-outer {
+            .cell {
+              width: 16px;
+              height: 16px;
+
+              @include tiny-browser-height {
+                width: 14px;
+                height: 14px;
+              }
+            }
+          }
+
+          .cell-outer.active {
+            width: 28px;
+            height: 28px;
+
+            @include tiny-browser-height {
+              width: 22px;
+              height: 22px;
+            }
+          }
         }
       }
     }
 
+    .signature-clear {
+      @include button-reset;
+      color: var(--secondary-button-text);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      height: 28px;
+      width: 63px;
+      margin: auto 8px;
+      font-size: 13px;
+
+      &:enabled:hover {
+        color: var(--secondary-button-hover);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+      }
+    }
 
     .footer {
       display: flex;
-      padding-top: 12px;
+      padding: 16px;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       width: 100%;
-
-      .signature-save {
-        position: relative;
-        margin-left: 8px;
-        user-select: none;
-
-        input {
-          display: none;
-
-          & + label:before {
-            cursor: pointer;
-            content: '';
-            margin: 1px 10px 0px 0px;
-            display: inline-block;
-            vertical-align: text-top;
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
-            border: 1px solid #979797;
-          }
-
-          &:checked + label:before {
-            background: $pdftron-blue;
-            border: 1px solid transparent;
-          }
-
-          &:checked + label:after {
-            content: '';
-            position: absolute;
-            left: 4px;
-            top: 9px;
-            background: #ffffff;
-            width: 2px;
-            height: 2px;
-            box-shadow: 2px 0 0 #ffffff, 4px 0 0 #ffffff, 4px -2px 0 #ffffff,
-              4px -4px 0 #ffffff, 4px -6px 0 #ffffff, 4px -8px 0 #ffffff;
-            transform: rotate(45deg);
-          }
-        }
-
-        label {
-          display: flex;
-          align-items: center;
-        }
-      }
-
-      .signature-clear {
-        @include button-reset;
-        color: var(--secondary-button-text);
-        padding: 0 16px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-
-        &:enabled:hover {
-          color: var(--secondary-button-hover);
-        }
-
-        &:disabled {
-          opacity: 0.5;
-        }
-      }
+      box-shadow: inset 0px 1px 0px var(--modal-stroke-and-border);
+      margin: 0;
 
       .signature-create {
         @include button-reset;
@@ -217,17 +180,16 @@
         border-radius: 4px;
         padding: 0 8px;
         height: 32px;
+        width: 72px;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         color: var(--primary-button-text);
-        font-weight: bold;
         cursor: pointer;
 
         @include mobile {
-          height: 40px;
-          width: 128px;
+          font-size: 13px;
         }
 
         &:enabled:hover {
@@ -239,5 +201,163 @@
         }
       }
     }
+  }
+
+  .colorpalette-clear-container {
+    display: flex;
+    height: 44px;
+    box-sizing: border-box;
+    justify-content: space-between;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+
+    .signature-style-options {
+      width: 90%;
+      display: flex;
+
+      .divider {
+        display: inline-block;
+        border-left: 1px solid var(--modal-stroke-and-border);
+        margin: auto 8px auto 16px;
+        height: 16px;
+      }
+
+      .placeholder-dropdown {
+        width: 160px;
+        height: 31px;
+        margin: auto 0;
+      }
+
+
+      .Dropdown__wrapper {
+        width: 160px;
+        height: 31px;
+        margin: auto 0;
+        position: absolute;
+        margin-top: 6px;
+
+        .Dropdown {
+          width: 100% !important;
+          height: 100%;
+          text-align: left;
+        }
+
+        .picked-option-text {
+          margin-right: -18px;
+          padding-left: 2px;
+          font-size: 15px;
+        }
+
+        .arrow {
+          flex: unset;
+        }
+
+        .Dropdown__items {
+
+          bottom: auto;
+          top: 100%;
+          width: 100%;
+          left: 0;
+          right: auto;
+
+        }
+
+        .Dropdown__items button:nth-child(n) {
+          font-size: 15px;
+        }
+
+        .Dropdown__items button:nth-child(2) {
+          font-size: 13px;
+        }
+
+        .Dropdown__items button:nth-child(4) {
+          font-size: 18px;
+        }
+
+        .Dropdown__item {
+          display: block;
+          padding-right: 16px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+          text-align: left;
+        }
+      }
+    }
+  }
+
+  .footer-signature-clear {
+    @include button-reset;
+    color: var(--secondary-button-text);
+    display: flex;
+    flex: 0 0 0;
+    align-items: baseline;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    height: 28px;
+    width: 63px;
+    font-size: 13px;
+
+    &:enabled:hover {
+      color: var(--secondary-button-hover);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+
+  .signature-input {
+    background: var(--signature-draw-background);
+    border: 1px solid var(--modal-stroke-and-border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    width: 100%;
+    height: 200px;
+    border-radius: 4px;
+
+    &.full-signature {
+      flex: 1.5 0 0;
+    }
+
+    &.initials {
+      flex: 1 0 0;
+    }
+
+    @include small-browser-height {
+      height: 116px;
+    }
+
+    @include tiny-browser-height {
+      height: 86px;
+    }
+
+    &.image {
+      height: 244px;
+    }
+
+    &-footer {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+    }
+
+    .signature-prompt {
+      font-size: 10px;
+      color: var(--faded-text);
+      flex: 3 0 0;
+      text-align: center;
+    }
+  }
+
+  .signature-and-initials-container {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
   }
 }

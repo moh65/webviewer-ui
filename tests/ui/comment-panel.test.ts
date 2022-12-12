@@ -170,7 +170,7 @@ describe('Test cases for comment panel', () => {
     const instance = await result.waitForInstance();
     instance('openElement', 'notesPanel');
 
-    await result.iframe.click('[data-element=notesOrderDropdown] .down-arrow');
+    await result.iframe.click('[data-element=notesOrderDropdown] .arrow');
     await result.iframe.click('[data-element=dropdown-item-type]');
 
     let notesContainer = await result.iframe.$('.normal-notes-container .ListSeparator');
@@ -219,6 +219,57 @@ describe('Test cases for comment panel', () => {
     await page.waitFor(2000);
     const innerHTML1 = await noteContainer.evaluate((node) => node.innerHTML);
     expect(innerHTML1).toBe('<span><span style="font-style: italic;">T</span><span style="font-weight: bold; font-style: italic;">es</span><span style="font-style: italic;">t</span><span> </span></span><a href="http://www.google.ca" target="_blank" rel="noopener noreferrer"><span class="highlight"><span>ww</span><span style="text-decoration: line-through;">w</span></span><span style="text-decoration: line-through;">.go</span><span>ogle.c</span><span style=\"font-weight: bold; color: rgb(228, 66, 52);\">a</span></a><span style=\"font-weight: bold; color: rgb(228, 66, 52);\"> 12</span><span style=\"text-decoration: underline;\">34</span>');
+  });
+
+  it('should apply rich text style into Notes Panel comments and render them with rich text stylings', async () => {
+    
+    await addAndCreateAnnot(result.iframe, true, false, 'Adding Free Text', '');
+    const instance = await result.waitForInstance();
+
+    const annotId = await (result.iframe as Frame).evaluate(async () => {
+      const annots = window.instance.Core.documentViewer.getAnnotationManager().getAnnotationsList();
+      return annots[0].Id;
+    });
+
+    instance('openElement', 'notesPanel');
+    await page.waitFor(1000);
+    await selectAnnotation(annotId, result.iframe);
+
+    await result.iframe.focus(`#note_${annotId} .reply-area-container .ql-editor`);
+    await page.keyboard.type('Normal content ');
+    
+    // Activating bold style
+    await page.keyboard.down('ControlLeft');  
+    await page.keyboard.press('KeyB');
+    await page.keyboard.up('ControlLeft');
+    await page.keyboard.type('Bold content ');
+
+    // Activating Italic style
+    await page.keyboard.down('ControlLeft');  
+    await page.keyboard.press('KeyI');
+    await page.keyboard.up('ControlLeft');
+    await page.keyboard.type('Bold + Italic content ');
+
+    // Disabling Italic and bold style and activating Underline style
+    await page.keyboard.down('ControlLeft');  
+    await page.keyboard.press('KeyI');
+    await page.keyboard.press('KeyB');
+    await page.keyboard.press('KeyU');
+    await page.keyboard.up('ControlLeft');
+    await page.keyboard.type('Underline content');
+    
+    await page.keyboard.down('ControlLeft');
+    await page.keyboard.down('Enter');
+    await page.keyboard.up('ControlLeft');
+
+    await page.waitFor(500);
+    
+    await selectAnnotation(annotId, result.iframe);
+
+    const commentContainer = await result.iframe.$(`#note_${annotId} .container.reply-content`);
+   
+    const innerHTML1 = await commentContainer.evaluate((node) => node.innerHTML);
+    expect(innerHTML1).toBe(`<div class="note-text-preview preview-comment"><span>Normal content </span><span style="font-weight: bold;">Bold content </span><span style="font-weight: bold; font-style: italic;">Bold + Italic content </span><span style="text-decoration: underline;">Underline content</span> </div>`);
   });
 
   it.skip('should be able to only add reply to annotation that does not belong to user', async () => {
@@ -313,7 +364,7 @@ describe('Test cases for comment panel', () => {
       });
 
       // check if focusing on the textarea, can't think of any other way to tell if there is a blinking text cursor
-      expect(focusedElement).toBe('HTMLTextAreaElement');
+      expect(focusedElement).toBe('HTMLDivElement');
 
       const notePanel = await result.iframe.$('.NotesPanel .ReactVirtualized__Grid');
       const selectedScrollTop = await notePanel.evaluate((node) => node.scrollTop);
@@ -407,7 +458,7 @@ describe('Test cases for comment panel', () => {
         </annots>
       </xfdf>>`);
       // blurring so we don't have a blinking text cursor causing screenshot test to fail
-      (document.querySelector('.reply-area-container > div > textarea') as HTMLElement).blur();
+      (document.querySelector('.reply-area-container > div.reply-area > .comment-textarea .ql-editor') as HTMLElement).blur();
     });
 
     await page.waitFor(1000);
@@ -432,7 +483,7 @@ describe('Test cases for comment panel', () => {
     const saveButton = await result.iframe.$('.save-button');
     expect(await saveButton.evaluate((element) => element.classList.contains('disabled'))).toBeTruthy();
 
-    await result.iframe.focus('div.edit-content textarea');
+    await result.iframe.focus('div.edit-content .ql-editor');
     await page.keyboard.type('Some content');
 
     await page.waitFor(500);
@@ -446,7 +497,7 @@ describe('Test cases for comment panel', () => {
     const replyButton = await result.iframe.$('.reply-button');
     expect(await replyButton.evaluate((element) => element.classList.contains('disabled'))).toBeTruthy();
 
-    await result.iframe.focus('div.reply-area-container textarea');
+    await result.iframe.focus('form.reply-area-container .ql-editor');
     await page.keyboard.type('Some reply');
 
     await page.waitFor(500);
@@ -489,6 +540,8 @@ describe('Test cases for comment panel', () => {
     await (result.iframe as Frame).evaluate(async () => {
       window.instance.UI.enableFeatures(window.instance.UI.Feature.NotesPanelVirtualizedList);
     });
+
+    await page.waitFor(1000);
 
     const virtualNoteEleCount = await (result.iframe as Frame).evaluate(async () => {
       return Array.from(document.querySelectorAll('.Note')).length;
@@ -658,6 +711,14 @@ describe('Test cases for comment panel', () => {
     });
 
     expect(duplicateCount).toEqual(2);
+
+    // Test disabling "sortContainer" data element
+    const sortContainer = await result.iframe.$('[data-element=sortContainer]');
+    expect(sortContainer).not.toBe(null);
+    await instance('disableElements', ['sortContainer']);
+
+    const sortContainer2 = await result.iframe.$('[data-element=sortContainer]');
+    expect(sortContainer2).toBe(null);
   });
 
   it(
@@ -736,4 +797,145 @@ describe('Test cases for comment panel', () => {
       expect(noteEleCount).toBe(0);
     }
   );
+
+  it('should add comment note by only clicking Enter after call enableNoteSubmissionWithEnter', async () => {
+    await page.waitFor(Timeouts.PDF_PRIME_DOCUMENT);
+
+    const instance = await result.waitForInstance();
+
+    await instance('setToolMode', 'AnnotationCreateSticky');
+    const pageContainer = await result.iframe.$('#pageContainer1');
+    const { x, y } = await pageContainer.boundingBox();
+    await page.mouse.click(x + 100, y + 20);
+
+    await page.waitFor(1000);
+
+    await result.iframe.focus('div.edit-content .ql-editor');
+    await page.keyboard.type('Some content');
+
+    await page.waitFor(500);
+
+    await page.keyboard.down('Enter');
+
+    const noteSubmissionWithEnterNotEnableCount = await (result.iframe as Frame).evaluate(async () => {
+      return Array.from(document.querySelectorAll('.NoteContent .container')).length;
+    });
+
+    expect(noteSubmissionWithEnterNotEnableCount).toBe(0);
+
+    // After call enableNoteSubmissionWithEnter API, it will be able to add the note by clicking Enter
+    await instance('enableNoteSubmissionWithEnter');
+    await page.waitFor(2000);
+
+    await result.iframe.focus('div.edit-content .ql-editor');
+    await page.keyboard.down('Enter');
+
+    const noteSubmissionWithEnterEnableCount = await (result.iframe as Frame).evaluate(async () => {
+      return Array.from(document.querySelectorAll('.NoteContent .container')).length;
+    });
+
+    expect(noteSubmissionWithEnterEnableCount).toBe(1);
+    await instance('disableNoteSubmissionWithEnter');
+    await page.waitFor(2000);
+  });
+
+  it.skip('should use correct icon for annotation comments', async () => {
+    const { iframe, waitForWVEvent, waitForInstance } = await loadViewerSample('viewing/viewing');
+
+    const instance = await waitForInstance();
+    await waitForWVEvent('documentLoaded');
+    await iframe.evaluate(async () => {
+      const stampAnnot = new window.Annotations.StampAnnotation();
+      stampAnnot.PageNumber = 1;
+      stampAnnot.X = 100;
+      stampAnnot.Y = 250;
+      stampAnnot.Width = 275;
+      stampAnnot.Height = 40;
+      const keepAsSVG = false;
+      const dd = 'data:image/png;base64,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';
+      await stampAnnot.setImageData(dd, keepAsSVG);
+      const annotationManager = window.instance.docViewer.getAnnotationManager();
+      stampAnnot.Author = annotationManager.getCurrentUser();
+      window.instance.Core.documentViewer.getAnnotationManager().addAnnotation(stampAnnot);
+      window.instance.Core.documentViewer.getAnnotationManager().redrawAnnotation(stampAnnot);
+    });
+
+    await page.waitFor(Timeouts.WIDGETS_IN_DOM);
+    await instance('openElement', 'notesPanel');
+    await page.waitFor(2000);
+    const notesPanelContainer = await iframe.$('.NoteContent .type-icon-container');
+
+    const image0 = await notesPanelContainer.screenshot();
+    expect(image0).toMatchImageSnapshot({
+      customSnapshotIdentifier: 'image-stamp-annotation-icon',
+    });
+  });
+
+  it('should be able to disable the collapse of the Notes Panel text and show the truncate text', async () => {
+    const instance = await result.waitForInstance();
+
+    await instance('loadDocument', '/test-files/VirtualizedAnnotTest.pdf');
+    await result.waitForWVEvent('annotationsLoaded');
+
+    instance('openElement', 'notesPanel');
+    await page.waitFor(500);
+
+    const moreButtonSelector = '.virtualized-notes-container .ReactVirtualized__Grid__innerScrollContainer > div > .note-wrapper .note-text-preview .note-text-preview-prompt';
+   
+    // The collapse of text is enable so the button with 'more' label should be visible
+    const showMoreTextButton = await result.iframe.$(moreButtonSelector);
+    expect(await showMoreTextButton.evaluate((node) => node.innerHTML)).toBe('...more');
+
+    await (result.iframe as Frame).evaluate(async () => {
+      window.instance.UI.NotesPanel.disableTextCollapse();
+    });
+    
+    instance('closeElements', ['notesPanel']);
+    await page.waitFor(500);
+
+    instance('openElement', 'notesPanel');
+    await page.waitFor(500);
+    
+    // After disable the collapse of texts feature, the 'more' button should not be visible
+    expect(await showMoreTextButton.evaluate((node) => node)).toBeFalsy();
+  });
+
+  it('should add a note with mentions active and not crash', async () => {
+    const instance = await result.waitForInstance();
+
+    await (result.iframe as Frame).evaluate(async () => {
+      const userData = [
+        {
+          value: 'John Doe', // required property
+          id: 'johndoe@gmail.com', // optional property
+          email: 'johndoe@gmail.com', // optional property
+        },
+        {
+          value: 'Jane Doe',
+          id: 'janedoe@gmail.com',
+          email: 'janedoe@gmail.com'
+        },
+        {
+          value: 'Random Name',
+          id: 'userID1',
+          email: 'verydifferentemail@gmail.com'
+        },
+      ];
+      
+      instance.UI.mentions.setUserData(userData);
+    });
+    
+    await instance('setToolMode', 'AnnotationCreateSticky');
+    const pageContainer = await result.iframe.$('#pageContainer1');
+    const { x, y } = await pageContainer.boundingBox();
+    await page.mouse.click(x + 100, y + 20);
+
+    await page.waitFor(1000);
+
+    const annotCount = await (result.iframe as Frame).evaluate(async () => {
+      return window.instance.Core.documentViewer.getAnnotationManager().getAnnotationsList().length;
+    });
+
+    expect(annotCount).toBe(1);
+  });
 });

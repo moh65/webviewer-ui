@@ -1,52 +1,50 @@
 @import '../../constants/styles';
 @import '../../constants/modal';
+@import "../../constants/tabs";
 
-.PageReplacementModal {
+.PageReplacementModal, .OpenFileModal {
   @extend %modal;
 
   .container {
     @extend %modal-shared-container-style;
+    @extend %modal-shared-container-style-mobile;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     border-radius: 4px;
     box-shadow: 0px 0px 3px 0px var(--document-box-shadow);
-    padding: 8px;
+    padding: 20px 16px 16px 16px;
     background: var(--component-background);
-    width: 825px;
+    width: 888px;
 
     @include tablet {
       width: 625px;
+
       .modal-body-container {
         width: 609px;
       }
     }
+    .header{
+      margin-bottom: 6px;
+    }
+
+    .Button {
+      height: 100%;
+      justify-content: right;
+    }
+
+    .page-replacement-divider {
+      border-top: 1px solid var(--divider);
+      margin: 18px 0px 16px 0px;
+      width: 100%;
+    }
 
     @include mobile {
-      width: 100%;
-      position: fixed;
-      left: 0;
-      bottom: 0;
+      box-sizing: border-box;
       padding-top: 24px;
       padding-bottom: 16px;
       padding-left: 24px;
       padding-right: 24px;
-      min-width: 100px;
-      .swipe-indicator {
-        background: var(--divider);
-        border-radius: 2px;
-        height: 4px;
-        width: 38px;
-        position: absolute;
-        top: 12px;
-        margin-left: auto;
-        margin-right: auto;
-        left: 0;
-        right: 0;
-
-        @include tablet-and-desktop {
-          display: none;
-        }
-      }
 
       .modal-body-container {
         max-height: 350px;
@@ -55,25 +53,31 @@
     }
 
     &.tabs {
-      width: 466px;
-      @include tablet {
-        width: 466px;
+      width: 479px;
+      height: 436px;
+
+      @include mobile {
+        height: 450px;
       }
     }
 
     .header {
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-between;
       width: 100%;
-      margin-top: 4px;
-      margin-bottom: 10px;
-      font-size: 15px;
+      font-size: 16px;
+      line-height: 24px;
     }
 
     .footer {
-      margin-top: 8px;
-      position: relative;
-      .modal-close {
+      margin-top: 0px;
+      justify-content: flex-end;
+
+      &.isFileSelected {
+        justify-content: space-between;
+      }
+
+      .deselect-thumbnails {
         @include button-reset;
         color: var(--secondary-button-text);
         padding: 0 8px;
@@ -82,19 +86,23 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        position: absolute;
-        left:0px;
 
         &:hover {
           color: var(--secondary-button-hover);
         }
+
+        &.disabled {
+          visibility: hidden
+        }
       }
+
       .modal-btn {
         @include button-reset;
         background: var(--primary-button);
         border-radius: 4px;
         padding: 0 20px;
-        height: 26px;
+        height: 32px;
+        width: 67px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -112,8 +120,10 @@
           background: var(--primary-button-hover);
         }
       }
-      .modal-btn.disabled {
+
+      .modal-btn.noFile {
         opacity: 0.5;
+        cursor: not-allowed;
       }
     }
 
@@ -124,71 +134,38 @@
 
       .modal-body-container {
         height: 350px;
-        width: 786px;
+        width: 856px;
+        padding: 16px 0px 16px 16px;
+        border-radius: 4px;
         overflow: auto;
+        background-color: var(--gray-2);
+
+        &.isLoading {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
       }
     }
 
-    .tab-panel {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    @extend %tab-panel;
 
-      .panel-body {
-        width: 450px;
-        height: 220px;
-        position: relative;
-        border-radius: 4px;
-        background: var(--faded-component-background);
-      }
+    .tab-panel .panel-body {
+      width: 100%;
+      height: 240px;
+      position: relative;
+      border-radius: 4px;
+      background: var(--faded-component-background);
     }
 
     .tab-list {
-      display: flex;
-      margin-bottom: 16px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-      height: 28px;
-      color: var(--text-color);
-      margin: 8px 0;
-      width: 100%;
+      margin-bottom: 1px;
+
       .tab-options-button {
         @include button-reset;
-        text-align: center;
-        vertical-align: middle;
-        line-height: 24px;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        flex: 1;
-        border-radius: 0px;
-        cursor: pointer;
-
-        &:first-child {
-          border-bottom-left-radius: 4px;
-          border-top-left-radius: 4px;
-        }
-
-        &:last-child {
-          border-bottom-right-radius: 4px;
-          border-top-right-radius: 4px;
-        }
-
-        &:hover {
-          background: var(--popup-button-hover);
-        }
-
-        &.selected {
-          background: var(--popup-button-active);
-          cursor: default;
-        }
-      }
-
-      .tab-options-divider {
-        width: 1px;
-        background: var(--divider);
       }
     }
+
+    @extend %tab-list;
   }
 }

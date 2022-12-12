@@ -98,6 +98,11 @@ class ToolGroupButton extends React.PureComponent {
       }
     }
 
+    if (toolName.indexOf('AnnotationCreateRedaction') > -1 && !isActive) {
+      // The redaction icon needs a default fill for it's inactive state
+      fillColor = '868E96';
+    }
+
     return allButtonsInGroupDisabled ? null : (
       <DataElementWrapper
         className={classNames({
@@ -145,7 +150,7 @@ const mapDispatchToProps = {
 
 const ConnectedToolGroupButton = connect(mapStateToProps, mapDispatchToProps)(ToolGroupButton);
 
-export default props => {
+const connectedComponent = (props) => {
   const isTabletAndMobile = useMedia(
     // Media queries
     ['(max-width: 900px)'],
@@ -158,3 +163,5 @@ export default props => {
     <ConnectedToolGroupButton {...props} isTabletAndMobile={isTabletAndMobile} />
   );
 };
+
+export default connectedComponent;

@@ -10,9 +10,9 @@ import { shortcutAria } from 'helpers/hotkeysManager';
 
 import selectors from 'selectors';
 
-import './Button.scss'; 
+import './Button.scss';
 
-const NOOP = e => {
+const NOOP = (e) => {
   e?.stopPropagation();
   e?.preventDefault();
 };
@@ -29,18 +29,21 @@ const propTypes = {
   onClick: PropTypes.func,
   onDoubleClick: PropTypes.func,
   onMouseUp: PropTypes.func,
+  isSubmitType: PropTypes.bool,
   /** Will override translated title if both given. */
   ariaLabel: PropTypes.string,
   role: PropTypes.string,
   hideTooltipShortcut: PropTypes.bool,
   useI18String: PropTypes.bool,
+  shouldPassActiveDocumentViewerKeyToOnClickHandler: PropTypes.bool,
 };
 
-const Button = props => {
-  const [removeElement, customOverrides = {}] = useSelector(
-    state => [
+const Button = (props) => {
+  const [removeElement, customOverrides = {}, activeDocumentViewerKey = 1] = useSelector(
+    (state) => [
       selectors.isElementDisabled(state, props.dataElement),
       selectors.getCustomElementOverrides(state, props.dataElement),
+      selectors.getActiveDocumentViewerKey(state),
     ],
     shallowEqual,
   );
@@ -55,7 +58,7 @@ const Button = props => {
     img,
     tabIndex,
     label,
-    useI18String=true,
+    useI18String = true,
     color,
     dataElement,
     onClick,
@@ -70,7 +73,10 @@ const Button = props => {
     fillColor,
     hideTooltipShortcut,
     iconClassName,
-    forceTooltipPosition
+    forceTooltipPosition,
+    isSubmitType,
+    hideOnClick,
+    shouldPassActiveDocumentViewerKeyToOnClickHandler,
   } = { ...props, ...customOverrides };
   const [t] = useTranslation();
 
@@ -85,6 +91,12 @@ const Button = props => {
 
   // for backwards compatibility
   const actuallyDisabled = disable || disabled;
+  let onClickHandler;
+  if (shouldPassActiveDocumentViewerKeyToOnClickHandler) {
+    onClickHandler = () => onClick(activeDocumentViewerKey);
+  } else {
+    onClickHandler = onClick;
+  }
 
   // if there is no file extension then assume that this is a glyph
   const isGlyph =
@@ -104,13 +116,15 @@ const Button = props => {
       // Can't use button disabled property here.
       // Because mouse events won't fire and we want them to
       // so that we can show the button tooltip
-      onClick={actuallyDisabled ? NOOP : onClick}
+      onClick={actuallyDisabled ? NOOP : onClickHandler}
       onDoubleClick={actuallyDisabled ? NOOP : onDoubleClick}
       onMouseUp={actuallyDisabled ? NOOP : onMouseUp}
       aria-label={aLabel}
       role={role}
       tabIndex={tabIndex}
       aria-keyshortcuts={ariaKeyshortcuts}
+      type={isSubmitType ? 'submit' : 'button'}
+      disabled={actuallyDisabled}
     >
       {isGlyph && (
         <Icon
@@ -125,8 +139,8 @@ const Button = props => {
       {imgToShow && !isGlyph && <img src={imgToShow} />}
       {
         label && (useI18String ?
-        <span>{t(label)}</span> :
-        <span>{label}</span>)
+          <span>{t(label)}</span> :
+          <span>{label}</span>)
       }
     </button>
   );
@@ -135,7 +149,9 @@ const Button = props => {
     <Tooltip
       content={title}
       hideShortcut={hideTooltipShortcut || actuallyDisabled}
-      forcePosition={forceTooltipPosition}>
+      forcePosition={forceTooltipPosition}
+      hideOnClick={hideOnClick}
+    >
       {children}
     </Tooltip>
   ) : (

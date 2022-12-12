@@ -1,9 +1,14 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
-import SearchOverlay from "./SearchOverlay";
-import { Basic } from "./SearchOverlay.stories";
-import { executeSearch, selectNextResult, selectPreviousResult } from "./SearchOverlayContainer";
+import SearchOverlay from './SearchOverlay';
+import { Basic } from './SearchOverlay.stories';
+import { executeSearch, selectNextResult, selectPreviousResult } from './SearchOverlayContainer';
 import core from 'core';
+
+// To create mocks of something that executeSearch uses we need to first import them
+// and then call jest.mock them.
+import { getOverrideSearchExecution } from 'helpers/search';
+import searchTextFullFactory from '../../apis/searchTextFull';
 
 // wrap story component with i18n provider, so component can use useTranslation()
 const BasicSearchOverlayStory = withI18n(Basic);
@@ -14,17 +19,13 @@ const TestSearchOverlay = withProviders(SearchOverlay);
 // thus having excessive comments
 
 function noop() {}
-
-
-// To create mocks of something that executeSearch uses we need to first import them
-// and then call jest.mock them.
-import { getOverrideSearchExecution } from "helpers/search";
-import searchTextFullFactory from '../../apis/searchTextFull';
 jest.mock('../../apis/searchTextFull');
 // To override something else that default export, we need to use factory function
 jest.mock('helpers/search', () => {
   return {
     getOverrideSearchExecution: jest.fn(),
+    addSearchListener: jest.fn(),
+    removeSearchListener: jest.fn(),
   };
 });
 
@@ -32,11 +33,11 @@ jest.mock('core');
 
 
 describe('SearchOverlay', () => {
-
   beforeEach(() => {
     searchTextFullFactory.mockReset();
     getOverrideSearchExecution.mockReset();
   });
+
   describe('Component', () => {
     // It's good practice to test that all stories of current component work without throwing errors.
     // In some cases when changing code (or configuration), we forget to make necessary changes to
@@ -54,9 +55,11 @@ describe('SearchOverlay', () => {
         <TestSearchOverlay
           setSearchValue={noop}
           setCaseSensitive={noop}
+          setSearchStatus={noop}
           setWholeWord={noop}
           setWildcard={noop}
           executeSearch={noop}
+          setReplaceValue={noop}
           isSearchOverlayDisabled
         />
       );
@@ -70,35 +73,22 @@ describe('SearchOverlay', () => {
       const { container } = render(
         <TestSearchOverlay
           setSearchValue={noop}
+          setSearchStatus={noop}
           setCaseSensitive={noop}
           setWholeWord={noop}
           setWildcard={noop}
+          setReplaceValue={noop}
           executeSearch={executeSearch}
         />
       );
       const searchInput = container.querySelector('#SearchPanel__input');
       expect(searchInput).toBeInTheDocument();
       fireEvent.keyDown(searchInput, { key: 'Enter', code: 'Enter' });
-      expect(executeSearch).toHaveBeenCalled();
+      setTimeout(() => {
+        expect(executeSearch).toHaveBeenCalled();
+      }, 1000);
     });
 
-    it('Should execute search when search button clicked', () => {
-      const executeSearch = jest.fn();
-      const { container } = render(
-        <TestSearchOverlay
-          setSearchValue={noop}
-          setCaseSensitive={noop}
-          setWholeWord={noop}
-          setWildcard={noop}
-          executeSearch={executeSearch}
-        />
-      );
-
-      const searchButton = container.querySelector('.input-button');
-      expect(searchButton).toBeInTheDocument();
-      fireEvent.click(searchButton);
-      expect(executeSearch).toHaveBeenCalled();
-    });
 
     it('Should execute search when case sensitive checkbox changed', () => {
       const executeSearch = jest.fn();
@@ -110,6 +100,7 @@ describe('SearchOverlay', () => {
           setCaseSensitive={noop}
           setWholeWord={noop}
           setWildcard={noop}
+          setReplaceValue={noop}
           executeSearch={executeSearch}
         />
       );
@@ -117,7 +108,7 @@ describe('SearchOverlay', () => {
       const checkbox = container.querySelector('#case-sensitive-option');
       expect(checkbox).toBeInTheDocument();
       fireEvent.click(checkbox);
-      expect(executeSearch).not.toBeCalled();
+      expect(executeSearch).toBeCalled();
     });
 
     it('Should execute search when whole word checkbox changed', () => {
@@ -130,6 +121,7 @@ describe('SearchOverlay', () => {
           setCaseSensitive={noop}
           setWholeWord={noop}
           setWildcard={noop}
+          setReplaceValue={noop}
           executeSearch={executeSearch}
         />
       );
@@ -137,7 +129,7 @@ describe('SearchOverlay', () => {
       const checkbox = container.querySelector('#whole-word-option');
       expect(checkbox).toBeInTheDocument();
       fireEvent.click(checkbox);
-      expect(executeSearch).not.toBeCalled();
+      expect(executeSearch).toBeCalled();
     });
 
     it('Should render wild card checkbox and execute search when checkbox changed', () => {
@@ -150,6 +142,7 @@ describe('SearchOverlay', () => {
           setCaseSensitive={noop}
           setWholeWord={noop}
           setWildcard={noop}
+          setReplaceValue={noop}
           executeSearch={executeSearch}
         />
       );
@@ -157,7 +150,7 @@ describe('SearchOverlay', () => {
       const checkbox = container.querySelector('#wild-card-option');
       expect(checkbox).toBeInTheDocument();
       fireEvent.click(checkbox);
-      expect(executeSearch).not.toBeCalled();
+      expect(executeSearch).toBeCalled();
     });
 
     it('Should not be focused on mount', () => {
@@ -165,15 +158,17 @@ describe('SearchOverlay', () => {
         <TestSearchOverlay
           setSearchValue={noop}
           setCaseSensitive={noop}
+          setSearchStatus={noop}
           setWholeWord={noop}
           setWildcard={noop}
+          setReplaceValue={noop}
           executeSearch={noop}
         />
       );
 
       const searchInput = container.querySelector('#SearchPanel__input');
       expect(searchInput === document.activeElement).toBe(false);
-    })
+    });
   });
 
   describe('Functionality', () => {
@@ -222,8 +217,7 @@ describe('SearchOverlay', () => {
     it('Should call search when search value is empty', () => {
       const searchTextFullMock = jest.fn();
       searchTextFullFactory.mockReturnValue(searchTextFullMock);
-      // When we call executeSearch without searchValue (or with empty string)
-      // Search should not be initiated.
+      // When we call executeSearch with empty string, search should be initiated.
       executeSearch('', {});
       expect(searchTextFullMock).toHaveBeenCalled();
     });
@@ -233,8 +227,7 @@ describe('SearchOverlay', () => {
       getOverrideSearchExecution.mockReturnValue(overrideSearchExecutionFnMock);
       const searchTextFullMock = jest.fn();
       searchTextFullFactory.mockReturnValue(searchTextFullMock);
-      // When we call executeSearch without searchValue (or with empty string)
-      // Search should not be initiated.
+      // When we call executeSearch without searchValue, search should not be initiated.
       executeSearch(null, {});
       executeSearch(undefined, {});
       expect(searchTextFullMock).not.toHaveBeenCalled();
@@ -244,7 +237,7 @@ describe('SearchOverlay', () => {
     it('Should select next result', () => {
       // create search results. As we mock the core, we can just pass any objects here and we can test
       // that the selection logic works correctly. In real code these object are SearchResult objects
-      const searchResults = [{ first:true }, { second:true }, { third:true }, { fourth:true }];
+      const searchResults = [{ first: true }, { second: true }, { third: true }, { fourth: true }];
       const activeResultIndex = 0;
       const setActiveSearchResultMock = jest.fn();
       // set mock for setActiveSearchResult so we can verify that it gets called correctly
@@ -254,7 +247,7 @@ describe('SearchOverlay', () => {
     });
 
     it('Should go back to first result when last is selected and next button is clicked', () => {
-      const searchResults = [{ first:true }, { second:true }, { third:true }, { fourth:true }];
+      const searchResults = [{ first: true }, { second: true }, { third: true }, { fourth: true }];
       const activeResultIndex = searchResults.length - 1;
       const setActiveSearchResultMock = jest.fn();
       // set mock for setActiveSearchResult so we can verify that it gets called correctly
@@ -272,7 +265,7 @@ describe('SearchOverlay', () => {
     });
 
     it('Should select previous result', () => {
-      const searchResults = [{ first:true }, { second:true }, { third:true }, { fourth:true }];
+      const searchResults = [{ first: true }, { second: true }, { third: true }, { fourth: true }];
       const activeResultIndex = 3;
       const setActiveSearchResultMock = jest.fn();
       core.setActiveSearchResult = setActiveSearchResultMock;
@@ -281,7 +274,7 @@ describe('SearchOverlay', () => {
     });
 
     it('Should go back to last result when first is selected and previous is clicked', () => {
-      const searchResults = [{ first:true }, { second:true }, { third:true }, { fourth:true }];
+      const searchResults = [{ first: true }, { second: true }, { third: true }, { fourth: true }];
       const activeResultIndex = 0;
       const setActiveSearchResultMock = jest.fn();
       core.setActiveSearchResult = setActiveSearchResultMock;

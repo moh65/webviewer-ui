@@ -17,13 +17,13 @@ const propTypes = {
   fitToWidth: PropTypes.func.isRequired,
   fitToPage: PropTypes.func.isRequired,
   isMarqueeToolButtonDisabled: PropTypes.bool
-}
+};
 
 function ZoomOverlay(props) {
   const [t] = useTranslation();
-  
+
   const { zoomList, currentZoomLevel, isReaderMode, isMarqueeZoomActive, fitToWidth, fitToPage, onClickZoomLevelOption, onClickMarqueeZoom, isMarqueeToolButtonDisabled } = props;
-  
+
   return (
     <>
       <Button
@@ -55,7 +55,7 @@ function ZoomOverlay(props) {
           )}
           <div onClick={() => onClickMarqueeZoom()}>
             <ToolButton
-              className={classNames({ZoomItem: true, selected: isMarqueeZoomActive})}
+              className={classNames({ ZoomItem: true, selected: isMarqueeZoomActive })}
               role="option"
               toolName="MarqueeZoomTool"
               label={t('tool.Marquee')}

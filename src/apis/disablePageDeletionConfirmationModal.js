@@ -1,7 +1,7 @@
 import actions from 'actions';
 
 /**
- * Disable the confirmation modal when deleteing a page from the thumnail view
+ * Disable the confirmation modal when deleting a page from the thumbnail view
  *
  * @method UI.disablePageDeletionConfirmationModal
  * @example
@@ -10,10 +10,8 @@ import actions from 'actions';
     instance.UI.disablePageDeletionConfirmationModal();
   });
  */
-function disablePageDeletionConfirmationModal(store) {
-  return function disablePageDeletionConfirmationModal() {
-    store.dispatch(actions.disablePageDeletionConfirmationModal());
-  };
-}
+const disablePageDeletionConfirmationModal = (store) => () => {
+  store.dispatch(actions.disablePageDeletionConfirmationModal());
+};
 
 export default disablePageDeletionConfirmationModal;

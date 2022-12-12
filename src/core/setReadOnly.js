@@ -1,12 +1,23 @@
+import core from 'core';
+
 /**
- * https://www.pdftron.com/api/web/Core.AnnotationManager.html#setReadOnly__anchor
+ * https://www.pdftron.com/api/web/Core.AnnotationManager.html#enableReadOnlyMode__anchor
+ * https://www.pdftron.com/api/web/Core.AnnotationManager.html#disableReadOnlyMode__anchor
+ * https://www.pdftron.com/api/web/Core.DocumentViewer.html#enableReadOnlyMode__anchor
+ * https://www.pdftron.com/api/web/Core.DocumentViewer.html#disableReadOnlyMode__anchor
  * @fires updateAnnotationPermission on AnnotationManager
- * @see https://www.pdftron.com/api/web/Core.AnnotationManager.html#event:updateAnnotationPermission__anchor
+ * @fires readyOnlyModeChanged on DocumentViewer
+ * @see https://www.pdftron.com/api/web/Core.AnnotationManager.html#event:readOnlyModeChanged__anchor
+ * @see https://www.pdftron.com/api/web/Core.DocumentViewer.html#event:readOnlyModeChanged__anchor
  */
-export default isReadOnly => {
-  if (isReadOnly) {
-    window.documentViewer.getAnnotationManager().enableReadOnlyMode();
-  } else {
-    window.documentViewer.getAnnotationManager().disableReadOnlyMode();
+export default (isReadOnly) => {
+  for (const documentViewer of core.getDocumentViewers()) {
+    if (isReadOnly) {
+      documentViewer.getAnnotationManager().enableReadOnlyMode();
+      documentViewer.enableReadOnlyMode();
+    } else {
+      documentViewer.getAnnotationManager().disableReadOnlyMode();
+      documentViewer.disableReadOnlyMode();
+    }
   }
 };

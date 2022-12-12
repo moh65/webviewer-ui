@@ -1,6 +1,7 @@
 import hotkeys from 'hotkeys-js';
 
 import core from 'core';
+import i18next from 'i18next';
 import { isMac, isMobile } from 'helpers/device';
 import openFilePicker from 'helpers/openFilePicker';
 import copyText from 'helpers/copyText';
@@ -13,38 +14,39 @@ import getNumberOfPagesToNavigate from 'helpers/getNumberOfPagesToNavigate';
 import setCurrentPage from 'helpers/setCurrentPage';
 import actions from 'actions';
 import selectors from 'selectors';
+import DataElements from 'src/constants/dataElement';
 
 // prettier-ignore
 const keyMap = {
-  "arrow":                  "A",
-  "callout":                "C",
-  "copy":                   "Control+C",
-  "delete":                 "Delete",
-  "ellipse":                "O",
-  "eraser":                 "E",
-  "freehand":               "F",
-  "freetext":               "T",
-  "highlight":              "H",
-  "line":                   "L",
-  "pan":                    "P",
-  "rectangle":              "R",
-  "rotateClockwise":        "Control+Shift+=",
-  "rotateCounterClockwise": "Control+Shift+-",
-  "select":                 "Escape",
-  "signature":              "S",
-  "squiggly":               "G",
-  "image":                  "I",
-  "redo":                   "Control+Shift+Z",
-  "undo":                   "Control+Z",
-  "stickyNote":             "N",
-  "strikeout":              "K",
-  "underline":              "U",
-  "zoomIn":                 "Control+=",
-  "zoomOut":                "Control+-",
-  "richText.bold":          "Control+B",
-  "richText.italic":        "Control+I",
-  "richText.underline":     "Control+U",
-  "richText.strikeout":     "Control+K",
+  'arrow': 'A',
+  'callout': 'C',
+  'copy': 'Control+C',
+  'delete': 'Delete',
+  'ellipse': 'O',
+  'eraser': 'E',
+  'freehand': 'F',
+  'freetext': 'T',
+  'highlight': 'H',
+  'line': 'L',
+  'pan': 'P',
+  'rectangle': 'R',
+  'rotateClockwise': 'Control+Shift+=',
+  'rotateCounterClockwise': 'Control+Shift+-',
+  'select': 'Escape',
+  'signature': 'S',
+  'squiggly': 'G',
+  'image': 'I',
+  'redo': 'Control+Shift+Z',
+  'undo': 'Control+Z',
+  'stickyNote': 'N',
+  'strikeout': 'K',
+  'underline': 'U',
+  'zoomIn': 'Control+=',
+  'zoomOut': 'Control+-',
+  'richText.bold': 'Control+B',
+  'richText.italic': 'Control+I',
+  'richText.underline': 'Control+U',
+  'richText.strikeout': 'Control+K',
 };
 
 export function shortcutAria(shortcut) {
@@ -89,6 +91,8 @@ const NOOP = () => {};
  * @property {string} COMMAND_0 Fit the document to the screen width in a small screen(< 640px), otherwise fit it to its original size
  * @property {string} CTRL_P Print
  * @property {string} COMMAND_P Print
+ * @property {string} CTRL_B Quickly bookmark a page and open the bookmark panel
+ * @property {string} COMMAND_B Quickly bookmark a page and open the bookmark panel
  * @property {string} PAGE_UP Go to the previous page
  * @property {string} PAGE_DOWN Go to the next page
  * @property {string} UP Go to the previous page in single layout mode (ArrowUp)
@@ -137,6 +141,8 @@ export const Keys = {
   COMMAND_0: 'command+0',
   CTRL_P: 'ctrl+p',
   COMMAND_P: 'command+p',
+  CTRL_B: 'ctrl+b',
+  COMMAND_B: 'command+b',
   ENTER: 'enter',
   PAGE_UP: 'pageup',
   PAGE_DOWN: 'pagedown',
@@ -167,6 +173,8 @@ export function concatKeys(...keys) {
   return keys.join(', ');
 }
 
+const unbindedHotkeysMap = {};
+
 /**
  * A class which contains hotkeys APIs.<br/><br/>
  * <span style="color: red; font-size: 1.2em; font-weight: bold">⚠</span> You must NOT instantiate this yourself. Access instances of this class using {@link UI.hotkeys instance.UI.hotkeys}
@@ -180,9 +188,10 @@ const HotkeysManager = {
     this.store = store;
     this.keyHandlerMap = this.createKeyHandlerMap(store);
     this.prevToolName = null;
-    Object.keys(this.keyHandlerMap).forEach(key => {
+    Object.keys(this.keyHandlerMap).forEach((key) => {
       this.on(key, this.keyHandlerMap[key]);
     });
+    this.didInitializeAllKeys = true;
   },
   /**
    * Add an event handler for the given hotkey
@@ -227,20 +236,45 @@ WebViewer(...)
       handler = this.keyHandlerMap[key];
     }
 
+    function enableHotkey(_key, _handler) {
+      // https://github.com/jaywcjlove/hotkeys#defining-shortcuts
+      const { keyup = NOOP, keydown = _handler } = _handler;
+      hotkeys(_key, { keyup: true }, (e) => {
+        if (e.type === 'keyup') {
+          keyup(e);
+        }
+        if (e.type === 'keydown') {
+          keydown(e);
+        }
+      });
+    }
+
+    if ((!key || !handler) && !this.didInitializeAllKeys) {
+      this.keyHandlerMap = this.createKeyHandlerMap(this.store);
+      this.prevToolName = null;
+      Object.keys(this.keyHandlerMap).forEach((_key) => {
+        // Check if the "key" has already been inilized
+        if (!unbindedHotkeysMap[_key]) {
+          enableHotkey(_key, this.keyHandlerMap[_key]);
+        }
+      });
+      this.didInitializeAllKeys = true;
+    }
+
+    // when key is undefined we need to set all keys to true
+    if (!key) {
+      for (const property in Keys) {
+        unbindedHotkeysMap[Keys[property]] = true;
+      }
+    } else {
+      unbindedHotkeysMap[key.toLocaleLowerCase()] = true;
+    }
+
     if (!key || !handler) {
       return;
     }
 
-    // https://github.com/jaywcjlove/hotkeys#defining-shortcuts
-    const { keyup = NOOP, keydown = handler } = handler;
-    hotkeys(key, { keyup: true }, e => {
-      if (e.type === 'keyup') {
-        keyup(e);
-      }
-      if (e.type === 'keydown') {
-        keydown(e);
-      }
-    });
+    enableHotkey(key, handler);
   },
   /**
    * Remove an event handler for the given hotkey
@@ -267,52 +301,100 @@ WebViewer(...)
       }
     }
 
+    // when key is undefined hotkeysjs unbinds all handler
+    // here we need to flag all keys too
+    if (!key) {
+      for (const property in Keys) {
+        unbindedHotkeysMap[Keys[property]] = false;
+      }
+      this.didInitializeAllKeys = false;
+    } else {
+      unbindedHotkeysMap[key.toLocaleLowerCase()] = false;
+    }
+
     // https://github.com/jaywcjlove/hotkeys#unbind
     hotkeys.unbind(key, handler);
   },
+
+  isActive(shortcut) {
+    const key = keyMap[shortcut];
+    if (key) {
+      let hotkeyName;
+      // change 'ctrl' to 'command' for Mac OS
+      if (isMac) {
+        hotkeyName = key.replace('Control', 'command').toLocaleLowerCase();
+      } else {
+        hotkeyName = key.replace('Control', 'ctrl').toLocaleLowerCase();
+      }
+      return unbindedHotkeysMap[hotkeyName];
+    }
+    return true;
+  },
+
   createKeyHandlerMap(store) {
     const { dispatch, getState } = store;
 
     return {
-      [`${Keys.CTRL_SHIFT_EQUAL}, ${Keys.COMMAND_SHIFT_EQUAL}`]: e => {
+      [`${Keys.CTRL_SHIFT_EQUAL}, ${Keys.COMMAND_SHIFT_EQUAL}`]: (e) => {
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(getState());
         e.preventDefault();
-        core.rotateClockwise();
+        core.rotateClockwise(activeDocumentViewerKey);
       },
-      [`${Keys.CTRL_SHIFT_MINUS}, ${Keys.COMMAND_SHIFT_MINUS}`]: e => {
+      [`${Keys.CTRL_SHIFT_MINUS}, ${Keys.COMMAND_SHIFT_MINUS}`]: (e) => {
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(getState());
         e.preventDefault();
-        core.rotateCounterClockwise();
+        core.rotateCounterClockwise(activeDocumentViewerKey);
       },
       [`${Keys.CTRL_C}, ${Keys.COMMAND_C}`]: () => {
-        if (core.getSelectedText()) {
-          copyText();
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(getState());
+        if (core.getSelectedText(activeDocumentViewerKey)) {
+          copyText(activeDocumentViewerKey);
           dispatch(actions.closeElement('textPopup'));
-        } else if (core.getSelectedAnnotations().length) {
-          core.updateCopiedAnnotations();
+        } else if (core.getSelectedAnnotations(activeDocumentViewerKey).length) {
+          core.updateCopiedAnnotations(activeDocumentViewerKey);
         }
       },
-      [`${Keys.CTRL_V}, ${Keys.COMMAND_V}`]: e => {
+      [`${Keys.CTRL_V}, ${Keys.COMMAND_V}`]: (e) => {
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(getState());
         if (!isFocusingElement()) {
           e.preventDefault();
-          core.pasteCopiedAnnotations();
+          core.pasteCopiedAnnotations(activeDocumentViewerKey);
         }
       },
-      [`${Keys.CTRL_Z}, ${Keys.COMMAND_Z}`]: e => {
+      [`${Keys.CTRL_Z}, ${Keys.COMMAND_Z}`]: (e) => {
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(getState());
         if (!isFocusingElement()) {
           e.preventDefault();
-          core.undo();
+          core.undo(activeDocumentViewerKey);
         }
       },
-      [`${Keys.CTRL_Y}, ${Keys.COMMAND_SHIFT_Z}`]: e => {
+      [`${Keys.CTRL_Y}, ${Keys.COMMAND_SHIFT_Z}`]: (e) => {
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(getState());
         if (!isFocusingElement()) {
           e.preventDefault();
-          core.redo();
+          core.redo(activeDocumentViewerKey);
         }
       },
-      [`${Keys.CTRL_O}, ${Keys.COMMAND_O}`]: e => {
+      [`${Keys.CTRL_O}, ${Keys.COMMAND_O}`]: (e) => {
         e.preventDefault();
         openFilePicker();
       },
-      [concatKeys(Keys.CTRL_F, Keys.COMMAND_F)]: e => {
+      // TODO Compare: Intergrate panels with compare
+      [`${Keys.CTRL_B}, ${Keys.COMMAND_B}`]: (e) => {
+        e.preventDefault();
+        if (!selectors.isElementDisabled(getState(), DataElements.BOOKMARK_PANEL)) {
+          dispatch(actions.openElement(DataElements.LEFT_PANEL));
+          dispatch(actions.setActiveLeftPanel(DataElements.BOOKMARK_PANEL));
+
+          const bookmarks = selectors.getBookmarks(getState());
+          const currentPageIndex = core.getCurrentPage() - 1;
+          // only add bookmark if page is not already bookmarked
+          if (!bookmarks[currentPageIndex]) {
+            dispatch(actions.addBookmark(currentPageIndex, i18next.t('message.untitled')));
+          }
+        }
+      },
+      [concatKeys(Keys.CTRL_F, Keys.COMMAND_F)]: (e) => {
         e.preventDefault();
 
         const isNotesPanelOpen = selectors.isElementOpen(getState(), 'notesPanel');
@@ -320,53 +402,82 @@ WebViewer(...)
           dispatch(actions.closeElement('notesPanel'));
         }
 
-        dispatch(actions.openElement('searchPanel'));
-      },
-      [`${Keys.CTRL_EQUAL}, ${Keys.COMMAND_EQUAL}`]: e => {
-        e.preventDefault();
-        zoomIn();
-      },
-      [`${Keys.CTRL_MINUS}, ${Keys.COMMAND_MINUS}`]: e => {
-        e.preventDefault();
-        zoomOut();
-      },
-      [`${Keys.CTRL_0}, ${Keys.COMMAND_0}`]: e => {
-        e.preventDefault();
+        const isRedactionPanelOpen = selectors.isElementOpen(getState(), 'redactionPanel');
+        if (isRedactionPanelOpen) {
+          dispatch(actions.closeElement('redactionPanel'));
+        }
 
+        const isTextEditingPanelOpen = selectors.isElementOpen(getState(), 'textEditingPanel');
+        if (isTextEditingPanelOpen) {
+          dispatch(actions.closeElement('textEditingPanel'));
+        }
+
+        const isWv3dPropertiesPanelOpen = selectors.isElementOpen(getState(), 'wv3dPropertiesPanel');
+        if (isWv3dPropertiesPanelOpen) {
+          dispatch(actions.closeElement('wv3dPropertiesPanel'));
+        }
+
+        dispatch(actions.toggleElement('searchPanel'));
+      },
+      [`${Keys.CTRL_EQUAL}, ${Keys.COMMAND_EQUAL}`]: (e) => {
+        e.preventDefault();
+        const state = getState();
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(state);
+        const isMultiViewerMode = selectors.isMultiViewerMode(state);
+        zoomIn(isMultiViewerMode, activeDocumentViewerKey);
+      },
+      [`${Keys.CTRL_MINUS}, ${Keys.COMMAND_MINUS}`]: (e) => {
+        e.preventDefault();
+        const state = getState();
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(state);
+        const isMultiViewerMode = selectors.isMultiViewerMode(state);
+        zoomOut(isMultiViewerMode, activeDocumentViewerKey);
+      },
+      [`${Keys.CTRL_0}, ${Keys.COMMAND_0}`]: (e) => {
+        e.preventDefault();
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(getState());
         if (isMobile) {
-          core.fitToWidth();
+          core.fitToWidth(activeDocumentViewerKey);
         } else {
-          core.fitToPage();
+          core.fitToPage(activeDocumentViewerKey);
         }
       },
-      [concatKeys(Keys.CTRL_P, Keys.COMMAND_P)]: e => {
+      [concatKeys(Keys.CTRL_P, Keys.COMMAND_P)]: (e) => {
         e.preventDefault();
 
-        print(dispatch, selectors.isEmbedPrintSupported(getState()), selectors.getSortStrategy(getState()), selectors.getColorMap(getState()));
+        print(
+          dispatch,
+          selectors.isEmbedPrintSupported(getState()),
+          selectors.getSortStrategy(getState()),
+          selectors.getColorMap(getState()),
+        );
       },
-      [`${Keys.PAGE_UP}`]: e => {
+      [`${Keys.PAGE_UP}`]: (e) => {
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(getState());
         e.preventDefault();
 
-        setCurrentPage(core.getCurrentPage() - getNumberOfPagesToNavigate());
+        setCurrentPage(core.getCurrentPage() - getNumberOfPagesToNavigate(), activeDocumentViewerKey);
       },
-      [`${Keys.PAGE_DOWN}`]: e => {
+      [`${Keys.PAGE_DOWN}`]: (e) => {
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(getState());
         e.preventDefault();
 
-        setCurrentPage(core.getCurrentPage() + getNumberOfPagesToNavigate());
+        setCurrentPage(core.getCurrentPage() + getNumberOfPagesToNavigate(), activeDocumentViewerKey);
       },
       [`${Keys.UP}`]: () => {
-        if (isFocusingElement() || core.isContinuousDisplayMode()) {
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(getState());
+        if (isFocusingElement() || core.isContinuousDisplayMode(activeDocumentViewerKey)) {
           return;
         }
 
         // do not call preventDefault else it will prevent scrolling
-        const scrollViewElement = core.getScrollViewElement();
+        const scrollViewElement = core.getScrollViewElement(activeDocumentViewerKey);
         const { scrollHeight, clientHeight } = scrollViewElement;
         const reachedTop = scrollViewElement.scrollTop === 0;
 
         if (reachedTop) {
-          const currentPage = core.getCurrentPage();
-          setCurrentPage(currentPage - getNumberOfPagesToNavigate());
+          const currentPage = core.getCurrentPage(activeDocumentViewerKey);
+          setCurrentPage(currentPage - getNumberOfPagesToNavigate(), activeDocumentViewerKey);
 
           // set the scrollbar to be at the bottom of the page only if the previous page is bigger than 1
           if (currentPage > 1) {
@@ -375,26 +486,27 @@ WebViewer(...)
         }
       },
       [`${Keys.DOWN}`]: () => {
-        if (isFocusingElement() || core.isContinuousDisplayMode()) {
+        const activeDocumentViewerKey = selectors.getActiveDocumentViewerKey(getState());
+        if (isFocusingElement() || core.isContinuousDisplayMode(activeDocumentViewerKey)) {
           return;
         }
 
         // do not call preventDefault else it will prevent scrolling
-        const scrollViewElement = core.getScrollViewElement();
+        const scrollViewElement = core.getScrollViewElement(activeDocumentViewerKey);
         const { scrollTop, clientHeight, scrollHeight } = scrollViewElement;
         const reachedBottom = Math.abs(scrollTop + clientHeight - scrollHeight) <= 1;
         if (reachedBottom) {
-          setCurrentPage(core.getCurrentPage() + getNumberOfPagesToNavigate());
+          setCurrentPage(core.getCurrentPage(activeDocumentViewerKey) + getNumberOfPagesToNavigate());
         }
       },
       [`${Keys.SPACE}`]: {
-        keyup: this.createToolHotkeyHandler(e => {
+        keyup: this.createToolHotkeyHandler((e) => {
           e.preventDefault();
 
           setToolModeAndGroup(store, this.prevToolName);
           this.prevToolName = null;
         }),
-        keydown: this.createToolHotkeyHandler(e => {
+        keydown: this.createToolHotkeyHandler((e) => {
           e.preventDefault();
 
           if (core.getToolMode().name !== 'Pan') {
@@ -403,7 +515,7 @@ WebViewer(...)
           }
         }),
       },
-      [`${Keys.ESCAPE}`]: e => {
+      [`${Keys.ESCAPE}`]: (e) => {
         e.preventDefault();
         setToolModeAndGroup(store, 'AnnotationEdit', '');
 
@@ -418,9 +530,9 @@ WebViewer(...)
             'customStampModal',
             'printModal',
             'rubberStampOverlay',
-            'editTextModal',
+            'contentEditModal',
             'filterModal',
-          ])
+          ]),
         );
       },
       [`${Keys.P}`]: this.createToolHotkeyHandler(() => {
@@ -460,9 +572,7 @@ WebViewer(...)
         setToolModeAndGroup(store, 'AnnotationCreateFreeText');
       }),
       [`${Keys.S}`]: this.createToolHotkeyHandler(() => {
-        const sigToolButton = document.querySelector(
-          '[data-element="signatureToolButton"] .Button'
-        );
+        const sigToolButton = document.querySelector('[data-element="signatureToolButton"] .Button');
 
         sigToolButton?.click();
       }),
@@ -509,7 +619,8 @@ WebViewer(...)
       const currentToolName = core.getToolMode().name;
 
       // disable changing tool when the signature overlay is opened.
-      const isSignatureModalOpen = currentToolName === window.Core.Tools.ToolNames.SIGNATURE && openElements['signatureModal'];
+      const isSignatureModalOpen =
+        currentToolName === window.Core.Tools.ToolNames.SIGNATURE && openElements['signatureModal'];
 
       if (isFocusingElement() || isSignatureModalOpen) {
         return;

@@ -9,6 +9,7 @@ import core from 'core';
 import actions from 'actions';
 import selectors from 'selectors';
 import fireEvent from 'helpers/fireEvent';
+import DataElements from 'constants/dataElement';
 import { rgbaToHex, hexToRgba } from 'helpers/color';
 
 import Choice from 'components/Choice';
@@ -794,8 +795,8 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
   //customization
 
   return isDisabled ? null : (
-    <Swipeable onSwipedUp={closeModal} onSwipedDown={closeModal} preventDefaultTouchmoveEvent>
-      <div className={modalClass} data-element="filterModal" onMouseDown={closeModal}>
+
+      <div className={modalClass} data-element={DataElements.FILTER_MODAL} onMouseDown={closeModal}>
         <FocusTrap locked={isOpen} focusLastOnUnlock>
           <div className="container" onMouseDown={e => {closeDatePickers(event); e.stopPropagation()}}>
             <div className="modal4-header">
@@ -827,7 +828,6 @@ currentDocumentInfo.dateFormat = currentDocumentInfo.dateFormat.replace('DD', 'd
           </div>
         </FocusTrap>
       </div>
-    </Swipeable>
   );
 };
 

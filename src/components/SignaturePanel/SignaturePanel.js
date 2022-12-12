@@ -25,13 +25,14 @@ const SignaturePanel = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [certificateErrorMessage, setCertificateErrorMessage] = useState('');
   const [document, setDocument] = useState(core.getDocument());
-  const [isDisabled, certificate] = useSelector(state => [
+  const [isDisabled, certificate, trustLists] = useSelector((state) => [
     selectors.isElementDisabled(state, 'signaturePanel'),
     selectors.getCertificates(state),
+    selectors.getTrustLists(state),
   ]);
   const [translate] = useTranslation();
 
-  const onDocumentLoaded = async() => {
+  const onDocumentLoaded = async () => {
     setDocument(core.getDocument());
   };
 
@@ -57,17 +58,17 @@ const SignaturePanel = () => {
     // document
     if (document) {
       setShowSpinner(true);
-      setVerificationResult(certificate, dispatch)
+      setVerificationResult(certificate, trustLists, dispatch)
         .then(async (verificationResult) => {
           // We need to wait for the annotationsLoaded event, otherwise the
           // Field will not exist in the document
           await core.getAnnotationsLoadedPromise();
           const fieldManager = core.getAnnotationManager().getFieldManager();
-          setFields(Object.keys(verificationResult).map(fieldName => fieldManager.getField(fieldName)));
+          setFields(Object.keys(verificationResult).map((fieldName) => fieldManager.getField(fieldName)));
           setCertificateErrorMessage('');
           setShowSpinner(false);
         })
-        .catch(e => {
+        .catch((e) => {
           if (e && e.message) {
             setCertificateErrorMessage(e.message);
           } else {

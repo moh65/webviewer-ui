@@ -7,6 +7,8 @@ import Events from 'constants/events';
 import ToolbarGroup from 'constants/toolbar';
 import { NotesPanelSortStrategy } from 'constants/sortStrategies';
 import Theme from 'constants/theme';
+import RedactionSearchPatterns from 'constants/redactionSearchPatterns';
+import { languageEnum } from 'constants/languages';
 import addSearchListener from './addSearchListener';
 import addSortStrategy from './addSortStrategy';
 import annotationPopup from './annotationPopup';
@@ -55,6 +57,7 @@ import extractPagesWithAnnotations from './extractPagesWithAnnotations';
 import focusNote from './focusNote';
 import getAnnotationUser from './getAnnotationUser';
 import getBBAnnotManager from './getBBAnnotManager';
+import getCurrentLanguage from './getCurrentLanguage';
 import getCurrentPageNumber from './getCurrentPageNumber';
 import getFitMode from './getFitMode';
 import getLayoutMode from './getLayoutMode';
@@ -97,6 +100,8 @@ import rotateCounterClockwise from './rotateCounterClockwise';
 import saveAnnotations from './saveAnnotations';
 import searchText from './searchText';
 import searchTextFull from './searchTextFull';
+import setWv3dPropertiesPanelModelData from './setWv3dPropertiesPanelModelData';
+import setWv3dPropertiesPanelSchema from './setWv3dPropertiesPanelSchema';
 import setActiveHeaderGroup from './setActiveHeaderGroup';
 import setActiveLeftPanel from './setActiveLeftPanel';
 import setAdminUser from './setAdminUser';
@@ -106,7 +111,7 @@ import setColorPalette from './setColorPalette';
 import setPageReplacementModalFileList from './setPageReplacementModalFileList';
 import setHighContrastMode from './setHighContrastMode';
 import setCurrentPageNumber from './setCurrentPageNumber';
-import setCustomModal from './setCustomModal';
+import addCustomModal, { setCustomModal } from './addCustomModal';
 import setCustomNoteFilter from './setCustomNoteFilter';
 import setCustomPanel from './setCustomPanel';
 import exportBookmarks from './exportBookmarks';
@@ -132,6 +137,7 @@ import setNotesPanelSortStrategy from './setNotesPanelSortStrategy';
 import setSwipeOrientation from './setSwipeOrientation';
 import setTheme from './setTheme';
 import setToolbarGroup from './setToolbarGroup';
+import createToolbarGroup from './createToolbarGroup';
 import setToolMode from './setToolMode';
 import setZoomLevel from './setZoomLevel';
 import setZoomList from './setZoomList';
@@ -161,6 +167,9 @@ import getCustomData from './getCustomData';
 import setCustomMeasurementOverlayInfo from './setCustomMeasurementOverlayInfo';
 import setNoteTransformFunction from './setNoteTransformFunction';
 import setCustomNoteSelectionFunction from './setCustomNoteSelectionFunction';
+import setCustomApplyRedactionsHandler from './setCustomApplyRedactionsHandler';
+import setCustomMultiViewerSyncHandler from './setCustomMultiViewerSyncHandler';
+import setCustomMultiViewerAcceptedFileFormats from './setCustomMultiViewerAcceptedFileFormats';
 import selectThumbnailPages from './selectThumbnailPages';
 import unselectThumbnailPages from './unselectThumbnailPages';
 import setSearchResults from './setSearchResults';
@@ -168,7 +177,28 @@ import setActiveResult from './setActiveResult';
 import setAnnotationContentOverlayHandler from './setAnnotationContentOverlayHandler';
 import overrideSearchExecution from './overrideSearchExecution';
 import reactElements from './reactElements';
-import { addTrustedCertificates } from './verificationOptions';
+import { addTrustedCertificates, loadTrustList } from './verificationOptions';
+import {
+  enableTextCollapse,
+  disableTextCollapse,
+  enableReplyCollapse,
+  disableReplyCollapse,
+  disableAutoExpandCommentThread,
+  enableAutoExpandCommentThread,
+  setCustomHeader,
+  setCustomEmptyPanel,
+  enableAttachmentPreview,
+  disableAttachmentPreview,
+  setAttachmentHandler
+} from './notesPanel';
+import {
+  enableMultiselect,
+  disableMultiselect,
+  selectPages,
+  unselectPages,
+  getSelectedPageNumbers,
+  setThumbnailSelectionMode,
+} from './thumbnailsPanel';
 import toggleReaderMode from './toggleReaderMode';
 import toggleElementVisibility from './toggleElementVisibility';
 import setAnnotationReadState from './setAnnotationReadState';
@@ -185,19 +215,53 @@ import enableDesktopOnlyMode from './enableDesktopOnlyMode';
 import disableDesktopOnlyMode from './disableDesktopOnlyMode';
 import isInDesktopOnlyMode from './isInDesktopOnlyMode';
 import pageManipulationOverlay from './pageManipulationOverlay';
+import multiPageManipulationControls from './multiPageManipulationControls';
+import thumbnailControlMenu from './thumbnailControlMenu';
 import getWatermarkModalOptions from './getWatermarkModalOptions';
 import enableNoteSubmissionWithEnter from './enableNoteSubmissionWithEnter';
+import willUseEmbeddedPrinting from 'src/apis/willUseEmbeddedPrinting';
 import reloadOutline from './reloadOutline';
 //customization
 import setCustomURLs from './setCustomURLs';
 import setThisDocumentInfo from './setThisDocumentInfo';
 import updateTags from './updateTags';
-import core from "core";
 
 //customization
 
+import Fonts from 'src/apis/fonts';
+import TabManagerAPI from './TabManagerAPI';
+import getAvailableLanguages from './getAvailableLanguages';
+import replaceRedactionSearchPattern from './replaceRedactionSearchPattern';
+import setPresetCropDimensions from './setPresetCropDimensions';
+import setPresetNewPageDimensions from './setPresetNewPageDimensions';
+import addDateTimeFormat from './addDateTimeFormat';
+import addRedactionSearchPattern from './addRedactionSearchPattern';
+import removeRedactionSearchPattern from './removeRedactionSearchPattern';
+import getAnnotationStylePopupTabs from './getAnnotationStylePopupTabs';
+import setAnnotationStylePopupTabs from './setAnnotationStylePopupTabs';
+import { AnnotationKeys, AnnotationStylePopupTabs } from '../constants/map';
+import getZoomStepFactors from './getZoomStepFactors';
+import setZoomStepFactors from './setZoomStepFactors';
+import enableBookmarkIconShortcutVisibility from './enableBookmarkIconShortcutVisibility';
+import disableBookmarkIconShortcutVisibility from './disableBookmarkIconShortcutVisibility';
+import showFormFieldIndicators from './showFormFieldIndicators';
+import hideFormFieldIndicators from './hideFormFieldIndicators';
+import signSignatureWidget from './signSignatureWidget';
+import core from 'core';
+import { setDefaultOptions } from './outlinesPanel';
+import {
+  getMeasurementScalePreset,
+  addMeasurementScalePreset,
+  removeMeasurementScalePreset,
+  enableMultipleScalesMode,
+  disableMultipleScalesMode,
+  isMultipleScalesModeEnabled,
+} from './measurementScale';
+import getLocalizedText from './getLocalizedText';
+import getDocumentViewer from './getDocumentViewer';
+import { enableMultiViewerSync, disableMultiViewerSync, isMultiViewerSyncing } from './multiViewerSync';
 
-export default store => {
+export default (store) => {
   const CORE_NAMESPACE = 'Core';
   const UI_NAMESPACE = 'UI';
   const objForWebViewerCore = {
@@ -215,9 +279,11 @@ export default store => {
     LayoutMode,
     Feature,
     Events,
+    Languages: languageEnum,
     ToolbarGroup,
     NotesPanelSortStrategy,
     Theme,
+    RedactionSearchPatterns,
     addSearchListener,
     addSortStrategy: addSortStrategy(store),
     annotationPopup: annotationPopup(store),
@@ -225,6 +291,8 @@ export default store => {
     closeElements: closeElements(store),
     contextMenuPopup: contextMenuPopup(store),
     disableElements: disableElements(store),
+    setWv3dPropertiesPanelModelData: setWv3dPropertiesPanelModelData(store),
+    setWv3dPropertiesPanelSchema: setWv3dPropertiesPanelSchema(store),
     disableFeatures: disableFeatures(store),
     disableTools: disableTools(store),
     disableReplyForAnnotations: disableReplyForAnnotations(store),
@@ -251,6 +319,8 @@ export default store => {
     loadDocument: loadDocument(store),
     settingsMenuOverlay: settingsMenuOverlay(store),
     pageManipulationOverlay: pageManipulationOverlay(store),
+    multiPageManipulationControls: multiPageManipulationControls(store),
+    thumbnailControlMenu: thumbnailControlMenu(store),
     openElements: openElements(store),
     print: print(store),
     printInBackground: printInBackground(store),
@@ -258,11 +328,12 @@ export default store => {
     registerTool: registerTool(store),
     removeSearchListener,
     searchText: searchText(store.dispatch),
-    searchTextFull: searchTextFull(store.dispatch),
+    searchTextFull: searchTextFull(store),
     overrideSearchExecution,
     setActiveHeaderGroup: setActiveHeaderGroup(store),
     setActiveLeftPanel: setActiveLeftPanel(store),
     setCustomModal: setCustomModal(store),
+    addCustomModal: addCustomModal(store),
     showOutlineControl: showOutlineControl(store),
     setCustomNoteFilter: setCustomNoteFilter(store),
     setCustomPanel: setCustomPanel(store),
@@ -292,8 +363,12 @@ export default store => {
     setSwipeOrientation,
     setTheme: setTheme(store),
     setToolbarGroup: setToolbarGroup(store),
+    createToolbarGroup: createToolbarGroup(store),
     dangerouslySetNoteTransformFunction: setNoteTransformFunction(store),
     setCustomNoteSelectionFunction: setCustomNoteSelectionFunction(store),
+    setCustomApplyRedactionsHandler: setCustomApplyRedactionsHandler(store),
+    setCustomMultiViewerSyncHandler: setCustomMultiViewerSyncHandler(store),
+    setCustomMultiViewerAcceptedFileFormats: setCustomMultiViewerAcceptedFileFormats(store),
     setToolMode,
     setZoomLevel,
     setZoomList: setZoomList(store),
@@ -306,18 +381,43 @@ export default store => {
     updateTool: updateTool(store),
     updateElement: updateElement(store),
     useEmbeddedPrint: useEmbeddedPrint(store),
+    willUseEmbeddedPrinting: willUseEmbeddedPrinting(store),
     setMaxSignaturesCount: setMaxSignaturesCount(store),
     mentions: mentions(store),
     setCustomMeasurementOverlayInfo: setCustomMeasurementOverlayInfo(store),
     setSignatureFonts: setSignatureFonts(store),
     setSelectedTab: setSelectedTab(store),
-    getSelectedThumbnailPageNumbers: getSelectedThumbnailPageNumbers(store),
+
     setDisplayedSignaturesFilter: setDisplayedSignaturesFilterFunction(store),
-    selectThumbnailPages: selectThumbnailPages(store),
-    unselectThumbnailPages: unselectThumbnailPages(store),
+
     setAnnotationContentOverlayHandler: setAnnotationContentOverlayHandler(store),
     VerificationOptions: {
       addTrustedCertificates: addTrustedCertificates(store),
+      loadTrustList: loadTrustList(store),
+    },
+    ThumbnailsPanel: {
+      selectPages: selectPages(store),
+      unselectPages: unselectPages(store),
+      getSelectedPageNumbers: getSelectedPageNumbers(store),
+      enableMultiselect: enableMultiselect(store),
+      disableMultiselect: disableMultiselect(store),
+      setThumbnailSelectionMode: setThumbnailSelectionMode(store),
+    },
+    NotesPanel: {
+      enableTextCollapse: enableTextCollapse(store),
+      disableTextCollapse: disableTextCollapse(store),
+      enableReplyCollapse: enableReplyCollapse(store),
+      disableReplyCollapse: disableReplyCollapse(store),
+      disableAutoExpandCommentThread: disableAutoExpandCommentThread(store),
+      enableAutoExpandCommentThread: enableAutoExpandCommentThread(store),
+      setCustomHeader: setCustomHeader(store),
+      setCustomEmptyPanel: setCustomEmptyPanel(store),
+      enableAttachmentPreview: enableAttachmentPreview(store),
+      disableAttachmentPreview: disableAttachmentPreview(store),
+      setAttachmentHandler: setAttachmentHandler(store)
+    },
+    OutlinesPanel: {
+      setDefaultOptions: setDefaultOptions(store),
     },
     getWatermarkModalOptions: getWatermarkModalOptions(store),
     // undocumented and deprecated, to be removed in 7.0
@@ -350,6 +450,8 @@ export default store => {
     enableNativeScrolling,
     getAnnotationUser,
     getCurrentPageNumber: getCurrentPageNumber(store),
+    getCurrentLanguage: getCurrentLanguage(store),
+    getLocalizedText,
     getPageCount: getPageCount(store),
     getShowSideWindow: getShowSideWindow(store),
     getSideWindowVisibility: getSideWindowVisibility(store),
@@ -381,9 +483,33 @@ export default store => {
     addEventListener,
     removeEventListener,
     syncNamespaces,
+    Fonts: Fonts(store),
     reloadOutline: reloadOutline(store),
+    TabManager: TabManagerAPI(store),
+    getAvailableLanguages,
+    replaceRedactionSearchPattern: replaceRedactionSearchPattern(store),
+    setPresetCropDimensions: setPresetCropDimensions(store),
+    setPresetNewPageDimensions: setPresetNewPageDimensions(store),
+    addDateTimeFormat: addDateTimeFormat(store),
+    addRedactionSearchPattern: addRedactionSearchPattern(store),
+    removeRedactionSearchPattern: removeRedactionSearchPattern(store),
+    setThumbnailSelectionMode: setThumbnailSelectionMode(store),
+    enableBookmarkIconShortcutVisibility: enableBookmarkIconShortcutVisibility(store),
+    disableBookmarkIconShortcutVisibility: disableBookmarkIconShortcutVisibility(store),
+    showFormFieldIndicators: showFormFieldIndicators(store),
+    hideFormFieldIndicators: hideFormFieldIndicators(store),
+    signSignatureWidget,
+    getMeasurementScalePreset: getMeasurementScalePreset(store),
+    addMeasurementScalePreset: addMeasurementScalePreset(store),
+    removeMeasurementScalePreset: removeMeasurementScalePreset(store),
+    enableMultipleScalesMode: enableMultipleScalesMode(store),
+    disableMultipleScalesMode: disableMultipleScalesMode(store),
+    isMultipleScalesModeEnabled: isMultipleScalesModeEnabled(store),
+    enableMultiViewerSync: enableMultiViewerSync(store),
+    disableMultiViewerSync: disableMultiViewerSync(store),
+    isMultiViewerSyncing: isMultiViewerSyncing(store),
 
-    //deprecated, to be removed in 8.0
+    // deprecated, to be removed in 8.0
     useNativeScroll,
     showErrorMessage: showErrorMessage(store),
     toggleElement: toggleElement(store),
@@ -391,8 +517,11 @@ export default store => {
     setHighContrastMode: setHighContrastMode(store),
     getIsHighContrastMode: getIsHighContrastMode(store),
 
-    //deprecated, to be removed in 9.0
+    // deprecated, to be removed in 9.0
     updateOutlines: updateOutlines(store),
+    selectThumbnailPages: selectThumbnailPages(store),
+    unselectThumbnailPages: unselectThumbnailPages(store),
+    getSelectedThumbnailPageNumbers: getSelectedThumbnailPageNumbers(store),
 
     // undocumented
     loadedFromServer: false,
@@ -414,153 +543,15 @@ export default store => {
     isInDesktopOnlyMode: isInDesktopOnlyMode(store),
     disablePageDeletionConfirmationModal: disablePageDeletionConfirmationModal(store),
     enablePageDeletionConfirmationModal: enablePageDeletionConfirmationModal(store),
+    getAnnotationStylePopupTabs,
+    setAnnotationStylePopupTabs: setAnnotationStylePopupTabs(store),
+    AnnotationKeys,
+    AnnotationStylePopupTabs,
+    getZoomStepFactors: getZoomStepFactors(store),
+    setZoomStepFactors: setZoomStepFactors(store),
+    getDocumentViewer,
   };
-
-  // objForWebViewerUI.overrideSearchExecution((value, options) => {
-
-  //   fetch('http://localhost:5600/api/search/build/f3396a7768184e9b8e2baa5ca1893e34/19/55237/logicalItemPageId/0/10', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json', "Authorization": `Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImxyLU93Q3RDVkstcGF0Y3RabzJ2MnciLCJ0eXAiOiJhdCtqd3QiLCJjdHkiOiJKV1QifQ.eyJuYmYiOjE2NTQ2NDUyMjEsImV4cCI6MTY1NDY0ODgyMSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDA0IiwiYXVkIjoiYnVuZGxlIiwiY2xpZW50X2lkIjoiMEZBNjI2QjQwQkNGNDE4Q0FBQzQ3MkE4MkQ1MUIzQTYiLCJzdWIiOiJlNzYwZGNjMmEyMDI0YmY4YThlOThmZWE0NzJmNzAxNSIsImF1dGhfdGltZSI6MTY1NDM5NTI1OSwiaWRwIjoibG9jYWwiLCJmaXJtSWQiOiJmMzM5NmE3NzY4MTg0ZTliOGUyYmFhNWNhMTg5M2UzNCIsInBlcm1pc3Npb25zIjoiTGVnYWxCdW5kbGUiLCJyb2xlIjpbIlN1cHBvcnREZXNrIiwiU3VwZXJBZG1pbiJdLCJzY29wZSI6WyJwZXJtaXNzaW9ucyIsInJvbGVzIiwicHJvZmlsZSIsIm9wZW5pZCIsImJ1bmRsZSJdLCJhbXIiOlsicHdkIl19.D0Um9V3bdUFLBOQL4EPXynNV75amTL6czDZR2l7ZsC8irUNTaLjIn1FpW-W0odP78snLXbinJowqzjQrzPvESsvzlOSq1_h_wEG7uEAQACD8odWfBuSZuNfspt0unf5pcDPUcE_KkvXJkpTBVS4aIBmk5irHJCUpkJ9IF2IREVuIXlgjSUle5ZI-A22y9-k7gaTE1E7Bn1U7aeEIxLwsNUsouxzoJblS03iGbzizBUN4WYqUhqF208uCV9Q1NrI7LRL_fek8lRHPkTsBOG5GKsjU2dWgU0o6p6vqqGlUggNkDWdyWtJzM3OZtsqkpevXBYrda0-jsphi3IaE-x828g` },
-  //     body: JSON.stringify(value)
-  //   }).then(async response => {
-  //     if (response.ok) {
-
-  //       let r = await response.json();
-
-  //       showSearchResult(r, 0)
-
-  //     } else {
-
-  //     }
-  //   }).catch(e => {
-
-  //   });
-  // })
-
-  // const showSearchResult = (searchResultData, pageNum, instance) => {
-  //   const finishedPages = [];
-
-  //   let SearchMode = core.getSearchMode();
-  //   let documentViewer = window.documentViewer;
-
-  //   //this.openedFromSearch = true      
-  //   let results = []
-
-  //   documentViewer.clearSearchResults()
-
-  //   objForWebViewerUI.closeElements(['notesPanel'])
-  //   objForWebViewerUI.openElements(['searchPanel'])
-
-  //   function doSearch(pn, word) {
-  //     const mode = SearchMode.WHOLE_WORD | SearchMode.HIGHLIGHT
-
-  //     const options = {
-  //       fullSearch: true,
-  //       onResult: (result) => {
-  //         if (result.resultCode === 2 && !finishedPages.includes(result.pageNum)) {
-  //           //documentViewer.displayAdditionalSearchResult(result)
-  //           results.push(result)
-  //         }
-  //       },
-  //       onPageEnd: arg => {
-  //         if (!finishedPages.includes(pn)) {
-  //           documentViewer.displayAdditionalSearchResults(results)
-  //           //   documentViewer.setActiveSearchResult(results[0])
-  //           finishedPages.push(pn)
-  //           //   results = []
-  //         }
-  //         showResult()
-  //       },
-  //       onDocumentEnd: arg => {
-  //         //if (pageNum != 0) { documentViewer.setCurrentPage(pageNum) }
-  //       },
-  //       startPage: pn,
-  //       endPage: pn
-  //     }
-
-  //     documentViewer.textSearchInit(word, mode, options)
-  //   }
-
-  //   let textToBeHighlighted = []
-  //   let reg = /<span(.*?)>(.*?)<\/span>/g
-
-  //   let highlightCounter = 0
-  //   let searchResultIndex = 0
-  //   let matches = null
-
-  //   setTimeout(() => {
-  //     showResult()
-  //   }, 50)
-
-  //   function showResult() {
-  //     if (searchResultData && searchResultData.BundlePageSearchResults && searchResultIndex < searchResultData.BundlePageSearchResults.length) {
-  //       let searchResult = searchResultData.BundlePageSearchResults[searchResultIndex]
-  //       let highlightedResults = !searchResult.HighlightedText ? searchResult.highlightedText : searchResult.HighlightedText
-  //       let pageNum = !searchResult.PageNumber ? searchResult.pageNumber : searchResult.PageNumber
-
-  //       if (highlightCounter < highlightedResults.length) {
-  //         matches = matches == null ? highlightedResults[highlightCounter].matchAll(reg) : matches
-  //         let word = ''
-  //         try {
-  //           do {
-  //             word = matches.next().value[2]
-  //           } while (textToBeHighlighted.includes(word.trim().toLowerCase()))
-
-  //           textToBeHighlighted.push(word.trim().toLowerCase())
-  //           doSearch(parseInt(pageNum), word)
-  //         } catch (e) {
-  //           highlightCounter++
-  //           matches = null
-  //           showResult()
-  //         }
-  //       } else {
-  //         highlightCounter = 0
-  //         matches = null
-  //         ++searchResultIndex
-  //         textToBeHighlighted = []
-  //         showResult()
-  //       }
-  //     } else {
-  //       //highlight finished
-
-  //       // let rows = window.document.querySelectorAll('[data-element=searchPanel] .results [role=row]');
-  //       // let prevPage = { height: 0, isFirst: false };
-  //       // let needToChangeTop = false;
-  //       // let changeTop = 27;
-        
-  //       // for (const row of rows) {
-  //       //   let pageSplitter = row.querySelector('div[role=cell]')
-  //       //   if (pageSplitter) {
-  //       //     let firstPageHeight = parseInt(row.style.height.replace('px', ''));
-  //       //     prevPage = { height: firstPageHeight, isFirst: true };
-  //       //     if (needToChangeTop) {
-  //       //       debugger
-  //       //       let top = parseInt(row.style.top.replace('px', ''));
-  //       //       row.style.top = `${(top + changeTop)}px`;
-  //       //       changeTop += 27;
-  //       //     }
-  //       //   } else if (needToChangeTop) {
-  //       //     debugger
-  //       //     let top = parseInt(row.style.top.replace('px', ''));
-  //       //     row.style.top = `${(top + changeTop)}px`;
-  //       //   } else {
-  //       //     debugger
-  //       //     let pageHeight = parseInt(row.style.height.replace('px', ''));
-  //       //     if (prevPage && prevPage.isFirst) {
-  //       //       if (prevPage.height === pageHeight) {
-  //       //         needToChangeTop = true;
-  //       //         let top = parseInt(row.style.top.replace('px', ''));
-  //       //         row.style.top = `${(top + changeTop)}px`;
-  //       //       }
-  //       //     }
-  //       //   }
-
-  //       // }
-  //     }
-  //   }
-  // }
-
-
+  const documentViewer = core.getDocumentViewer(1);
 
   window.instance = {
     // keys needed for webviewer.js
@@ -569,15 +560,16 @@ export default store => {
     [CORE_NAMESPACE]: {
       ...objForWebViewerCore,
       ...window.Core,
-      documentViewer: window.documentViewer,
-      annotationManager: window.documentViewer.getAnnotationManager(),
+      documentViewer,
+      annotationManager: documentViewer.getAnnotationManager(),
+      getDocumentViewers: () => core.getDocumentViewers(),
     },
     [UI_NAMESPACE]: objForWebViewerUI,
 
     // keep them here for backwards compatibililty. should remove them in 9.0
     ...objForWebViewerCore,
     ...objForWebViewerUI,
-    docViewer: window.documentViewer,
-    annotManager: window.documentViewer.getAnnotationManager(),
+    docViewer: documentViewer,
+    annotManager: documentViewer.getAnnotationManager(),
   };
 };

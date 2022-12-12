@@ -1,30 +1,58 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, useStore } from 'react-redux';
 import { FocusTrap } from '@pdftron/webviewer-react-toolkit';
 import core from 'core';
 import actions from 'actions';
 import selectors from 'selectors';
 import { useTranslation } from 'react-i18next';
-// import ActionButton from 'components/ActionButton'; /* Temporarily commented out */
 import CustomStampForums from './CustomStampForums';
+import Button from 'components/Button';
 
 import './CreateStampModal.scss';
 
 const TOOL_NAME = 'AnnotationCreateRubberStamp';
 
 const CustomStampModal = () => {
-  const [state, setState] = useState({});
-  const stampTool = core.getTool(TOOL_NAME);
+  const [state, setState] = useState({ font: 'Helvetica', bold: true });
+  const stampToolArray = core.getToolsFromAllDocumentViewers(TOOL_NAME);
   const [t] = useTranslation();
-  const [isOpen] = useSelector(state => [
+  const store = useStore();
+  const [emptyInput, setEmptyInput] = useState(false);
+  const [isOpen, fonts, dateTimeFormats, userName] = useSelector((state) => [
     selectors.isElementOpen(state, 'customStampModal'),
+    selectors.getFonts(state),
+    selectors.getDateTimeFormats(state),
+    selectors.getUserName(state),
   ]);
   const dispatch = useDispatch();
   const closeModal = () => {
     dispatch(actions.closeElement('customStampModal'));
   };
 
+  const openColorPicker = () => {
+    dispatch(actions.openElement('ColorPickerModal'));
+  };
+
+  const getCustomColorAndRemove = () => {
+    const customColor = selectors.getCustomColor(store.getState());
+    dispatch(actions.setCustomColor(null));
+    return customColor;
+  };
+
+  const openDeleteModal = async (onConfirm) => {
+    const message = t('warning.colorPicker.deleteMessage');
+    const title = t('warning.colorPicker.deleteTitle');
+    const confirmBtnText = t('action.ok');
+
+    const warning = {
+      message,
+      title,
+      confirmBtnText,
+      onConfirm,
+    };
+    dispatch(actions.showWarningMessage(warning));
+  };
 
   const modalClass = classNames({
     Modal: true,
@@ -35,13 +63,15 @@ const CustomStampModal = () => {
 
   const createCustomStamp = async () => {
     core.setToolMode(TOOL_NAME);
-    stampTool.addCustomStamp(state);
-    const annot = await stampTool.createCustomStampAnnotation(state);
-    await stampTool.setRubberStamp(annot);
-    stampTool.showPreview();
+    for (const stampTool of stampToolArray) {
+      stampTool.addCustomStamp(state);
+      const annot = await stampTool.createCustomStampAnnotation(state);
+      await stampTool.setRubberStamp(annot);
+      stampTool.showPreview();
+    }
     dispatch(actions.closeElement('customStampModal'));
-    const standardStampCount = stampTool.getStandardStamps().length;
-    const customStampCount = stampTool.getCustomStamps().length;
+    const standardStampCount = stampToolArray[0].getStandardStamps().length;
+    const customStampCount = stampToolArray[0].getCustomStamps().length;
     dispatch(actions.setSelectedStampIndex(standardStampCount + customStampCount - 1));
   };
 
@@ -50,27 +80,51 @@ const CustomStampModal = () => {
       <div
         className={modalClass}
         data-element="customStampModal"
-        onMouseDown={closeModal}
       >
         <FocusTrap locked={isOpen}>
-          <div className="container" onMouseDown={e => e.stopPropagation()}>
+          <div className="container" onMouseDown={(e) => e.stopPropagation()}>
             <div className="header">
-              <p style={{ textAlign: 'center' }}>{t(`component.createStampButton`)}</p>
-              {/* Temporarily commented out */}
-              {/* <ActionButton
-              dataElement="customStampModalCloseButton"
-              title="action.close"
-              img="ic_close_black_24px"
-              onClick={closeModal}
-            /> */}
+              <p>{t('option.customStampModal.modalName')}</p>
+              <Button
+                dataElement="customStampModalCloseButton"
+                title="action.close"
+                img="ic_close_black_24px"
+                onClick={closeModal}
+              />
             </div>
             <CustomStampForums
+              openDeleteModal={openDeleteModal}
+              getCustomColorAndRemove={getCustomColorAndRemove}
+              openColorPicker={openColorPicker}
               isModalOpen={isOpen}
               state={state}
               setState={setState}
               closeModal={closeModal}
-              createCustomStamp={createCustomStamp}
+              setEmptyInput={setEmptyInput}
+              fonts={fonts}
+              dateTimeFormats={dateTimeFormats}
+              stampTool={stampToolArray[0]}
+              userName={userName}
             />
+            <div className="footer">
+              <div
+                className={
+                  emptyInput
+                    ? 'stamp-create stamp-create-disabled'
+                    : 'stamp-create'
+                }
+                onClick={
+                  () => {
+                    if (emptyInput) {
+                      return;
+                    }
+                    createCustomStamp();
+                  }
+                }
+              >
+                {t('action.create')}
+              </div>
+            </div>
           </div>
         </FocusTrap>
       </div>

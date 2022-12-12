@@ -64,7 +64,7 @@ class MentionsManager {
      */
     this.idMentionDataMap = {};
     this.allowedTrailingCharacters = [' '];
-
+    this.mentionLookupCallback = this.defaultMentionsSearchCallback;
     annotManager.addEventListener('annotationChanged', (annotations, action, { imported }) => {
       if (imported || !annotations.length || !this.getUserData().length) {
         return;
@@ -83,7 +83,7 @@ class MentionsManager {
   handleAnnotationsAdded(annotations) {
     let newMentions = [];
 
-    annotations.forEach(annotation => {
+    annotations.forEach((annotation) => {
       const mentionData = this.extractMentionDataFromAnnot(annotation);
 
       this.idMentionDataMap[annotation.Id] = mentionData;
@@ -100,7 +100,7 @@ class MentionsManager {
     let modifiedMentions = [];
     const deletedMentions = [];
 
-    annotations.forEach(annotation => {
+    annotations.forEach((annotation) => {
       const prevMentionData = this.idMentionDataMap[annotation.Id] || {
         mentions: [],
         contentWithoutMentions: '',
@@ -111,18 +111,16 @@ class MentionsManager {
 
       this.idMentionDataMap[annotation.Id] = currMentionData;
 
-      currMentions.forEach(currMention => {
-        const isNewMention = !prevMentions.find(prevMention =>
-          this.isSameMention(prevMention, currMention)
+      currMentions.forEach((currMention) => {
+        const isNewMention = !prevMentions.find((prevMention) => this.isSameMention(prevMention, currMention)
         );
         if (isNewMention) {
           newMentions.push(currMention);
         }
       });
 
-      prevMentions.forEach(prevMention => {
-        const isDeletedMention = !currMentions.find(currMention =>
-          this.isSameMention(prevMention, currMention)
+      prevMentions.forEach((prevMention) => {
+        const isDeletedMention = !currMentions.find((currMention) => this.isSameMention(prevMention, currMention)
         );
         if (isDeletedMention) {
           deletedMentions.push(prevMention);
@@ -151,7 +149,7 @@ class MentionsManager {
   handleAnnotationsDeleted(annotations) {
     let deletedMentions = [];
 
-    annotations.forEach(annotation => {
+    annotations.forEach((annotation) => {
       if (this.idMentionDataMap[annotation.Id]) {
         deletedMentions = deletedMentions.concat(this.idMentionDataMap[annotation.Id].mentions);
         delete this.idMentionDataMap[annotation.Id];
@@ -161,6 +159,22 @@ class MentionsManager {
     if (deletedMentions.length) {
       this.trigger('mentionChanged', [deletedMentions, 'delete']);
     }
+  }
+
+  getFormattedTextFromDeltas(deltas) {
+    const formattedMentionTextList = [];
+    deltas.forEach((delta) => {
+      if (delta.insert) {
+        if (typeof (delta.insert) === 'string') {
+          formattedMentionTextList.push(delta.insert);
+        } else if (delta.insert.mention) {
+          const mention = delta.insert.mention;
+          const formattedMentionText = `${mention.denotationChar}[${mention.value}](${mention.id})`;
+          formattedMentionTextList.push(formattedMentionText);
+        }
+      }
+    });
+    return formattedMentionTextList.join('');
   }
 
   /**
@@ -183,6 +197,7 @@ class MentionsManager {
     //   plainTextValue: Hello! Zhijie Zhang,
     //   ids: ['zzhang@pdftron.com'],
     // }
+    // eslint-disable-next-line no-cond-assign
     while ((match = markupRegex.exec(str)) !== null) {
       const [wholeMatch, displayName, id] = match;
 
@@ -216,11 +231,11 @@ class MentionsManager {
 
     if (mentionData === '') {
       return result;
-    } else {
-      mentionData = JSON.parse(mentionData);
     }
 
-    userData.forEach(user => {
+    mentionData = JSON.parse(mentionData);
+
+    userData.forEach((user) => {
       if (mentionData.ids.includes(user.id) && this.isValidMention(contents, user.value)) {
         result.mentions.push({
           ...user,
@@ -273,6 +288,8 @@ class MentionsManager {
     annotation.addReply(replyAnnot);
 
     core.addAnnotations([replyAnnot]);
+
+    return replyAnnot;
   }
 
   /**
@@ -294,7 +311,7 @@ WebViewer(...)
   });
    */
   setUserData(userData) {
-    userData = userData.map(user => ({
+    userData = userData.map((user) => ({
       ...user,
       id: user.id || user.email || user.value,
     }));
@@ -377,7 +394,7 @@ WebViewer(...)
     }
 
     if (fn) {
-      this.events[eventName] = this.events[eventName].filter(handler => handler !== fn);
+      this.events[eventName] = this.events[eventName].filter((handler) => handler !== fn);
     } else {
       this.events[eventName] = [];
     }
@@ -413,7 +430,7 @@ WebViewer(...)
       data = data[0];
     }
 
-    this.events[eventName].forEach(fn => {
+    this.events[eventName].forEach((fn) => {
       fn.call(this, ...data);
     });
 
@@ -430,6 +447,62 @@ WebViewer(...)
 
   removeEventListener(...args) {
     this.off(...args);
+  }
+
+
+  /**
+   * Sets the mention lookup callback function used by quill-mentions to filter the users in the suggestions overlay.
+   * @method UI.MentionsManager#setMentionLookupCallback
+   * @param {function} callback A callback function that returns an array of users that displayed in the suggestions overlay.
+   * @example
+WebViewer(...)
+  .then(function(instance) {
+    instance.mentions.setMentionLookupCallback(async (userData, searchTerm) => {
+      const matches = [];
+      userData.forEach((user) => {
+        if (user.name === 'John Doe') {
+          matches.push(user);
+        }
+      });
+      return matches;
+    });
+  });
+   */
+  setMentionLookupCallback(callback) {
+    this.mentionLookupCallback = callback;
+  }
+
+  /**
+   * Gets the current mention lookup callback function being used by quill-mentions to filter the users in the suggestions overlay.
+   * @method UI.MentionsManager#getMentionLookupCallback
+   * @returns {function} the current function used to filter users in the suggestions overlay
+   */
+  getMentionLookupCallback() {
+    return this.mentionLookupCallback;
+  }
+
+  /**
+   * The default mention lookup callback used to filter users in the suggestions overlay.
+   * @method UI.MentionsManager#defaultMentionLookupCallback
+   */
+  defaultMentionsSearchCallback(userData, searchTerm) {
+    if (searchTerm.length === 0) {
+      return (userData);
+    }
+
+    const matches = [];
+    const searchTermLowerCase = searchTerm.toLowerCase();
+    userData.forEach(function(user) {
+      const userValueIncludesSearchTerm = user.value.toLowerCase().includes(searchTermLowerCase);
+      const userIdIncludesSearchTerm = user.id && user.id.toLowerCase().includes(searchTermLowerCase);
+      const userEmailIncludesSearchTerm = user.email && user.email.toLowerCase().includes(searchTermLowerCase);
+
+      if (userValueIncludesSearchTerm || userIdIncludesSearchTerm || userEmailIncludesSearchTerm) {
+        matches.push(user);
+      }
+    });
+
+    return (matches);
   }
 }
 

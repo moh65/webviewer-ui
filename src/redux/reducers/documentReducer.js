@@ -1,4 +1,4 @@
-export default initialState => (state = initialState, action) => {
+export default (initialState) => (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
     case 'SET_DOCUMENT_FILE':
@@ -6,7 +6,13 @@ export default initialState => (state = initialState, action) => {
     case 'SET_PAGE_NUMBER':
       return { ...state, pageNumber: payload.documentPageNumber };
     case 'SET_TOTAL_PAGES':
-      return { ...state, totalPages: payload.totalPages };
+      return {
+        ...state,
+        totalPages: {
+          ...state.totalPages,
+          [payload.documentViewerKey]: payload.totalPages,
+        }
+      };
     case 'SET_OUTLINES':
       return { ...state, outlines: payload.outlines };
     case 'SET_BOOKMARKS':

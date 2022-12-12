@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
@@ -10,7 +10,7 @@ import core from 'core';
 
 import './SelectedRubberStamp.scss';
 
-const usePrevious = value => {
+const usePrevious = (value) => {
   const ref = useRef();
   useEffect(() => {
     ref.current = value;
@@ -18,17 +18,20 @@ const usePrevious = value => {
   return ref.current;
 };
 
-const SelectedSignatureRow = () => {
+const SelectedRubberStamp = () => {
   const dispatch = useDispatch();
   const [t, i18n] = useTranslation();
   const prevLanguage = usePrevious(i18n.language);
+  const [isOpen, setIsOpen] = useState(false);
 
   const [
     activeToolName,
     selectedStamp,
-  ] = useSelector(state => [
+    activeToolGroup,
+  ] = useSelector((state) => [
     selectors.getActiveToolName(state),
     selectors.getSelectedStamp(state),
+    selectors.getActiveToolGroup(state),
   ]);
 
   useEffect(() => {
@@ -45,24 +48,43 @@ const SelectedSignatureRow = () => {
     }
   });
 
-  const rubberStampTool = core.getTool('AnnotationCreateRubberStamp');
+  const rubberStampToolArray = core.getToolsFromAllDocumentViewers('AnnotationCreateRubberStamp');
   const onStampsAdded = () => {
     dispatch(actions.setStandardStamps(t));
     dispatch(actions.setCustomStamps(t));
   };
 
   useEffect(() => {
-    rubberStampTool.addEventListener('stampsUpdated', onStampsAdded);
+    rubberStampToolArray[0].addEventListener('stampsUpdated', onStampsAdded);
     return () => {
-      rubberStampTool.removeEventListener('stampsUpdated', onStampsAdded);
+      rubberStampToolArray[0].removeEventListener('stampsUpdated', onStampsAdded);
     };
   }, []);
 
   const [isToolStyleOpen] = useSelector(
-    state => [
+    (state) => [
       selectors.isElementOpen(state, 'toolStylePopup'),
     ],
   );
+
+  useEffect(() => {
+    async function preselectRubberStamp() {
+      core.setToolMode('AnnotationCreateRubberStamp');
+      const text = t(`rubberStamp.${selectedStamp.annotation['Icon']}`);
+      for (const rubberStampTool of rubberStampToolArray) {
+        await rubberStampTool.setRubberStamp(selectedStamp.annotation, text);
+        rubberStampTool.showPreview();
+      }
+    }
+
+    if (!isOpen && activeToolGroup === 'rubberStampTools' && selectedStamp) {
+      setIsOpen(true);
+      preselectRubberStamp();
+    } else if (isOpen && activeToolGroup !== 'rubberStampTools') {
+      setIsOpen(false);
+    }
+  });
+
   return (
     <div
       className="selected-rubber-stamp-container"
@@ -76,12 +98,15 @@ const SelectedSignatureRow = () => {
             onClick={async () => {
               core.setToolMode('AnnotationCreateRubberStamp');
               const text = t(`rubberStamp.${selectedStamp.annotation['Icon']}`);
-              await rubberStampTool.setRubberStamp(selectedStamp.annotation, text);
-              rubberStampTool.showPreview();
+              for (const rubberStampTool of rubberStampToolArray) {
+                await rubberStampTool.setRubberStamp(selectedStamp.annotation, text);
+                rubberStampTool.showPreview();
+              }
             }}
             isActive={activeToolName === 'AnnotationCreateRubberStamp'}
             altText={t('option.toolsOverlay.currentStamp')}
-          />}
+          />
+        }
       </div>
       <ToolsDropdown
         onClick={() => dispatch(actions.toggleElement('toolStylePopup'))}
@@ -91,4 +116,4 @@ const SelectedSignatureRow = () => {
   );
 };
 
-export default SelectedSignatureRow;
+export default SelectedRubberStamp;

@@ -16,7 +16,6 @@ class ColorPaletteHeader extends React.PureComponent {
   static propTypes = {
     style: PropTypes.object.isRequired,
     colorPalette: PropTypes.oneOf(['TextColor', 'StrokeColor', 'FillColor']),
-    onPaletteChange: PropTypes.func,
     colorMapKey: PropTypes.string.isRequired,
     setActivePalette: PropTypes.func.isRequired,
     t: PropTypes.func.isRequired,
@@ -25,10 +24,10 @@ class ColorPaletteHeader extends React.PureComponent {
     isBorderColorPaletteDisabled: PropTypes.bool,
   }
 
-  setActivePalette = newPalette => {
-    const { setActivePalette, colorMapKey, onPaletteChange } = this.props;
+  setActivePalette = (newPalette) => {
+    const { setActivePalette, colorMapKey } = this.props;
+
     setActivePalette(colorMapKey, newPalette);
-    onPaletteChange && onPaletteChange(newPalette);
   }
 
   render() {
@@ -37,38 +36,34 @@ class ColorPaletteHeader extends React.PureComponent {
       colorPalette,
       colorMapKey,
       toolName,
-      isTextColorPaletteDisabled,
-      isBorderColorPaletteDisabled,
-      isFillColorPaletteDisabled,
       disableSeparator
     } = this.props;
-    const { availablePalettes } = getDataWithKey(colorMapKey);
+    const { styleTabs } = getDataWithKey(colorMapKey);
 
     if (toolName && (toolName.includes('Line') || toolName.includes('Arrow') || toolName.includes('Polyline'))) {
       return (
         <div className="palette-options">
-          {["StrokeColor", "FillColor"].map((palette, i) =>
-            <React.Fragment key={i}>
-              <Tooltip content={`option.annotationColor.${palette}`}>
-                <div
-                  className={classNames({
-                    'palette-options-button': true,
-                    active: colorPalette === palette,
-                    disabled: palette === 'FillColor',
-                  })}
-                >
-                  {t(`option.annotationColor.${palette}`)}
-                </div>
-              </Tooltip>
-              {i < 1 && <div className="palette-options-divider" />}
-            </React.Fragment>,
+          {['StrokeColor', 'FillColor'].map((palette, i) => <React.Fragment key={i}>
+            <Tooltip content={`option.annotationColor.${palette}`}>
+              <div
+                className={classNames({
+                  'palette-options-button': true,
+                  active: colorPalette === palette,
+                  disabled: palette === 'FillColor',
+                })}
+              >
+                {t(`option.annotationColor.${palette}`)}
+              </div>
+            </Tooltip>
+            {i < 1 && <div className="palette-options-divider" />}
+          </React.Fragment>,
           )}
         </div>
       );
     }
 
 
-    if (availablePalettes.length < 2) {
+    if (styleTabs.length < 2) {
       if (disableSeparator) {
         return null;
       }
@@ -78,28 +73,27 @@ class ColorPaletteHeader extends React.PureComponent {
 
     return (
       <div className="palette-options">
-        {availablePalettes.map((pallette, i) =>
-          <React.Fragment key={i}>
-            <Tooltip content={`option.annotationColor.${pallette}`}>
-              <button
-                className={classNames({
-                  'palette-options-button': true,
-                  active: colorPalette === pallette,
-                })}
-                onClick={() => this.setActivePalette(pallette)}
-              >
-                {t(`option.annotationColor.${pallette}`)}
-              </button>
-            </Tooltip>
-            {i < availablePalettes.length - 1 && <div className="palette-options-divider" />}
-          </React.Fragment>,
+        {styleTabs.map((pallette, i) => <React.Fragment key={i}>
+          <Tooltip content={`option.annotationColor.${pallette}`}>
+            <button
+              className={classNames({
+                'palette-options-button': true,
+                active: colorPalette === pallette,
+              })}
+              onClick={() => this.setActivePalette(pallette)}
+            >
+              {t(`option.annotationColor.${pallette}`)}
+            </button>
+          </Tooltip>
+          {i < styleTabs.length - 1 && <div className="palette-options-divider" />}
+        </React.Fragment>,
         )}
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   // TODO: Actually disable these elements
   // isTextColorPaletteDisabled, isBorderColorPaletteDisabled, isFillColorPaletteDisabled
   // TextColor, StrokeColor, FillColor

@@ -56,6 +56,7 @@ class Icon extends React.PureComponent {
     
     //customization
     try {
+      // eslint-disable-next-line global-require,import/no-dynamic-require
       svgElement = this.isInlineSvg() ? glyph : require(`../../../assets/icons/${this.props.glyph}.svg`);
     } catch {
       svgElement = undefined;

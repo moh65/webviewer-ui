@@ -1,6 +1,6 @@
 import setToolMode from './setToolMode';
 import getToolMode from './getToolMode';
-import getTool from './getTool';
+import getToolsFromAllDocumentViewers from './getToolsFromAllDocumentViewers';
 import setDisplayMode from './setDisplayMode';
 import getDisplayMode from './getDisplayMode';
 import rotateClockwise from './rotateClockwise';
@@ -16,7 +16,6 @@ import fitToZoom from './fitToZoom';
 import zoomToMouse from './zoomToMouse';
 import getZoom from './getZoom';
 import zoomTo from './zoomTo';
-import getDocumentViewer from './getDocumentViewer';
 import getAnnotationManager from './getAnnotationManager';
 import getTotalPages from './getTotalPages';
 import getCurrentPage from './getCurrentPage';
@@ -25,7 +24,6 @@ import getType from './getType';
 import isWebViewerServerDocument from './isWebViewerServerDocument';
 import getSelectedText from './getSelectedText';
 import clearSelection from './clearSelection';
-import setOptions from './setOptions';
 import closeDocument from './closeDocument';
 import getToolModeMap from './getToolModeMap';
 import getCurrentUser from './getCurrentUser';
@@ -38,6 +36,7 @@ import setScrollViewElement from './setScrollViewElement';
 import setViewerElement from './setViewerElement';
 import isContinuousDisplayMode from './isContinuousDisplayMode';
 import isScrollableDisplayMode from './isScrollableDisplayMode';
+import isSearchResultEqual from './isSearchResultEqual';
 import scrollViewUpdated from './scrollViewUpdated';
 import canModify from './canModify';
 import canModifyContents from './canModifyContents';
@@ -56,8 +55,10 @@ import getActiveSearchResult from './getActiveSearchResult';
 import setActiveSearchResult from './setActiveSearchResult';
 import textSearchInit from './textSearchInit';
 import getSearchMode from './getSearchMode';
+import getResultCode from './getResultCode';
 import getPageWidth from './getPageWidth';
 import getPageHeight from './getPageHeight';
+import getScales from './getScales';
 import drawAnnotations from './drawAnnotations';
 import getOutlines from './getOutlines';
 import getSelectedAnnotations from './getSelectedAnnotations';
@@ -111,6 +112,7 @@ import getWatermark from './getWatermark';
 import groupAnnotations from './groupAnnotations';
 import ungroupAnnotations from './ungroupAnnotations';
 import getNumberOfGroups from './getNumberOfGroups';
+import getGroupAnnotations from './getGroupAnnotations';
 import undo from './undo';
 import redo from './redo';
 import updateAnnotationState from './updateAnnotationState';
@@ -118,11 +120,31 @@ import getFontStyles from './getFontStyles';
 import mergeDocument from './mergeDocument';
 import getFormFieldCreationManager from './getFormFieldCreationManager';
 import syncNamespaces from './syncNamespaces';
+import createDocument from './createDocument';
+import getContentEditManager from './getContentEditManager';
+import getTool from './getTool';
+import { getDocumentViewer, setDocumentViewer, getDocumentViewers, deleteDocumentViewer } from './documentViewers';
+import setUserBookmarks from './setUserBookmarks';
+import setBookmarkIconShortcutVisibility from './setBookmarkIconShortcutVisibility';
+import setBookmarkShortcutToggleOnFunction from './setBookmarkShortcutToggleOnFunction';
+import setBookmarkShortcutToggleOffFunction from './setBookmarkShortcutToggleOffFunction';
+import createAndApplyScale from './createAndApplyScale';
+import replaceScales from './replaceScales';
+import deleteScale from './deleteScale';
+import getScalePrecision from './getScalePrecision';
+import enableAnnotationNumbering from './enableAnnotationNumbering';
+import getSemanticDiffAnnotations from './getSemanticDiffAnnotations';
 
 export default {
+  getSemanticDiffAnnotations,
+  getDocumentViewers,
+  getDocumentViewer,
+  setDocumentViewer,
+  deleteDocumentViewer,
   setToolMode,
   getToolMode,
   getTool,
+  getToolsFromAllDocumentViewers,
   setDisplayMode,
   getDisplayMode,
   rotateClockwise,
@@ -138,16 +160,15 @@ export default {
   zoomToMouse,
   getZoom,
   zoomTo,
-  getDocumentViewer,
   getAnnotationManager,
   getTotalPages,
   getCurrentPage,
   setCurrentPage,
   getType,
+  getScales,
   isWebViewerServerDocument,
   getSelectedText,
   clearSelection,
-  setOptions,
   closeDocument,
   getToolModeMap,
   getCurrentUser,
@@ -160,6 +181,7 @@ export default {
   setViewerElement,
   isContinuousDisplayMode,
   isScrollableDisplayMode,
+  isSearchResultEqual,
   scrollViewUpdated,
   canModify,
   canModifyContents,
@@ -178,6 +200,7 @@ export default {
   textSearchInit,
   displaySearchResult,
   getSearchMode,
+  getResultCode,
   getPageWidth,
   getPageHeight,
   drawAnnotations,
@@ -234,6 +257,7 @@ export default {
   groupAnnotations,
   ungroupAnnotations,
   getNumberOfGroups,
+  getGroupAnnotations,
   undo,
   redo,
   updateAnnotationState,
@@ -241,4 +265,15 @@ export default {
   mergeDocument,
   getFormFieldCreationManager,
   syncNamespaces,
+  createDocument,
+  getContentEditManager,
+  setUserBookmarks,
+  setBookmarkIconShortcutVisibility,
+  setBookmarkShortcutToggleOnFunction,
+  setBookmarkShortcutToggleOffFunction,
+  createAndApplyScale,
+  replaceScales,
+  deleteScale,
+  getScalePrecision,
+  enableAnnotationNumbering,
 };

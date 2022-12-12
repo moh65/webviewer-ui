@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { withTranslation } from 'react-i18next';
+import { FocusTrap } from '@pdftron/webviewer-react-toolkit';
 import classNames from 'classnames';
-import getHashParams from 'helpers/getHashParams';
 
 import ActionButton from 'components/ActionButton';
 import CustomizablePopup from 'components/CustomizablePopup';
@@ -12,17 +12,14 @@ import { getTextPopupPositionBasedOn } from 'helpers/getPopupPosition';
 import createTextAnnotationAndSelect from 'helpers/createTextAnnotationAndSelect';
 import copyText from 'helpers/copyText';
 import useOnClickOutside from 'hooks/useOnClickOutside';
-import useArrowFocus from 'hooks/useArrowFocus';
 import actions from 'actions';
 import selectors from 'selectors';
 
 import './TextPopup.scss';
 
 const TextPopup = ({ t }) => {
-  const fullAPI = !!getHashParams('pdfnet', false);
-
   const [isDisabled, isOpen, popupItems] = useSelector(
-    state => [
+    (state) => [
       selectors.isElementDisabled(state, 'textPopup'),
       selectors.isElementOpen(state, 'textPopup'),
       selectors.getPopupItems(state, 'textPopup'),
@@ -56,11 +53,6 @@ const TextPopup = ({ t }) => {
   }, [dispatch, popupItems]);
 
   const onClose = useCallback(() => dispatch(actions.closeElement('textPopup')), [dispatch]);
-  useArrowFocus(!isDisabled && isOpen, onClose, popupRef);
-
-  const textEditingHandler = useCallback(() => {
-    dispatch(actions.openElement('editTextModal'));
-  }, [dispatch]);
 
   return isDisabled ? null : (
     <div
@@ -77,75 +69,64 @@ const TextPopup = ({ t }) => {
       role="listbox"
       aria-label={t('component.textPopup')}
     >
-      <CustomizablePopup dataElement="textPopup">
-        {fullAPI && (
-          <ActionButton
-            dataElement="editTextButton"
-            title="action.edit"
-            img="ic_edit_black_24px"
-            onClick={textEditingHandler}
-            role="option"
-          />
-        )}
-        <ActionButton dataElement="copyTextButton" title="action.copy" img="ic_copy_black_24px" onClick={copyText} role="option" />
-        <ActionButton
-          dataElement="textHighlightToolButton"
-          title="annotation.highlight"
-          img="icon-tool-highlight"
-          onClick={() => createTextAnnotationAndSelect(dispatch, Annotations.TextHighlightAnnotation)}
-          role="option"
-        />
-        <ActionButton
-          dataElement="textUnderlineToolButton"
-          title="annotation.underline"
-          img="icon-tool-text-manipulation-underline"
-          onClick={() => createTextAnnotationAndSelect(dispatch, Annotations.TextUnderlineAnnotation)}
-          role="option"
-        />
-        <ActionButton
-          dataElement="textSquigglyToolButton"
-          title="annotation.squiggly"
-          img="icon-tool-text-manipulation-squiggly"
-          onClick={() => createTextAnnotationAndSelect(dispatch, Annotations.TextSquigglyAnnotation)}
-          role="option"
-        />
-        <ActionButton
-          title="annotation.strikeout"
-          img="icon-tool-text-manipulation-strikethrough"
-          onClick={() => createTextAnnotationAndSelect(dispatch, Annotations.TextStrikeoutAnnotation)}
-          dataElement="textStrikeoutToolButton"
-          role="option"
-        />
-        {/*customization*/}
-        <ActionButton
-          title="tool.LinkUrl"
-          img="icon-tool-link"
-          onClick={() => {
-            dispatch(actions.openElement('linkModalUrl'))
-          }}
-          dataElement="linkButton"
-          role="option"
-        />
-        <ActionButton
-          title="tool.Link"
-          img="icon-page-link"
-          onClick={() => {
-            dispatch(actions.openElement('linkModal'))
-          }}
-          dataElement="linkButtonToUrl"
-          role="option"
-        />
-        {/* {core.isCreateRedactionEnabled() && (
-          <ActionButton
-            dataElement="textRedactToolButton"
-            title="option.redaction.markForRedaction"
-            img="ic_annotation_add_redact_black_24px"
-            onClick={() => createTextAnnotationAndSelect(dispatch, Annotations.RedactionAnnotation)}
-            role="option"
-          />
-        )} */}
-        {/*customization*/}
-      </CustomizablePopup>
+      <FocusTrap locked={isOpen}>
+        <div className="container">
+          <CustomizablePopup dataElement="textPopup">
+            <ActionButton
+              dataElement="copyTextButton"
+              title="action.copy"
+              img="ic_copy_black_24px"
+              onClick={() => copyText()}
+              role="option"
+            />
+            <ActionButton
+              dataElement="textHighlightToolButton"
+              title="annotation.highlight"
+              img="icon-tool-highlight"
+              onClick={() => createTextAnnotationAndSelect(dispatch, Annotations.TextHighlightAnnotation)}
+              role="option"
+            />
+            <ActionButton
+              dataElement="textUnderlineToolButton"
+              title="annotation.underline"
+              img="icon-tool-text-manipulation-underline"
+              onClick={() => createTextAnnotationAndSelect(dispatch, Annotations.TextUnderlineAnnotation)}
+              role="option"
+            />
+            <ActionButton
+              dataElement="textSquigglyToolButton"
+              title="annotation.squiggly"
+              img="icon-tool-text-manipulation-squiggly"
+              onClick={() => createTextAnnotationAndSelect(dispatch, Annotations.TextSquigglyAnnotation)}
+              role="option"
+            />
+            <ActionButton
+              title="annotation.strikeout"
+              img="icon-tool-text-manipulation-strikethrough"
+              onClick={() => createTextAnnotationAndSelect(dispatch, Annotations.TextStrikeoutAnnotation)}
+              dataElement="textStrikeoutToolButton"
+              role="option"
+            />
+            <ActionButton
+              title="tool.Link"
+              img="icon-tool-link"
+              onClick={() => dispatch(actions.openElement('linkModal'))}
+              dataElement="linkButton"
+              role="option"
+            />
+            {/*core.isCreateRedactionEnabled() && (
+              <ActionButton
+                dataElement="textRedactToolButton"
+                title="option.redaction.markForRedaction"
+                fillColor="868E96"
+                img="icon-tool-select-area-redaction"
+                onClick={() => createTextAnnotationAndSelect(dispatch, Annotations.RedactionAnnotation)}
+                role="option"
+              />
+            )*/}
+          </CustomizablePopup>
+        </div>
+      </FocusTrap>
     </div>
   );
 };

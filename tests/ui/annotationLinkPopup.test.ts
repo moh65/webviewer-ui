@@ -1,5 +1,4 @@
 import { loadViewerSample, Timeouts } from '../../utils';
-import { ElementHandle } from 'puppeteer';
 
 // Skipping this test because it fails multiple times even after updating image in circleci
 it.skip('link annotation modal should accept page labels', async () => {
@@ -163,4 +162,90 @@ it('should release two annotations in a single event when adding link annotation
   await iframe.click('[data-element=linkButton]');
   const count = await promise;
   expect(count).toBe(2);
+});
+
+it('Should set custom onTrigger successfully', async () => {
+  const {
+    iframe,
+    waitForInstance,
+    getTextPosition,
+    waitForWVEvents
+  } = await loadViewerSample('viewing/viewing');
+  const initialPageLength = (await browser.pages()).length;
+  const instance = await waitForInstance();
+  await instance('disableElements', ['pageNavOverlay']);
+  await waitForWVEvents(['annotationsLoaded', 'pageComplete']);
+  await iframe.evaluate(async () => {
+    const { Actions, Annotations } = window.instance;
+    Actions.setCustomOnTriggeredHandler(Actions.URI, (target, event, doc, options) => {
+      if (target instanceof Annotations.Link) {
+        return;
+      }
+      options.originalOnTriggered(target, event, doc);
+    });
+    window.instance.UI.disableFeatures(window.instance.UI.Feature.Redaction);
+  });
+  await instance('setToolMode', 'TextSelect');
+  const text = await getTextPosition('6 Important');
+
+  // Select the text, but don't release the button to finish it
+  await page.mouse.move(text.x1, text.y1);
+  await page.mouse.down();
+  await page.mouse.move(text.x2, text.y2);
+  await page.mouse.up();
+  // wait for the text selection to finish
+  await iframe.waitForSelector('[data-element=textPopup]');
+  await iframe.click('[data-element=linkButton]');
+  await iframe.waitForSelector('[data-element=URLPanel]');
+  await iframe.type('.urlInput', 'https://www.google.ca/');
+  await iframe.click('[data-element=linkSubmitButton]');
+  await iframe.waitForSelector('[data-element=textPopup]', { hidden: true });
+  await page.mouse.click(text.x1, text.y1);
+  await iframe.waitFor(200);
+  expect((await browser.pages()).length).toEqual(initialPageLength);
+});
+
+it('should create new annotations when pressing Enter to finish adding new link', async () => {
+  const {
+    iframe,
+    waitForInstance,
+    getTextPosition,
+    waitForWVEvents
+  } = await loadViewerSample('viewing/viewing');
+
+  const instance = await waitForInstance();
+  await instance('disableElements', ['pageNavOverlay']);
+  await waitForWVEvents(['annotationsLoaded', 'pageComplete']);
+
+  const promise = iframe.evaluate(
+    async () => {
+      const annotationManager = window.instance.Core.documentViewer.getAnnotationManager();
+      return new Promise((resolve) => {
+        annotationManager.addEventListener('annotationChanged', (annotations, action) => {
+          if (action === 'add' && annotations.length === 2) {
+            resolve("ok");
+          }
+        });
+      });
+    },
+  );
+
+  await instance('setToolMode', 'TextSelect');
+  const text = await getTextPosition('6 Important');
+
+  // Select the text
+  await page.mouse.move(text.x1, text.y1);
+  await page.mouse.down();
+  await page.mouse.move(text.x2, text.y2);
+  await page.mouse.up();
+
+  // Wait for the text selection to finish
+  await iframe.waitForSelector('[data-element=textPopup]');
+  await iframe.click('[data-element=linkButton]');
+  await iframe.waitForSelector('[data-element=URLPanel]');
+  await iframe.type('.urlInput', 'www.google.ca');
+  await page.keyboard.press('Enter');
+
+  const result = await promise;
+  expect(result).toBe("ok");
 });

@@ -7,9 +7,6 @@ import selectors from 'selectors';
 import actions from 'actions';
 import useMedia from 'hooks/useMedia';
 
-import core from 'core';
-import defaultTool from 'constants/defaultTool';
-
 const ToggleElementButton = ({
   onClick,
   dataElement,
@@ -47,7 +44,7 @@ const ConnectedToggleElementButton = connect(
   mapDispatchToProps,
 )(ToggleElementButton);
 
-export default props => {
+const connectedComponent = (props) => {
   const isMobile = useMedia(
     // Media queries
     ['(max-width: 640px)'],
@@ -60,3 +57,5 @@ export default props => {
     <ConnectedToggleElementButton {...props} isMobile={isMobile} />
   );
 };
+
+export default connectedComponent;

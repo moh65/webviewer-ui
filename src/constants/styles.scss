@@ -113,6 +113,12 @@ $light-gray: #e7ebee;
   }
 }
 
+@mixin tiny-browser-height {
+  @media (max-height: 320px) {
+    @content;
+  }
+}
+
 .hide-in-desktop {
   @include desktop {
     display: none;
@@ -188,30 +194,52 @@ $light-gray: #e7ebee;
   &.tools-header-open {
     height: calc(100% - 80px);
   }
+  
+  &.multi-tab-active {
+    height: calc(100% - 120px);
+
+    @include tablet {
+      height: calc(100% - 140px); // minus the height of both headers and of the tabs;
+    }
+  }
 
   @include desktop {
     height: calc(100% - 40px);
     &.tools-header-open {
       height: calc(100% - 74px); // minus the height of both headers;
     }
+    &.multi-tab-active {
+      height: calc(100% - 120px); // minus the height of both headers and of the tabs;
+    }
   }
 
   @include tablet-and-desktop {
     height: calc(100% - 37px); // minus the height of the top header;
-    @include tablet {
-      height: calc(100% - 53px); // minus the height of the top header;
-    }
 
     &.tools-header-open {
       height: calc(100% - 76px); // minus the height of both headers;
+    }
 
-      @include tablet {
-        height: calc(100% - 104px); // minus the height of both headers;
-      }
+    &.multi-tab-active {
+      height: calc(100% - 115px); // minus the height of both headers and of the tabs;
     }
 
     &.tools-header-and-header-hidden {
       height: 100%;
+
+      &.multi-tab-active {
+        height: calc(100% - 140px); // minus the height of both headers and of the tabs;
+      }
+    }
+  }
+
+  @include tablet {
+    height: calc(100% - 53px); // minus the height of the top header;
+  }
+
+  &.tools-header-open {
+    @include tablet {
+      height: calc(100% - 104px); // minus the height of both headers;
     }
   }
 }

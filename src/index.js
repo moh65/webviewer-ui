@@ -1,5 +1,5 @@
 import 'core-js/stable';
-import "regenerator-runtime/runtime";
+import 'regenerator-runtime/runtime';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -8,8 +8,8 @@ import { Provider } from 'react-redux';
 import { I18nextProvider } from 'react-i18next';
 import i18next from 'i18next';
 import thunk from 'redux-thunk';
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import core from 'core';
 import actions from 'actions';
@@ -24,17 +24,18 @@ import eventHandler from 'helpers/eventHandler';
 import setupI18n from 'helpers/setupI18n';
 import setAutoSwitch from 'helpers/setAutoSwitch';
 import setDefaultDisabledElements from 'helpers/setDefaultDisabledElements';
-import setupDocViewer from 'helpers/setupDocViewer';
-import setDefaultToolStyles from 'helpers/setDefaultToolStyles';
 import setUserPermission from 'helpers/setUserPermission';
 import logDebugInfo from 'helpers/logDebugInfo';
 import rootReducer from 'reducers/rootReducer';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
-import getHashParams from 'helpers/getHashParams';
+import getHashParameters from 'helpers/getHashParameters';
 import defineWebViewerInstanceUIAPIs from 'src/apis';
 
 import './index.scss';
+import hotkeysManager from './helpers/hotkeysManager';
+import { addDocumentViewer } from 'helpers/documentViewerHelper';
+import setEnableAnnotationNumbering from './helpers/setEnableAnnotationNumbering';
 
 //customization
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -55,9 +56,11 @@ let composeEnhancer = function noopStoreComposeEnhancer(middleware) {
 if (process.env.NODE_ENV === 'development') {
   const isSpamDisabled = localStorage.getItem('spamDisabled') === 'true';
   if (!isSpamDisabled) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires,global-require
     const { createLogger } = require('redux-logger');
     middleware.push(createLogger({ collapsed: true }));
   }
+  // eslint-disable-next-line @typescript-eslint/no-var-requires,global-require
   const { composeWithDevTools } = require('redux-devtools-extension/logOnlyInProduction');
   composeEnhancer = composeWithDevTools({});
 }
@@ -68,6 +71,7 @@ const persistor = persistStore(store);
 
 if (process.env.NODE_ENV === 'development' && module.hot) {
   module.hot.accept('reducers/rootReducer', () => {
+    // eslint-disable-next-line global-require
     const updatedReducer = require('reducers/rootReducer').default;
     store.replaceReducer(updatedReducer);
   });
@@ -96,17 +100,17 @@ if (window.CanvasRenderingContext2D) {
     fullAPIReady = loadScript('../core/pdf/PDFNet.js');
   }
 
-  if (getHashParams('disableLogs', false)) {
+  if (getHashParameters('disableLogs', false)) {
     window.Core.disableLogs(true);
   }
 
-  window._disableStreaming = getHashParams('disableStreaming', false);
+  window._disableStreaming = getHashParameters('disableStreaming', false);
   window.Core.setWorkerPath('../core');
   window.Core.setResourcesPath('../core/assets');
 
   try {
     if (state.advanced.useSharedWorker && window.parent.WebViewer) {
-      var workerTransportPromise = window.parent.WebViewer.workerTransportPromise(window.frameElement);
+      const workerTransportPromise = window.parent.WebViewer.workerTransportPromise(window.frameElement);
       // originally the option was just for the pdf worker transport promise, now it can be an object
       // containing both the pdf and office promises
       if (workerTransportPromise.pdf || workerTransportPromise.office) {
@@ -122,14 +126,40 @@ if (window.CanvasRenderingContext2D) {
     }
   }
 
+  const backendType = getHashParameters('pdf');
+  if (backendType) {
+    window.Core.forceBackendType(backendType);
+  }
+
+  const { enableOptimizedWorkers } = state.advanced;
+
+  if (!enableOptimizedWorkers) {
+    window.Core.disableOptimizedWorkers();
+  }
+
   const { preloadWorker } = state.advanced;
 
-  function initTransports() {
-    const { PDF, OFFICE, LEGACY_OFFICE, ALL } = workerTypes;
+  loadCustomCSS(state.advanced.customCSS);
+
+  logDebugInfo();
+  const documentViewer = addDocumentViewer(1);
+  defineWebViewerInstanceUIAPIs(store);
+  hotkeysManager.initialize(store);
+
+  setupI18n(state);
+  setEnableAnnotationNumbering(state);
+  setUserPermission(state);
+  setAutoSwitch();
+  core.setToolMode(defaultTool);
+
+  const { addEventHandlers, removeEventHandlers } = eventHandler(store);
+
+  const initTransports = () => {
+    const { PDF, OFFICE, LEGACY_OFFICE, CONTENT_EDIT, ALL } = workerTypes;
     if (preloadWorker.includes(PDF) || preloadWorker === ALL) {
-      getBackendPromise(getHashParams('pdf', 'auto')).then(pdfType => {
+      getBackendPromise(getHashParameters('pdf', 'auto')).then((pdfType) => {
         window.Core.initPDFWorkerTransports(pdfType, {
-          workerLoadingProgress: percent => {
+          workerLoadingProgress: (percent) => {
             store.dispatch(actions.setLoadingProgress(percent));
           },
         }, window.sampleL);
@@ -137,9 +167,9 @@ if (window.CanvasRenderingContext2D) {
     }
 
     if (preloadWorker.includes(OFFICE) || preloadWorker === ALL) {
-      getBackendPromise(getHashParams('office', 'auto')).then(officeType => {
+      getBackendPromise(getHashParameters('office', 'auto')).then((officeType) => {
         window.Core.initOfficeWorkerTransports(officeType, {
-          workerLoadingProgress: percent => {
+          workerLoadingProgress: (percent) => {
             store.dispatch(actions.setLoadingProgress(percent));
           },
         }, window.sampleL);
@@ -147,47 +177,36 @@ if (window.CanvasRenderingContext2D) {
     }
 
     if (preloadWorker.includes(LEGACY_OFFICE) || preloadWorker === ALL) {
-      getBackendPromise(getHashParams('legacyOffice', 'auto')).then(officeType => {
-        window.CoreControls.initLegacyOfficeWorkerTransports(officeType, {
-          workerLoadingProgress: percent => {
+      getBackendPromise(getHashParameters('legacyOffice', 'auto')).then((officeType) => {
+        window.Core.initLegacyOfficeWorkerTransports(officeType, {
+          workerLoadingProgress: (percent) => {
             store.dispatch(actions.setLoadingProgress(percent));
           },
         }, window.sampleL);
       });
     }
-  }
 
-
-  loadCustomCSS(state.advanced.customCSS);
-
-  logDebugInfo();
-
-  const documentViewer = new window.Core.DocumentViewer();
-  window.documentViewer = documentViewer;
-
-  defineWebViewerInstanceUIAPIs(store);
+    if (preloadWorker.includes(CONTENT_EDIT) || preloadWorker === ALL) {
+      window.Core.ContentEdit.preloadWorker(documentViewer);
+    }
+  };
 
   fullAPIReady.then(() => loadConfig()).then(() => {
     if (preloadWorker) {
       initTransports();
     }
 
-    const { addEventHandlers, removeEventHandlers } = eventHandler(store);
+    if (getHashParameters('disableVirtualDisplayMode', false)) {
+      const displayMode = documentViewer.getDisplayModeManager();
+      displayMode.disableVirtualDisplayMode();
+    }
 
-    if (getHashParams('enableViewStateAnnotations', false)) {
+    if (getHashParameters('enableViewStateAnnotations', false)) {
       const tool = documentViewer.getTool(window.Core.Tools.ToolNames.STICKY);
       tool?.setSaveViewState(true);
     }
 
-    setupDocViewer();
-    setupI18n(state);
-    setUserPermission(state);
-    setAutoSwitch();
-    addEventHandlers();
-    setDefaultDisabledElements(store);
     setupLoadAnnotationsFromServer(store);
-    setDefaultToolStyles();
-    core.setToolMode(defaultTool);
 
     ReactDOM.render(
       <Provider store={store}>
@@ -202,6 +221,9 @@ if (window.CanvasRenderingContext2D) {
       document.getElementById('app'),
     );
   });
+
+  addEventHandlers();
+  setDefaultDisabledElements(store);
 }
 
 window.addEventListener('hashchange', () => {

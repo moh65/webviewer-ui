@@ -16,12 +16,14 @@ import onFileAttachmentAnnotationAdded from './onFileAttachmentAnnotationAdded';
 import onAnnotationChanged from './onAnnotationChanged';
 import onHistoryChanged from './onHistoryChanged';
 import onStickyAnnotationAdded from './onStickyAnnotationAdded';
+import onCaretAnnotationAdded from './onCaretAnnotationAdded';
 import onFullScreenChange from './onFullScreenChange';
 import onUpdateAnnotationPermission from './onUpdateAnnotationPermission';
-import onLayoutChanged from './onLayoutChanged';
+import onPagesUpdated from './onPagesUpdated';
 import onLocationSelected from './onLocationSelected';
 import onDotStampAnnotationAdded from './onDotStampAnnotationAdded';
 import onRubberStampAnnotationAdded from './onRubberStampAnnotationAdded';
+import onReadOnlyModeChanged from './onReadOnlyModeChanged';
 import onPageComplete from './onPageComplete';
 import onFileAttachmentDataAvailable from './onFileAttachmentDataAvailable';
 import onSignatureSaved from './onSignatureSaved';
@@ -30,6 +32,9 @@ import onFormFieldCreationModeStarted from './onFormFieldCreationModeStarted';
 import onFormFieldCreationModeEnded from './onFormFieldCreationModeEnded';
 import onDigitalSignatureAvailable from './onDigitalSignatureAvailable';
 import onLayersUpdated from './onLayersUpdated';
+import onImageContentAdded from './onImageContentAdded';
+import onInitialSaved from './onInitialSaved';
+import onInitialDeleted from './onInitialDeleted';
 
 export {
   onSignatureSaved,
@@ -51,17 +56,22 @@ export {
   onAnnotationChanged,
   onHistoryChanged,
   onStickyAnnotationAdded,
+  onCaretAnnotationAdded,
   onFullScreenChange,
   onUpdateAnnotationPermission,
-  onLayoutChanged,
+  onPagesUpdated,
   onLocationSelected,
   onDotStampAnnotationAdded,
   onRubberStampAnnotationAdded,
+  onReadOnlyModeChanged,
   onPageComplete,
   onFileAttachmentAnnotationAdded,
   onFileAttachmentDataAvailable,
   onFormFieldCreationModeStarted,
   onFormFieldCreationModeEnded,
   onDigitalSignatureAvailable,
-  onLayersUpdated
+  onLayersUpdated,
+  onImageContentAdded,
+  onInitialSaved,
+  onInitialDeleted,
 };
