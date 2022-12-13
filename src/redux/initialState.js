@@ -57,6 +57,7 @@ export default {
     disabledElements: {
       [DataElements.MULTI_VIEWER_SAVE_DOCUMENT_BUTTON]: { disabled: true, priority: 2 },
       [DataElements.SAVED_SIGNATURES_TAB]: { disabled: true, priorty: 2 },
+      redactionPanel: false,
     },
     selectedScale: initialScale,
     isAddingNewScale: false,
@@ -70,6 +71,7 @@ export default {
     deleteScale: '',
     openElements: {
       header: true,
+      redactionPanel: false,
       toolsHeader: true,
       [DataElements.STYLE_POPUP_TEXT_STYLE_CONTAINER]: true,
       [DataElements.STYLE_POPUP_LABEL_TEXT_CONTAINER]: true,
@@ -79,7 +81,7 @@ export default {
       leftPanel: 264,
       searchPanel: 293,
       notesPanel: 370,
-      redactionPanel: 330,
+      redactionPanel: 0,
       textEditingPanel: 330,
       wv3dPropertiesPanel: 330,
       comparePanel: 330,
@@ -105,21 +107,14 @@ export default {
       default: [
         {
           type: 'toggleElementButton',
-          dataElement: 'menuButton',
-          element: 'menuOverlay',
-          img: 'ic-hamburger-menu',
-          title: 'component.menuOverlay',
-        },
-        {
-          type: 'divider',
-          hidden: ['small-mobile'],
-        },
-        {
-          type: 'toggleElementButton',
           img: 'icon-header-sidebar-line',
           element: 'leftPanel',
           dataElement: 'leftPanelButton',
           title: 'component.leftPanel',
+        },
+        {
+          type: 'divider',
+          hidden: ['small-mobile'],
         },
         {
           type: 'toggleElementButton',
@@ -127,10 +122,6 @@ export default {
           element: 'viewControlsOverlay',
           dataElement: 'viewControlsButton',
           title: 'component.viewControlsOverlay',
-        },
-        {
-          type: 'divider',
-          hidden: ['small-mobile'],
         },
         {
           type: 'customElement',
@@ -514,13 +505,15 @@ export default {
           dataElement: 'cropToolGroupButton',
           title: 'annotation.crop',
         },
+        { type: 'toolGroupButton', toolGroup: 'redactionTools', dataElement: 'redactionToolGroupButton', title: 'annotation.redact', showColor: 'never' },
+        { type: 'divider' }, 
         {
           type: 'toolGroupButton',
           toolGroup: 'contentEditTools',
           dataElement: 'contentEditButton',
           title: 'action.edit',
         },
-        { type: 'spacer', hidden: ['mobile', 'small-mobile'] },
+       { type: 'spacer', hidden: ['mobile', 'small-mobile'] },
       ],
       'toolbarGroup-EditText': [
         { type: 'spacer' },
@@ -2051,7 +2044,7 @@ export default {
   },
   advanced: {
     customCSS: getHashParameters('css', null),
-    defaultDisabledElements: getHashParameters('disabledElements', ''),
+    defaultDisabledElements: getHashParameters('disabledElements', 'redactionPanel'),
     fullAPI: true, //getHashParameters('pdfnet', false),
     preloadWorker: getHashParameters('preloadWorker', false),
     enableOptimizedWorkers: getHashParameters('enableOptimizedWorkers', true),

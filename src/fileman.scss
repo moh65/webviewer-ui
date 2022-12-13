@@ -11,6 +11,10 @@
 @import 'constants/styles';
 @import 'constants/note';
 
+.RedactionPanel {
+  display: none !important;
+}
+
 .fm-save-button {
     @include button-reset;
     cursor: pointer;

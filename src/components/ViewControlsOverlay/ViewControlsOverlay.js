@@ -269,6 +269,7 @@ function ViewControlsOverlay() {
           )}
         </>
       )}
+      {/*
       <DataElementWrapper
         dataElement="viewControlsDivider3"
         className="divider"
@@ -284,6 +285,7 @@ function ViewControlsOverlay() {
         />
         <div className="title">{isFullScreen ? t('action.exitFullscreen') : t('action.enterFullscreen')}</div>
       </DataElementWrapper>
+      */}
     </FlyoutMenu>
   );
 }
