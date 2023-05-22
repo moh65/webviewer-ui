@@ -29,7 +29,7 @@ export default (store, documentViewerKey) => async () => {
 
   if (onFirstLoad) {
     //customization
-    window.documentViewer.getAnnotationManager().enableRedaction();
+    core.getAnnotationManager().enableRedaction();
     //customization
     onFirstLoad = false;
     // redaction button starts hidden. when the user first loads a document, check HashParams the first time

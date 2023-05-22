@@ -557,6 +557,7 @@ const AnnotationPopup = () => {
                     }}
                   />
                 )}
+                {/*
                 {showGroupButton && (
                   <ActionButton
                     dataElement="annotationGroupButton"
@@ -573,6 +574,7 @@ const AnnotationPopup = () => {
                     onClick={() => core.ungroupAnnotations(selectedAnnotations)}
                   />
                 )}
+                */}
                 {includesFormFieldAnnotation && (
                   <ActionButton
                     title="action.formFieldEdit"
@@ -596,7 +598,7 @@ const AnnotationPopup = () => {
                     }}
                   />
                 )}
-                {showLinkButton && (
+                { showLinkButton && (
                   <ActionButton
                     title="tool.Link"
                     img={hasAssociatedLink ? 'icon-tool-unlink' : 'icon-tool-link'}

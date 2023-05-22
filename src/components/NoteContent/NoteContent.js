@@ -574,7 +574,7 @@ const renderEditButtons = (t, annotation, isReply, dispatch, redactionBurninDate
       onClick={async e => {
         e.stopPropagation();
 
-        window.documentViewer.getAnnotationManager().enableRedaction();
+        core.getAnnotationManager().enableRedaction();
         let isEnabled = core.isCreateRedactionEnabled();
         applyRedactionFromCommentBox(annotation, dispatch, redactionBurninDateUrl, token);
       }}

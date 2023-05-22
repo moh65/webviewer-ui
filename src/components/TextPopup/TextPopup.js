@@ -107,13 +107,25 @@ const TextPopup = ({ t }) => {
               dataElement="textStrikeoutToolButton"
               role="option"
             />
-            <ActionButton
-              title="tool.Link"
-              img="icon-tool-link"
-              onClick={() => dispatch(actions.openElement('linkModal'))}
-              dataElement="linkButton"
-              role="option"
-            />
+        	{/*customization*/}
+	        <ActionButton
+	          title="tool.LinkUrl"
+	          img="icon-tool-link"
+	          onClick={() => {
+	            dispatch(actions.openElement('linkModalUrl'))
+	          }}
+	          dataElement="linkButton"
+	          role="option"
+	        />
+	        <ActionButton
+	          title="tool.Link"
+	          img="icon-page-link"
+	          onClick={() => {
+	            dispatch(actions.openElement('linkModal'))
+	          }}
+	          dataElement="linkButtonToUrl"
+	          role="option"
+	        />
             {/*core.isCreateRedactionEnabled() && (
               <ActionButton
                 dataElement="textRedactToolButton"
@@ -124,6 +136,7 @@ const TextPopup = ({ t }) => {
                 role="option"
               />
             )*/}
+        	{/*customization*/}
           </CustomizablePopup>
         </div>
       </FocusTrap>
