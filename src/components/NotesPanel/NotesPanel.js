@@ -136,8 +136,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
   useEffect(() => {
     const onAnnotationSelected = (annotations, action) => {
       const ids = {};
-
-      core.getSelectedAnnotations().forEach((annot) => {
+      core.getSelectedAnnotations().forEach(annot => {
         ids[annot.Id] = true;
       });
       if (isOpen || notesInLeftPanel) {

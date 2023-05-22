@@ -247,6 +247,19 @@ const NoteContent = ({
   } catch (e) {
     customData = annotation.getCustomData('trn-mention');
   }
+  
+    //customization
+  try {
+    let isLink = annotation.getCustomData('custom-link-type');
+    if (isLink !== '' && isLink != null) {
+      icon = isLink === 'url' ? 'icon-tool-link' : 'icon-page-link';
+
+    }
+  } catch (e) {
+
+  }
+  //customization
+  
   const contents = customData?.contents || annotation.getContents();
   const contentsToRender = annotation.getContents();
   const richTextStyle = annotation.getRichTextStyle();
@@ -429,6 +442,9 @@ const ContentArea = ({
   const [t] = useTranslation();
   const textareaRef = useRef();
   const isReply = annotation.isReply();
+  
+  
+  
   const {
     setCurAnnotId,
     pendingAttachmentMap,
@@ -518,6 +534,29 @@ const ContentArea = ({
   const onFocus = () => {
     setCurAnnotId(annotation.Id);
   };
+
+  //customization
+  let isAnnotPrivate = annotation.getCustomData("custom-private");
+  let annotNoteDate = annotation.getCustomData("custom-date");
+  // let annotTags = annotation.getCustomData("custom-tag");
+  let annotTags = annotation.getCustomData("custom-tag-options");
+
+  const [isPrivate, setIsPrivate] = useState(isAnnotPrivate === 'true' ? true : false);
+  const [noteDate, setNoteDate] = useState(annotNoteDate ? annotNoteDate : null);
+  const [showDateField, setShowDateField] = useState(false);
+  const [customDataChanged, setCustomDataChanged] = useState(false);
+  const [commentTextChanged, setCommentTextChanged] = useState(false);
+  const [selectedTags, setSelectedTags] = useState(annotTags != null && annotTags != undefined && annotTags != '' ? JSON.parse(annotTags) : [defaultTag]);
+  const allAnnotations = core.getAnnotationsList();
+  const linkAnnotation = allAnnotations.find(s => s.Subject === 'Link' && s.InReplyTo === annotation.Id);
+
+  useEffect(() => {
+    if (noteDate !== null && noteDate !== undefined && noteDate !== "" && noteDate !== "null") {
+      setShowDateField(true);
+    }
+  }, [noteDate]);
+
+  //customization
 
   const contentClassName = classNames('edit-content', { 'reply-content': isReply });
   const pendingAttachments = pendingAttachmentMap[annotation.Id] || [];
