@@ -141,14 +141,14 @@ const OutlineContent = ({
             className="bookmark-outline-text outline-text"
             onDoubleClick={() => {
               if (isOutlineEditable) {
-                setOutlineRenaming(true);
+                //setOutlineRenaming(true);
               }
             }}
           >
             {text}
           </div>
 
-          {isOutlineEditable &&
+          {/*isOutlineEditable &&
             <Button
               className="bookmark-outline-more-button"
               dataElement={`outline-more-button-${outlinePath}`}
@@ -158,7 +158,7 @@ const OutlineContent = ({
                 e.stopPropagation();
                 setContextMenuOpen(true);
               }}
-            />
+            />*/
           }
           {isContextMenuOpen &&
             <BookmarkOutlineContextMenuPopup

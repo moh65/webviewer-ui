@@ -10,6 +10,7 @@ import AnnotationStylePopup from 'components/AnnotationStylePopup';
 import DatePicker from 'src/components/DatePicker';
 import CustomizablePopup from 'components/CustomizablePopup';
 import CalibrationPopup from 'components/CalibrationPopup';
+import setToolStyles from 'helpers/setToolStyles';
 
 import core from 'core';
 import { getDataWithKey, mapToolNameToKey, mapAnnotationToKey } from 'constants/map';
@@ -332,7 +333,7 @@ const AnnotationPopup = () => {
     toolNames.STICKY3,
     toolNames.STICKY4,
   ];
-
+  
   let additionalToolsThatCantHaveLinks = ['AnnotationCreateTextHighlight',
   'AnnotationCreateEllipse',
   'AnnotationCreateRectangle',
@@ -412,6 +413,37 @@ const AnnotationPopup = () => {
   const onResize = () => {
     setStylePopupRepositionFlag(!stylePopupRepositionFlag);
   };
+
+  const setDefaultRedactionStyle = () => {
+    let red = new Annotations.Color(255, 0, 0);
+    let black =  new Annotations.Color(0, 0, 0);
+
+    firstAnnotation.OverlayText = ''
+    firstAnnotation.Color = red
+    firstAnnotation.StrokeColor = red
+    firstAnnotation.FillColor = black
+    firstAnnotation.FontSize = '18pt'
+    firstAnnotation.StrokeThickness = '1.5'
+    firstAnnotation.Opacity = 1
+    firstAnnotation.Font = 'Helvetica'
+    firstAnnotation.TextAlign = "left"
+    
+    setToolStyles(toolNames.REDACTION, 'TextColor', red);
+    setToolStyles(toolNames.REDACTION, 'StrokeColor', red);
+    setToolStyles(toolNames.REDACTION, 'Opacity', 1);
+    setToolStyles(toolNames.REDACTION, 'FillColor', black);
+    setToolStyles(toolNames.REDACTION, 'Font', 'Helvetica');
+    setToolStyles(toolNames.REDACTION, 'TextAlign', 'left');
+
+    setToolStyles(toolNames.REDACTION, 'OverlayText', '');
+    setToolStyles(toolNames.REDACTION, 'OverlayText', '');
+
+    setToolStyles(toolNames.REDACTION, 'FontSize', '18pt');
+    setToolStyles(toolNames.REDACTION, 'StrokeThickness', '1.5');
+    
+    // Force save
+    core.getAnnotationManager().setNoteContents(firstAnnotation, '');
+  }
 
   const isRectangle = firstAnnotation instanceof window.Annotations.RectangleAnnotation;
   const isEllipse = firstAnnotation instanceof window.Annotations.EllipseAnnotation;
@@ -527,6 +559,14 @@ const AnnotationPopup = () => {
                     img="icon-menu-style-line"
                     onClick={() => setIsStylePopupOpen(true)}
                   />
+                )}
+                {showEditStyleButton && (
+                  <ActionButton
+                  dataElement="annotationStyleDefaultEditButton"
+                  title="Apply Default Style"
+                  img="icon-header-full-screen"
+                  onClick={() => setDefaultRedactionStyle()}
+                />
                 )}
                 {firstAnnotation.isContentEditPlaceholder() && firstAnnotation.getContentEditType() === window.Core.ContentEdit.Types.TEXT && (
                   <ActionButton

@@ -662,6 +662,7 @@ export default {
       { dataElement: 'viewFileButton' },
       { dataElement: 'annotationCommentButton' },
       { dataElement: 'annotationStyleEditButton' },
+      { dataElement: 'annotationStyleDefaultEditButton' },
       { dataElement: 'annotationDateEditButton' },
       { dataElement: 'annotationRedactButton' },
       { dataElement: 'annotationCropButton' },
