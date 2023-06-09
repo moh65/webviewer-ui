@@ -51,6 +51,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
     isNoteStateDisabled,
     language,
     notesShowLastUpdatedDate,
+    defaultBaseUrlAddress,  
   ] = useSelector(
     state => [
       selectors.getNoteDateFormat(state),
@@ -58,6 +59,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
       selectors.isElementDisabled(state, 'notePopupState'),
       selectors.getCurrentLanguage(state),
       selectors.notesShowLastUpdatedDate(state),
+      selectors.getDefaultUrlBaseAddress(state),
     ],
     shallowEqual,
   );
@@ -65,6 +67,13 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
   const { isSelected, searchInput, resize, pendingEditTextMap, onTopNoteContentClicked, sortStrategy } = useContext(
     NoteContext,
   );
+
+  let [redactionBurninDateUrl, token] = useSelector(state => [
+    selectors.getRedactonBurninDateUrl(state),
+    selectors.getAuthToken(state)
+  ])
+
+  redactionBurninDateUrl = redactionBurninDateUrl ? redactionBurninDateUrl : `${defaultBaseUrlAddress}/api/apply/redactions/664?access_token=${token}`;
 
   const dispatch = useDispatch();
   const isReply = annotation.isReply();
@@ -274,8 +283,28 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
               // </div>
           ) : (
             contentsToRender && (
-              <div className={classNames('container', { 'reply-content': isReply })} onClick={handleContentsClicked} style={contentStyle}>
+              <div>
+              <div className={classNames('container', { 'reply-content': isReply })} onClick={handleContentsClicked} style={contentStyle}>                
                 {renderContents(contentsToRender, richTextStyle)}
+              </div>
+              {
+                (isSelected && annotation.Subject === "Redact") &&
+                <div className="edit-buttons">
+                <button
+                  className="apply-button"
+                  onClick={async e => {
+                    e.stopPropagation();
+
+                    core.getAnnotationManager().enableRedaction();
+                    let isEnabled = core.isCreateRedactionEnabled();
+                    applyRedactionFromCommentBox(annotation, dispatch, redactionBurninDateUrl, token);
+                  }}
+                >
+                  <FontAwesomeIcon icon={faStrikethrough} />
+                  {t('Apply Redaction')}
+                </button>
+                </div>
+              } 
               </div>
             )
           )}
