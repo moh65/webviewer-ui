@@ -45,7 +45,7 @@ export default ({ annotation }) => {
     const goToUrl= (e) => {
         e.preventDefault();
         debugger
-        annotation.actions.U[0].onTriggered(annotation, {rc: true}, annotation.fE);
+        annotation.actions.U[0].onTriggered(annotation, {rc: true}, annotation.kH);
     }
 
     return (
