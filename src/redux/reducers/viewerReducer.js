@@ -531,6 +531,8 @@ export default (initialState) => (state = initialState, action) => {
       return { ...state, customized: { ...state.customized, thisDocumentInfo: payload.thisDocumentInfo } };
     case 'SET_LOAD_DOCUMENT_IN_NEW_TAB_URL':
       return { ...state, customized: { ...state.customized, loadDocumentInNewTabUrl: payload.loadDocumentInNewTabUrl } };
+    case 'SET_NAVIGATION_PAGE_LINK_NEW_TAB_URL':
+      return { ...state, customized: { ...state.customized, navigationPageLinkNewTabUrl: payload.navigationPageLinkNewTabUrl } };
     case 'SET_DEFAULT_TAG':
       return { ...state, customized: { ...state.customized, defaultTag: payload.defaultTag } };
     case 'SET_EDIT_LINK_MODE':

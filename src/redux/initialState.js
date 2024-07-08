@@ -1919,6 +1919,7 @@ export default {
       documentPagesUrl:'',
       thisDocumentInfo:{},
       loadDocumentInNewTabUrl:'',
+      navigationPageLinkNewTabUrl:'',
       defaultTag:{},
       editLinkMode:false,
       annotationLinkToEdit:null,

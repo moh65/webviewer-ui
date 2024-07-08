@@ -193,6 +193,14 @@ export default (store, documentViewerKey) => async () => {
   Actions.GoTo.prototype.onTriggered = function(target, event) {
     
     if (selectors.isCtrlPressed(getState())){
+      
+      if (this && this.dest && this.dest.page && (typeof this.dest.page === 'number' && isFinite(this.dest.page))) {
+          let newTabUrl = selectors.getNavigationPageLinkNewTabUrl(getState());
+          let page = this.dest.page;
+          newTabUrl = newTabUrl.replace('%7BpageNum%7D', page);
+          window.open(newTabUrl);
+      }
+
       return;
     }
     onTriggeredGoto.apply(this, arguments);
@@ -201,7 +209,7 @@ export default (store, documentViewerKey) => async () => {
   Actions.URI.prototype.onTriggered = function(target, event) {
 
     if (target instanceof Annotations.Link) {
-
+      
       if (selectors.isCtrlPressed(getState())){
         return;
       }

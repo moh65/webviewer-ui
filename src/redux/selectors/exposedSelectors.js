@@ -353,6 +353,8 @@ export const getThisDocumentInfo = state => state.viewer.customized.thisDocument
 
 export const getLoadDocumentInNewTabUrl = state => state.viewer.customized.loadDocumentInNewTabUrl
 
+export const getNavigationPageLinkNewTabUrl = state => state.viewer.customized.navigationPageLinkNewTabUrl
+
 export const getDefaultTag = state => state.viewer.customized.defaultTag
 
 export const isEditLinkMode = state => state.viewer.customized.editLinkMode

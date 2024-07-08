@@ -580,6 +580,10 @@ export const setLoadDocumentInNewTabUrl = (loadDocumentInNewTabUrl) => ({
   type: 'SET_LOAD_DOCUMENT_IN_NEW_TAB_URL',
   payload: { loadDocumentInNewTabUrl: loadDocumentInNewTabUrl },
 });
+export const setNavigationPageLinkNewTabUrl = (navigationPageLinkNewTabUrl) => ({
+  type: 'SET_NAVIGATION_PAGE_LINK_NEW_TAB_URL',
+  payload: { navigationPageLinkNewTabUrl: navigationPageLinkNewTabUrl },
+});
 export const setDefaultTag = (defaultTag) => ({
   type: 'SET_DEFAULT_TAG',
   payload: { defaultTag: defaultTag },
@@ -626,7 +630,6 @@ export const setdefaultUrlBaseAddress = (defaultUrlBaseAddress) => ({
   type: 'SET_DEFAULT_URL_BASE_ADDRESS',
   payload: { defaultUrlBaseAddress: defaultUrlBaseAddress },
 });
-
 
 //customization
 
